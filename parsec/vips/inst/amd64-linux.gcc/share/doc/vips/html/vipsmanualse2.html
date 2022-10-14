@@ -1,0 +1,793 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html > 
+<head><title>The VIPS file format</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (http://www.cse.ohio-state.edu/~gurari/TeX4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.cse.ohio-state.edu/~gurari/TeX4ht/)"> 
+<!-- 3,html --> 
+<meta name="src" content="vipsmanual.tex"> 
+<meta name="date" content="2010-06-09 21:39:00"> 
+<link rel="stylesheet" type="text/css" href="vipsmanual.css"> 
+</head><body 
+>
+  <!--l. 1--><div class="crosslinks"><p class="noindent">[<a 
+href="vipsmanualse3.html" >next</a>] [<a 
+href="vipsmanualse1.html" >prev</a>] [<a 
+href="vipsmanualse1.html#tailvipsmanualse1.html" >prev-tail</a>] [<a 
+href="#tailvipsmanualse2.html">tail</a>] [<a 
+href="vipsmanualch1.html#vipsmanualse2.html" >up</a>] </p></div>
+  <h3 class="sectionHead"><span class="titlemark">1.2    </span> <a 
+ id="x7-70001.2"></a>The VIPS file format</h3>
+<!--l. 3--><p class="noindent" >VIPS has its own very simple file format. It is used inside
+VIPS to hold images during computation. You can save
+images in VIPS format if you want, but the VIPS format is
+not widely used and you may have problems reading your
+images into other packages.
+<!--l. 8--><p class="indent" >  If you intend to keep an image, it&#8217;s much better to save it
+as TIFF, JPEG, PNG, PBM/PGM/PPM or HDR. VIPS can
+transparently read and write all these formats.
+<!--l. 12--><p class="noindent" >
+  <h4 class="subsectionHead"><span class="titlemark">1.2.1    </span> <a 
+ id="x7-80001.2.1"></a>VIPS file header</h4>
+<!--l. 15--><p class="noindent" >All VIPS image files start with a 64-byte header giving
+basic information about the image dimensions, see
+Table&#x00A0;<a 
+href="#x7-80011">1.1<!--tex4ht:ref: fg:header --></a>. This is followed by the image data. This is
+usually just the pixel values in native format (ie. the byte
+order used by the machine that wrote the file) laid out
+left-to-right and top-to-bottom. After the image data comes
+a block of optional XML which holds extra image metadata,
+such as ICC profiles and image history. You can use the
+command-line program <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">header</span></span></span> to extract the XML
+from an image and <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">edvips</span></span></span> to replace it, see the man
+pages.
+<!--l. 24--><p class="indent" >  The <span 
+class="pcrr7t-">Type </span>field, the <span 
+class="pcrr7t-">Xres</span>/<span 
+class="pcrr7t-">Yres </span>fields, and the
+<span 
+class="pcrr7t-">Xoffset</span>/<span 
+class="pcrr7t-">Yoffset </span>fields are advisory. VIPS maintains
+their value (if you convert an image to <span 
+class="ptmri7t-">CIE</span><span 
+class="ptmri7t-">&#x00A0;</span><span 
+class="cmmi-10">L</span><span 
+class="cmsy-7">*</span><span 
+class="cmmi-10">a</span><span 
+class="cmsy-7">*</span><span 
+class="cmmi-10">b</span><span 
+class="cmsy-7">*</span>
+colour space with <span 
+class="pcrr7t-">im</span><span 
+class="pcrr7t-">_XYZ2Lab()</span>, for example, VIPS
+will set <span 
+class="pcrr7t-">Type </span>to be <span 
+class="pcrr7t-">IM</span><span 
+class="pcrr7t-">_TYPE</span><span 
+class="pcrr7t-">_LAB</span>), but never uses
+these values itself in determining the action of an image
+processing function. These fields are to help the user and to
+help application programs built on VIPS which are
+trying to present image data to the user in a meaningful
+way.
+<!--l. 33--><p class="indent" >  The <span 
+class="pcrr7t-">BandFmt</span>, <span 
+class="pcrr7t-">Coding </span>and <span 
+class="pcrr7t-">Type </span>fields can take the
+values shown in tables&#x00A0;<a 
+href="#x7-80022">1.2<!--tex4ht:ref: fg:bandfmt --></a>, <a 
+href="#x7-80033">1.3<!--tex4ht:ref: fg:coding --></a> and <a 
+href="#x7-80044">1.4<!--tex4ht:ref: fg:type --></a>. The C++ and
+Python names for these values are slightly different, for
+historical reasons.
+                                           
+                                                                                       
+
+                                                                                       
+<!--l. 39--><p class="indent" >  <a 
+ id="x7-80011"></a><hr class="float"><div class="float" 
+>
+                                           
+                                                                                       
+
+                                                                                       
+<div class="center" 
+>
+<!--l. 39--><p class="noindent" >
+<div class="tabular"> <table id="TBL-1" class="tabular" 
+cellspacing="0" cellpadding="0" rules="groups" 
+><colgroup id="TBL-1-1g"><col 
+id="TBL-1-1"></colgroup><colgroup id="TBL-1-2g"><col 
+id="TBL-1-2"></colgroup><colgroup id="TBL-1-3g"><col 
+id="TBL-1-3"></colgroup><tr 
+class="hline"><td><hr></td><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-1-1-"><td  style="white-space:nowrap; text-align:left;" id="TBL-1-1-1"  
+class="td11">Bytes</td><td  style="white-space:nowrap; text-align:left;" id="TBL-1-1-2"  
+class="td11">Represent                                                      </td><td  style="white-space:nowrap; text-align:left;" id="TBL-1-1-3"  
+class="td11">VIPS name        </td>
+</tr><tr 
+class="hline"><td><hr></td><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-1-2-"><td  style="white-space:nowrap; text-align:left;" id="TBL-1-2-1"  
+class="td11">0&#8211;3    </td><td  style="white-space:nowrap; text-align:left;" id="TBL-1-2-2"  
+class="td11">VIPS magic number (in hex, 08 f2 f6 b6)    </td><td  style="white-space:nowrap; text-align:left;" id="TBL-1-2-3"  
+class="td11">           </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-1-3-"><td  style="white-space:nowrap; text-align:left;" id="TBL-1-3-1"  
+class="td11">4&#8211;7    </td><td  style="white-space:nowrap; text-align:left;" id="TBL-1-3-2"  
+class="td11">Number of pels per horizontal line (integer)</td><td  style="white-space:nowrap; text-align:left;" id="TBL-1-3-3"  
+class="td11"><span 
+class="pcrr7t-">Xsize      </span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-1-4-"><td  style="white-space:nowrap; text-align:left;" id="TBL-1-4-1"  
+class="td11">8&#8211;11  </td><td  style="white-space:nowrap; text-align:left;" id="TBL-1-4-2"  
+class="td11">Number of horizontal lines (integer)            </td><td  style="white-space:nowrap; text-align:left;" id="TBL-1-4-3"  
+class="td11"><span 
+class="pcrr7t-">Ysize      </span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-1-5-"><td  style="white-space:nowrap; text-align:left;" id="TBL-1-5-1"  
+class="td11">12&#8211;15</td><td  style="white-space:nowrap; text-align:left;" id="TBL-1-5-2"  
+class="td11">Number of bands (integer)                            </td><td  style="white-space:nowrap; text-align:left;" id="TBL-1-5-3"  
+class="td11"><span 
+class="pcrr7t-">Bands      </span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-1-6-"><td  style="white-space:nowrap; text-align:left;" id="TBL-1-6-1"  
+class="td11">16&#8211;19</td><td  style="white-space:nowrap; text-align:left;" id="TBL-1-6-2"  
+class="td11">Unused (legacy)                                            </td><td  style="white-space:nowrap; text-align:left;" id="TBL-1-6-3"  
+class="td11"><span 
+class="pcrr7t-">Bbits      </span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-1-7-"><td  style="white-space:nowrap; text-align:left;" id="TBL-1-7-1"  
+class="td11">20&#8211;23</td><td  style="white-space:nowrap; text-align:left;" id="TBL-1-7-2"  
+class="td11">Band format (eg. <span 
+class="pcrr7t-">IM</span><span 
+class="pcrr7t-">_BANDFMT</span><span 
+class="pcrr7t-">_USHORT</span>)</td><td  style="white-space:nowrap; text-align:left;" id="TBL-1-7-3"  
+class="td11"><span 
+class="pcrr7t-">BandFmt    </span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-1-8-"><td  style="white-space:nowrap; text-align:left;" id="TBL-1-8-1"  
+class="td11">24&#8211;27</td><td  style="white-space:nowrap; text-align:left;" id="TBL-1-8-2"  
+class="td11">Coding type (eg. <span 
+class="pcrr7t-">IM</span><span 
+class="pcrr7t-">_CODING</span><span 
+class="pcrr7t-">_NONE</span>)        </td><td  style="white-space:nowrap; text-align:left;" id="TBL-1-8-3"  
+class="td11"><span 
+class="pcrr7t-">Coding     </span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-1-9-"><td  style="white-space:nowrap; text-align:left;" id="TBL-1-9-1"  
+class="td11">28&#8211;31</td><td  style="white-space:nowrap; text-align:left;" id="TBL-1-9-2"  
+class="td11">Type (eg. <span 
+class="pcrr7t-">IM</span><span 
+class="pcrr7t-">_TYPE</span><span 
+class="pcrr7t-">_LAB</span>)                           </td><td  style="white-space:nowrap; text-align:left;" id="TBL-1-9-3"  
+class="td11"><span 
+class="pcrr7t-">Type       </span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-1-10-"><td  style="white-space:nowrap; text-align:left;" id="TBL-1-10-1"  
+class="td11">32&#8211;35</td><td  style="white-space:nowrap; text-align:left;" id="TBL-1-10-2"  
+class="td11">Horizontal resolution (float, pixels mm<sup><span 
+class="cmsy-7">-</span><span 
+class="cmr-7">1</span></sup>)  </td><td  style="white-space:nowrap; text-align:left;" id="TBL-1-10-3"  
+class="td11"><span 
+class="pcrr7t-">Xres       </span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-1-11-"><td  style="white-space:nowrap; text-align:left;" id="TBL-1-11-1"  
+class="td11">36&#8211;39</td><td  style="white-space:nowrap; text-align:left;" id="TBL-1-11-2"  
+class="td11">Vertical resolution (float, pixels mm<sup><span 
+class="cmsy-7">-</span><span 
+class="cmr-7">1</span></sup>)       </td><td  style="white-space:nowrap; text-align:left;" id="TBL-1-11-3"  
+class="td11"><span 
+class="pcrr7t-">Yres       </span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-1-12-"><td  style="white-space:nowrap; text-align:left;" id="TBL-1-12-1"  
+class="td11">40&#8211;43</td><td  style="white-space:nowrap; text-align:left;" id="TBL-1-12-2"  
+class="td11">Unused (legacy)                                            </td><td  style="white-space:nowrap; text-align:left;" id="TBL-1-12-3"  
+class="td11"><span 
+class="pcrr7t-">Length     </span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-1-13-"><td  style="white-space:nowrap; text-align:left;" id="TBL-1-13-1"  
+class="td11">44&#8211;45</td><td  style="white-space:nowrap; text-align:left;" id="TBL-1-13-2"  
+class="td11">Unused (legacy)                                            </td><td  style="white-space:nowrap; text-align:left;" id="TBL-1-13-3"  
+class="td11"><span 
+class="pcrr7t-">Compression</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-1-14-"><td  style="white-space:nowrap; text-align:left;" id="TBL-1-14-1"  
+class="td11">46&#8211;47</td><td  style="white-space:nowrap; text-align:left;" id="TBL-1-14-2"  
+class="td11">Unused (legacy)                                            </td><td  style="white-space:nowrap; text-align:left;" id="TBL-1-14-3"  
+class="td11"><span 
+class="pcrr7t-">Level      </span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-1-15-"><td  style="white-space:nowrap; text-align:left;" id="TBL-1-15-1"  
+class="td11">48&#8211;51</td><td  style="white-space:nowrap; text-align:left;" id="TBL-1-15-2"  
+class="td11">Horizontal offset of origin                            </td><td  style="white-space:nowrap; text-align:left;" id="TBL-1-15-3"  
+class="td11"><span 
+class="pcrr7t-">Xoffset    </span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-1-16-"><td  style="white-space:nowrap; text-align:left;" id="TBL-1-16-1"  
+class="td11">52&#8211;55</td><td  style="white-space:nowrap; text-align:left;" id="TBL-1-16-2"  
+class="td11">Vertical offset of origin                                 </td><td  style="white-space:nowrap; text-align:left;" id="TBL-1-16-3"  
+class="td11"><span 
+class="pcrr7t-">Yoffset    </span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-1-17-"><td  style="white-space:nowrap; text-align:left;" id="TBL-1-17-1"  
+class="td11">56&#8211;63</td><td  style="white-space:nowrap; text-align:left;" id="TBL-1-17-2"  
+class="td11">For future expansion (all zeros for now)       </td><td  style="white-space:nowrap; text-align:left;" id="TBL-1-17-3"  
+class="td11">           </td>
+</tr><tr 
+class="hline"><td><hr></td><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-1-18-"><td  style="white-space:nowrap; text-align:left;" id="TBL-1-18-1"  
+class="td11">    </td></tr></table></div></div>
+<br /><div class="caption" 
+><span class="id">Table&#x00A0;1.1: </span><span  
+class="content">VIPS header</span></div><!--tex4ht:label?: x7-80011 -->
+                                           
+                                                                                       
+
+                                                                                       
+  </div><hr class="endfloat" />
+                                           
+                                                                                       
+
+                                                                                       
+<!--l. 67--><p class="indent" >  <a 
+ id="x7-80022"></a><hr class="float"><div class="float" 
+>
+                                           
+                                                                                       
+
+                                                                                       
+<div class="center" 
+>
+<!--l. 67--><p class="noindent" >
+<div class="tabular"> <table id="TBL-2" class="tabular" 
+cellspacing="0" cellpadding="0" rules="groups" 
+><colgroup id="TBL-2-1g"><col 
+id="TBL-2-1"></colgroup><colgroup id="TBL-2-2g"><col 
+id="TBL-2-2"></colgroup><colgroup id="TBL-2-3g"><col 
+id="TBL-2-3"></colgroup><colgroup id="TBL-2-4g"><col 
+id="TBL-2-4"></colgroup><tr 
+class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-2-1-"><td  style="white-space:nowrap; text-align:left;" id="TBL-2-1-1"  
+class="td11"><span 
+class="pcrr7t-">BandFmt             </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-2-1-2"  
+class="td11">C++ and Python name</td><td  style="white-space:nowrap; text-align:left;" id="TBL-2-1-3"  
+class="td11">Value</td><td  style="white-space:nowrap; text-align:left;" id="TBL-2-1-4"  
+class="td11">Meaning                   </td>
+</tr><tr 
+class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-2-2-"><td  style="white-space:nowrap; text-align:left;" id="TBL-2-2-1"  
+class="td11"><span 
+class="pcrr7t-">IM</span><span 
+class="pcrr7t-">_BANDFMT</span><span 
+class="pcrr7t-">_NOTSET   </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-2-2-2"  
+class="td11"><span 
+class="pcrr7t-">FMTNOTSET      </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-2-2-3"  
+class="td11">-1      </td><td  style="white-space:nowrap; text-align:left;" id="TBL-2-2-4"  
+class="td11">              </td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-2-3-"><td  style="white-space:nowrap; text-align:left;" id="TBL-2-3-1"  
+class="td11"><span 
+class="pcrr7t-">IM</span><span 
+class="pcrr7t-">_BANDFMT</span><span 
+class="pcrr7t-">_UCHAR </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-2-3-2"  
+class="td11"><span 
+class="pcrr7t-">FMTUCHAR </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-2-3-3"  
+class="td11">0 </td><td  style="white-space:nowrap; text-align:left;" id="TBL-2-3-4"  
+class="td11">Unsigned 8-bit int</td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-2-4-"><td  style="white-space:nowrap; text-align:left;" id="TBL-2-4-1"  
+class="td11"><span 
+class="pcrr7t-">IM</span><span 
+class="pcrr7t-">_BANDFMT</span><span 
+class="pcrr7t-">_CHAR     </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-2-4-2"  
+class="td11"><span 
+class="pcrr7t-">FMTCHAR        </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-2-4-3"  
+class="td11">1       </td><td  style="white-space:nowrap; text-align:left;" id="TBL-2-4-4"  
+class="td11">Signed 8-bit int         </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-2-5-"><td  style="white-space:nowrap; text-align:left;" id="TBL-2-5-1"  
+class="td11"><span 
+class="pcrr7t-">IM</span><span 
+class="pcrr7t-">_BANDFMT</span><span 
+class="pcrr7t-">_USHORT   </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-2-5-2"  
+class="td11"><span 
+class="pcrr7t-">FMTUSHORT      </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-2-5-3"  
+class="td11">2       </td><td  style="white-space:nowrap; text-align:left;" id="TBL-2-5-4"  
+class="td11">Unsigned 16-bit int   </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-2-6-"><td  style="white-space:nowrap; text-align:left;" id="TBL-2-6-1"  
+class="td11"><span 
+class="pcrr7t-">IM</span><span 
+class="pcrr7t-">_BANDFMT</span><span 
+class="pcrr7t-">_SHORT    </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-2-6-2"  
+class="td11"><span 
+class="pcrr7t-">FMTSHORT       </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-2-6-3"  
+class="td11">3       </td><td  style="white-space:nowrap; text-align:left;" id="TBL-2-6-4"  
+class="td11">Signed 16-bit int       </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-2-7-"><td  style="white-space:nowrap; text-align:left;" id="TBL-2-7-1"  
+class="td11"><span 
+class="pcrr7t-">IM</span><span 
+class="pcrr7t-">_BANDFMT</span><span 
+class="pcrr7t-">_UINT     </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-2-7-2"  
+class="td11"><span 
+class="pcrr7t-">FMTUINT        </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-2-7-3"  
+class="td11">4       </td><td  style="white-space:nowrap; text-align:left;" id="TBL-2-7-4"  
+class="td11">Unsigned 32-bit int   </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-2-8-"><td  style="white-space:nowrap; text-align:left;" id="TBL-2-8-1"  
+class="td11"><span 
+class="pcrr7t-">IM</span><span 
+class="pcrr7t-">_BANDFMT</span><span 
+class="pcrr7t-">_INT      </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-2-8-2"  
+class="td11"><span 
+class="pcrr7t-">FMTINT         </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-2-8-3"  
+class="td11">5       </td><td  style="white-space:nowrap; text-align:left;" id="TBL-2-8-4"  
+class="td11">Signed 32-bit int       </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-2-9-"><td  style="white-space:nowrap; text-align:left;" id="TBL-2-9-1"  
+class="td11"><span 
+class="pcrr7t-">IM</span><span 
+class="pcrr7t-">_BANDFMT</span><span 
+class="pcrr7t-">_FLOAT    </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-2-9-2"  
+class="td11"><span 
+class="pcrr7t-">FMTFLOAT       </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-2-9-3"  
+class="td11">6       </td><td  style="white-space:nowrap; text-align:left;" id="TBL-2-9-4"  
+class="td11">32-bit IEEE float      </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-2-10-"><td  style="white-space:nowrap; text-align:left;" id="TBL-2-10-1"  
+class="td11"><span 
+class="pcrr7t-">IM</span><span 
+class="pcrr7t-">_BANDFMT</span><span 
+class="pcrr7t-">_COMPLEX  </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-2-10-2"  
+class="td11"><span 
+class="pcrr7t-">FMTCOMPLEX     </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-2-10-3"  
+class="td11">7       </td><td  style="white-space:nowrap; text-align:left;" id="TBL-2-10-4"  
+class="td11">Complex (2 floats)    </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-2-11-"><td  style="white-space:nowrap; text-align:left;" id="TBL-2-11-1"  
+class="td11"><span 
+class="pcrr7t-">IM</span><span 
+class="pcrr7t-">_BANDFMT</span><span 
+class="pcrr7t-">_DOUBLE   </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-2-11-2"  
+class="td11"><span 
+class="pcrr7t-">FMTDOUBLE      </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-2-11-3"  
+class="td11">8       </td><td  style="white-space:nowrap; text-align:left;" id="TBL-2-11-4"  
+class="td11">64-bit IEEE double   </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-2-12-"><td  style="white-space:nowrap; text-align:left;" id="TBL-2-12-1"  
+class="td11"><span 
+class="pcrr7t-">IM</span><span 
+class="pcrr7t-">_BANDFMT</span><span 
+class="pcrr7t-">_DPCOMPLEX</span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-2-12-2"  
+class="td11"><span 
+class="pcrr7t-">FMTDPCOMPLEX   </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-2-12-3"  
+class="td11">9       </td><td  style="white-space:nowrap; text-align:left;" id="TBL-2-12-4"  
+class="td11">Complex (2 doubles)</td>
+</tr><tr 
+class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-2-13-"><td  style="white-space:nowrap; text-align:left;" id="TBL-2-13-1"  
+class="td11">                    </td></tr></table></div></div>
+<br /><div class="caption" 
+><span class="id">Table&#x00A0;1.2: </span><span  
+class="content">Possible values for <span 
+class="pcrr7t-">BandFmt</span></span></div><!--tex4ht:label?: x7-80022 -->
+                                           
+                                                                                       
+
+                                                                                       
+  </div><hr class="endfloat" />
+                                           
+                                                                                       
+
+                                                                                       
+<!--l. 90--><p class="indent" >  <a 
+ id="x7-80033"></a><hr class="float"><div class="float" 
+>
+                                           
+                                                                                       
+
+                                                                                       
+<div class="center" 
+>
+<!--l. 90--><p class="noindent" >
+<div class="tabular"><table id="TBL-3" class="tabular" 
+cellspacing="0" cellpadding="0" rules="groups" 
+><colgroup id="TBL-3-1g"><col 
+id="TBL-3-1"></colgroup><colgroup id="TBL-3-2g"><col 
+id="TBL-3-2"></colgroup><colgroup id="TBL-3-3g"><col 
+id="TBL-3-3"></colgroup><colgroup id="TBL-3-4g"><col 
+id="TBL-3-4"></colgroup><tr 
+class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-3-1-"><td  style="white-space:nowrap; text-align:left;" id="TBL-3-1-1"  
+class="td11"><span 
+class="pcrr7t-">Coding        </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-3-1-2"  
+class="td11">C++ and Python name</td><td  style="white-space:nowrap; text-align:left;" id="TBL-3-1-3"  
+class="td11">Value</td><td  style="white-space:nowrap; text-align:left;" id="TBL-3-1-4"  
+class="td11">Meaning                           </td>
+</tr><tr 
+class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-3-2-"><td  style="white-space:nowrap; text-align:left;" id="TBL-3-2-1"  
+class="td11"><span 
+class="pcrr7t-">IM</span><span 
+class="pcrr7t-">_CODING</span><span 
+class="pcrr7t-">_NONE</span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-3-2-2"  
+class="td11"><span 
+class="pcrr7t-">NOCODING       </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-3-2-3"  
+class="td11">0       </td><td  style="white-space:nowrap; text-align:left;" id="TBL-3-2-4"  
+class="td11">VIPS computation format</td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-3-3-"><td  style="white-space:nowrap; text-align:left;" id="TBL-3-3-1"  
+class="td11"><span 
+class="pcrr7t-">IM</span><span 
+class="pcrr7t-">_CODING</span><span 
+class="pcrr7t-">_LABQ</span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-3-3-2"  
+class="td11"><span 
+class="pcrr7t-">LABQ           </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-3-3-3"  
+class="td11">2       </td><td  style="white-space:nowrap; text-align:left;" id="TBL-3-3-4"  
+class="td11">LABQ storage format      </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-3-4-"><td  style="white-space:nowrap; text-align:left;" id="TBL-3-4-1"  
+class="td11"><span 
+class="pcrr7t-">IM</span><span 
+class="pcrr7t-">_CODING</span><span 
+class="pcrr7t-">_RAD </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-3-4-2"  
+class="td11"><span 
+class="pcrr7t-">RAD            </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-3-4-3"  
+class="td11">6       </td><td  style="white-space:nowrap; text-align:left;" id="TBL-3-4-4"  
+class="td11">Radiance storage format  </td>
+</tr><tr 
+class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-3-5-"><td  style="white-space:nowrap; text-align:left;" id="TBL-3-5-1"  
+class="td11">              </td></tr></table></div></div>
+<br /><div class="caption" 
+><span class="id">Table&#x00A0;1.3: </span><span  
+class="content">Possible values for <span 
+class="pcrr7t-">Coding</span></span></div><!--tex4ht:label?: x7-80033 -->
+                                           
+                                                                                       
+
+                                                                                       
+  </div><hr class="endfloat" />
+                                           
+                                                                                       
+
+                                                                                       
+<!--l. 105--><p class="indent" >  <a 
+ id="x7-80044"></a><hr class="float"><div class="float" 
+>
+                                           
+                                                                                       
+
+                                                                                       
+<div class="center" 
+>
+<!--l. 105--><p class="noindent" >
+<div class="tabular"><table id="TBL-4" class="tabular" 
+cellspacing="0" cellpadding="0" rules="groups" 
+><colgroup id="TBL-4-1g"><col 
+id="TBL-4-1"></colgroup><colgroup id="TBL-4-2g"><col 
+id="TBL-4-2"></colgroup><colgroup id="TBL-4-3g"><col 
+id="TBL-4-3"></colgroup><colgroup id="TBL-4-4g"><col 
+id="TBL-4-4"></colgroup><tr 
+class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-4-1-"><td  style="white-space:nowrap; text-align:left;" id="TBL-4-1-1"  
+class="td11"><span 
+class="pcrr7t-">Type             </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-4-1-2"  
+class="td11">C++ and Python name</td><td  style="white-space:nowrap; text-align:left;" id="TBL-4-1-3"  
+class="td11">Value</td><td  style="white-space:nowrap; text-align:left;" id="TBL-4-1-4"  
+class="td11">Meaning                           </td>
+</tr><tr 
+class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-4-2-"><td  style="white-space:nowrap; text-align:left;" id="TBL-4-2-1"  
+class="td11"><span 
+class="pcrr7t-">IM</span><span 
+class="pcrr7t-">_TYPE</span><span 
+class="pcrr7t-">_MULTIBAND</span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-4-2-2"  
+class="td11"><span 
+class="pcrr7t-">MULTIBAND      </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-4-2-3"  
+class="td11">0       </td><td  style="white-space:nowrap; text-align:left;" id="TBL-4-2-4"  
+class="td11">Some multiband image    </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-4-3-"><td  style="white-space:nowrap; text-align:left;" id="TBL-4-3-1"  
+class="td11"><span 
+class="pcrr7t-">IM</span><span 
+class="pcrr7t-">_TYPE</span><span 
+class="pcrr7t-">_B</span><span 
+class="pcrr7t-">_W      </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-4-3-2"  
+class="td11"><span 
+class="pcrr7t-">B</span><span 
+class="pcrr7t-">_W            </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-4-3-3"  
+class="td11">1       </td><td  style="white-space:nowrap; text-align:left;" id="TBL-4-3-4"  
+class="td11">Some single band image  </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-4-4-"><td  style="white-space:nowrap; text-align:left;" id="TBL-4-4-1"  
+class="td11"><span 
+class="pcrr7t-">IM</span><span 
+class="pcrr7t-">_TYPE</span><span 
+class="pcrr7t-">_HISTOGRAM</span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-4-4-2"  
+class="td11"><span 
+class="pcrr7t-">HISTOGRAM      </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-4-4-3"  
+class="td11">10     </td><td  style="white-space:nowrap; text-align:left;" id="TBL-4-4-4"  
+class="td11">Histogram or LUT           </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-4-5-"><td  style="white-space:nowrap; text-align:left;" id="TBL-4-5-1"  
+class="td11"><span 
+class="pcrr7t-">IM</span><span 
+class="pcrr7t-">_TYPE</span><span 
+class="pcrr7t-">_FOURIER  </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-4-5-2"  
+class="td11"><span 
+class="pcrr7t-">FOURIER        </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-4-5-3"  
+class="td11">24     </td><td  style="white-space:nowrap; text-align:left;" id="TBL-4-5-4"  
+class="td11">Image in Fourier space     </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-4-6-"><td  style="white-space:nowrap; text-align:left;" id="TBL-4-6-1"  
+class="td11"><span 
+class="pcrr7t-">IM</span><span 
+class="pcrr7t-">_TYPE</span><span 
+class="pcrr7t-">_XYZ      </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-4-6-2"  
+class="td11"><span 
+class="pcrr7t-">XYZ            </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-4-6-3"  
+class="td11">12     </td><td  style="white-space:nowrap; text-align:left;" id="TBL-4-6-4"  
+class="td11"><span 
+class="ptmri7t-">CIE XYZ </span>colour space      </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-4-7-"><td  style="white-space:nowrap; text-align:left;" id="TBL-4-7-1"  
+class="td11"><span 
+class="pcrr7t-">IM</span><span 
+class="pcrr7t-">_TYPE</span><span 
+class="pcrr7t-">_LAB      </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-4-7-2"  
+class="td11"><span 
+class="pcrr7t-">LAB            </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-4-7-3"  
+class="td11">13     </td><td  style="white-space:nowrap; text-align:left;" id="TBL-4-7-4"  
+class="td11"><span 
+class="ptmri7t-">CIE</span><span 
+class="ptmri7t-">&#x00A0;</span><span 
+class="cmmi-10">L</span><span 
+class="cmsy-7">*</span><span 
+class="cmmi-10">a</span><span 
+class="cmsy-7">*</span><span 
+class="cmmi-10">b</span><span 
+class="cmsy-7">*</span> colour space</td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-4-8-"><td  style="white-space:nowrap; text-align:left;" id="TBL-4-8-1"  
+class="td11"><span 
+class="pcrr7t-">IM</span><span 
+class="pcrr7t-">_TYPE</span><span 
+class="pcrr7t-">_CMYK     </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-4-8-2"  
+class="td11"><span 
+class="pcrr7t-">CMYK           </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-4-8-3"  
+class="td11">15     </td><td  style="white-space:nowrap; text-align:left;" id="TBL-4-8-4"  
+class="td11"><span 
+class="pcrr7t-">im</span><span 
+class="pcrr7t-">_icc</span><span 
+class="pcrr7t-">_export()  </span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-4-9-"><td  style="white-space:nowrap; text-align:left;" id="TBL-4-9-1"  
+class="td11"><span 
+class="pcrr7t-">IM</span><span 
+class="pcrr7t-">_TYPE</span><span 
+class="pcrr7t-">_LABQ     </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-4-9-2"  
+class="td11"><span 
+class="pcrr7t-">LABQ           </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-4-9-3"  
+class="td11">16     </td><td  style="white-space:nowrap; text-align:left;" id="TBL-4-9-4"  
+class="td11">32-bit <span 
+class="ptmri7t-">CIE</span><span 
+class="ptmri7t-">&#x00A0;</span><span 
+class="cmmi-10">L</span><span 
+class="cmsy-7">*</span><span 
+class="cmmi-10">a</span><span 
+class="cmsy-7">*</span><span 
+class="cmmi-10">b</span><span 
+class="cmsy-7">*</span>    </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-4-10-"><td  style="white-space:nowrap; text-align:left;" id="TBL-4-10-1"  
+class="td11"><span 
+class="pcrr7t-">IM</span><span 
+class="pcrr7t-">_TYPE</span><span 
+class="pcrr7t-">_RGB      </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-4-10-2"  
+class="td11"><span 
+class="pcrr7t-">RGB            </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-4-10-3"  
+class="td11">17     </td><td  style="white-space:nowrap; text-align:left;" id="TBL-4-10-4"  
+class="td11">Some RGB                       </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-4-11-"><td  style="white-space:nowrap; text-align:left;" id="TBL-4-11-1"  
+class="td11"><span 
+class="pcrr7t-">IM</span><span 
+class="pcrr7t-">_TYPE</span><span 
+class="pcrr7t-">_UCS      </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-4-11-2"  
+class="td11"><span 
+class="pcrr7t-">UCS            </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-4-11-3"  
+class="td11">18     </td><td  style="white-space:nowrap; text-align:left;" id="TBL-4-11-4"  
+class="td11"><span 
+class="ptmri7t-">UCS(1:1) </span>colour space     </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-4-12-"><td  style="white-space:nowrap; text-align:left;" id="TBL-4-12-1"  
+class="td11"><span 
+class="pcrr7t-">IM</span><span 
+class="pcrr7t-">_TYPE</span><span 
+class="pcrr7t-">_LCH      </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-4-12-2"  
+class="td11"><span 
+class="pcrr7t-">LCH            </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-4-12-3"  
+class="td11">19     </td><td  style="white-space:nowrap; text-align:left;" id="TBL-4-12-4"  
+class="td11"><span 
+class="ptmri7t-">CIE LCh </span>colour space      </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-4-13-"><td  style="white-space:nowrap; text-align:left;" id="TBL-4-13-1"  
+class="td11"><span 
+class="pcrr7t-">IM</span><span 
+class="pcrr7t-">_TYPE</span><span 
+class="pcrr7t-">_LABS     </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-4-13-2"  
+class="td11"><span 
+class="pcrr7t-">LABS           </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-4-13-3"  
+class="td11">21     </td><td  style="white-space:nowrap; text-align:left;" id="TBL-4-13-4"  
+class="td11">48-bit <span 
+class="ptmri7t-">CIE</span><span 
+class="ptmri7t-">&#x00A0;</span><span 
+class="cmmi-10">L</span><span 
+class="cmsy-7">*</span><span 
+class="cmmi-10">a</span><span 
+class="cmsy-7">*</span><span 
+class="cmmi-10">b</span><span 
+class="cmsy-7">*</span>    </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-4-14-"><td  style="white-space:nowrap; text-align:left;" id="TBL-4-14-1"  
+class="td11"><span 
+class="pcrr7t-">IM</span><span 
+class="pcrr7t-">_TYPE</span><span 
+class="pcrr7t-">_sRGB     </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-4-14-2"  
+class="td11"><span 
+class="pcrr7t-">sRGB           </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-4-14-3"  
+class="td11">22     </td><td  style="white-space:nowrap; text-align:left;" id="TBL-4-14-4"  
+class="td11">sRGB colour space           </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-4-15-"><td  style="white-space:nowrap; text-align:left;" id="TBL-4-15-1"  
+class="td11"><span 
+class="pcrr7t-">IM</span><span 
+class="pcrr7t-">_TYPE</span><span 
+class="pcrr7t-">_YXY      </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-4-15-2"  
+class="td11"><span 
+class="pcrr7t-">YXY            </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-4-15-3"  
+class="td11">23     </td><td  style="white-space:nowrap; text-align:left;" id="TBL-4-15-4"  
+class="td11"><span 
+class="ptmri7t-">CIE Yxy </span>colour space       </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-4-16-"><td  style="white-space:nowrap; text-align:left;" id="TBL-4-16-1"  
+class="td11"><span 
+class="pcrr7t-">IM</span><span 
+class="pcrr7t-">_TYPE</span><span 
+class="pcrr7t-">_RGB16    </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-4-16-2"  
+class="td11"><span 
+class="pcrr7t-">RGB16          </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-4-16-3"  
+class="td11">25     </td><td  style="white-space:nowrap; text-align:left;" id="TBL-4-16-4"  
+class="td11">16-bit RGB                       </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-4-17-"><td  style="white-space:nowrap; text-align:left;" id="TBL-4-17-1"  
+class="td11"><span 
+class="pcrr7t-">IM</span><span 
+class="pcrr7t-">_TYPE</span><span 
+class="pcrr7t-">_GREY16   </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-4-17-2"  
+class="td11"><span 
+class="pcrr7t-">GREY16         </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-4-17-3"  
+class="td11">26     </td><td  style="white-space:nowrap; text-align:left;" id="TBL-4-17-4"  
+class="td11">16-bit monochrome          </td>
+</tr><tr 
+class="hline"><td><hr></td><td><hr></td><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-4-18-"><td  style="white-space:nowrap; text-align:left;" id="TBL-4-18-1"  
+class="td11">                 </td></tr></table></div></div>
+<br /><div class="caption" 
+><span class="id">Table&#x00A0;1.4: </span><span  
+class="content">Possible values for <span 
+class="pcrr7t-">Type</span></span></div><!--tex4ht:label?: x7-80044 -->
+                                           
+                                                                                       
+
+                                                                                       
+  </div><hr class="endfloat" />
+  <h4 class="subsectionHead"><span class="titlemark">1.2.2    </span> <a 
+ id="x7-90001.2.2"></a>Computation formats</h4>
+<!--l. 134--><p class="noindent" >This type of image has <span 
+class="pcrr7t-">Coding </span>set to <span 
+class="pcrr7t-">IM</span><span 
+class="pcrr7t-">_CODING</span><span 
+class="pcrr7t-">_NONE</span>.
+The header is then followed by a large array of pixels, laid
+out left-to-right, top-to-bottom. Each pixel contains the
+specified number of bands. Each band has the specified
+band format, which may be an 8-, 16- or 32-bit integer
+(either signed or unsigned), a single or double precision
+IEEE floating point number, or a pair of single or double
+precision floats forming a complex number.
+<!--l. 142--><p class="indent" >  All values are stored in the host-machine&#8217;s native number
+representation (that is, either most-significant first, as in
+SPARC and 680x0 machines, or least-significant first,
+for Intel and DEC machines). If necessary, the VIPS
+library will automatically byte-swap for you during
+read.
+<!--l. 147--><p class="noindent" >
+  <h4 class="subsectionHead"><span class="titlemark">1.2.3    </span> <a 
+ id="x7-100001.2.3"></a>Storage formats</h4>
+<!--l. 149--><p class="noindent" >All storage formats have other values for the <span 
+class="pcrr7t-">Coding</span>
+field. This release supports <span 
+class="pcrr7t-">IM</span><span 
+class="pcrr7t-">_CODING</span><span 
+class="pcrr7t-">_LABQ </span>and
+<span 
+class="pcrr7t-">IM</span><span 
+class="pcrr7t-">_CODING</span><span 
+class="pcrr7t-">_RAD</span>.
+<!--l. 152--><p class="indent" >  <span 
+class="pcrr7t-">IM</span><span 
+class="pcrr7t-">_CODING</span><span 
+class="pcrr7t-">_LABQ </span>stores <span 
+class="cmmi-10">L</span><sup><span 
+class="cmsy-7">*</span></sup>, <span 
+class="cmmi-10">a</span><sup><span 
+class="cmsy-7">*</span></sup> and <span 
+class="cmmi-10">b</span><sup><span 
+class="cmsy-7">*</span></sup> for each
+pixel, with 10 bits for <span 
+class="cmmi-10">L</span><sup><span 
+class="cmsy-7">*</span></sup> and 11 bits for each of <span 
+class="cmmi-10">a</span><sup><span 
+class="cmsy-7">*</span></sup>
+and <span 
+class="cmmi-10">b</span><sup><span 
+class="cmsy-7">*</span></sup>. These 32 bits are packed into 4 bytes, with
+the most significant 8 bits of each value in the first 3
+bytes, and the left-over bits packed into the final byte as
+2:3:3.
+<!--l. 158--><p class="indent" >  This format is a little awkward to process. Some VIPS
+functions can work directly on <span 
+class="pcrr7t-">IM</span><span 
+class="pcrr7t-">_CODING</span><span 
+class="pcrr7t-">_LABQ</span>
+images (<span 
+class="pcrr7t-">im</span><span 
+class="pcrr7t-">_extract</span><span 
+class="pcrr7t-">_area()</span>, for example), but
+most will require you to unpack the image to one of the
+computation formats (for example with <span 
+class="pcrr7t-">im</span><span 
+class="pcrr7t-">_LabQ2Lab()</span>)
+first.
+<!--l. 163--><p class="indent" >  <span 
+class="pcrr7t-">IM</span><span 
+class="pcrr7t-">_CODING</span><span 
+class="pcrr7t-">_RAD </span>stores <span 
+class="cmmi-10">RGB </span>or <span 
+class="cmmi-10">XY Z </span>float images
+as 8 bytes of mantissa and then 8 bytes of exponent,
+shared between the three channels. This coding style
+is used by the Radiance family of programs (and the
+HDR format) commonly used for HDR imaging. This
+style of image is generated when you load an HDR
+image.
+<!--l. 169--><p class="indent" >  This format is a little awkward to process. Some VIPS
+functions can work directly on <span 
+class="pcrr7t-">IM</span><span 
+class="pcrr7t-">_CODING</span><span 
+class="pcrr7t-">_RAD</span>
+images (<span 
+class="pcrr7t-">im</span><span 
+class="pcrr7t-">_extract</span><span 
+class="pcrr7t-">_area()</span>, for example), but
+most will require you to unpack the image to one of     the computation formats with <span 
+class="pcrr7t-">im</span><span 
+class="pcrr7t-">_rad2float()</span>
+ first.
+                                                                                       
+
+                                                                                       
+  <!--l. 1--><div class="crosslinks"><p class="noindent">[<a 
+href="vipsmanualse3.html" >next</a>] [<a 
+href="vipsmanualse1.html" >prev</a>] [<a 
+href="vipsmanualse1.html#tailvipsmanualse1.html" >prev-tail</a>] [<a 
+href="vipsmanualse2.html" >front</a>] [<a 
+href="vipsmanualch1.html#vipsmanualse2.html" >up</a>] </p></div>
+<!--l. 1--><p class="indent" >  <a 
+ id="tailvipsmanualse2.html"></a>   
+</body></html> 

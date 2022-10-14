@@ -1,0 +1,121 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html > 
+<head><title>The VDisplay class</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (http://www.cse.ohio-state.edu/~gurari/TeX4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.cse.ohio-state.edu/~gurari/TeX4ht/)"> 
+<!-- 3,html --> 
+<meta name="src" content="vipsmanual.tex"> 
+<meta name="date" content="2010-06-09 21:39:00"> 
+<link rel="stylesheet" type="text/css" href="vipsmanual.css"> 
+</head><body 
+>
+  <!--l. 1--><div class="crosslinks"><p class="noindent">[<a 
+href="vipsmanualse6.html" >next</a>] [<a 
+href="vipsmanualse4.html" >prev</a>] [<a 
+href="vipsmanualse4.html#tailvipsmanualse4.html" >prev-tail</a>] [<a 
+href="#tailvipsmanualse5.html">tail</a>] [<a 
+href="vipsmanualch1.html#vipsmanualse5.html" >up</a>] </p></div>
+  <h3 class="sectionHead"><span class="titlemark">1.5    </span> <a 
+ id="x10-270001.5"></a>The <span 
+class="pcrr7t-">VDisplay </span>class</h3>
+<!--l. 3--><p class="noindent" >The <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VDisplay</span></span></span> class is an abstraction over the VIPS
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_col_display</span></span></span> type which gives convenient and safe
+representation of VIPS display profiles.
+<!--l. 6--><p class="indent" >  VIPS display profiles are now mostly obsolete. You&#8217;re
+better off using the ICC colour management <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VImage</span></span></span>
+member functions <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">ICC_export()</span></span></span> and <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">ICC_import()</span></span></span>.
+<!--l. 10--><p class="noindent" >
+  <h4 class="subsectionHead"><span class="titlemark">1.5.1    </span> <a 
+ id="x10-280001.5.1"></a>Constructors</h4>
+<!--l. 12--><p class="noindent" >There are two constructors for <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VDisplay</span></span></span>:
+                                                 <div class="verbatim" id="verbatim-36">
+  VDisplay(&#x00A0;const&#x00A0;char&#x00A0;&#x22C6;name&#x00A0;);
+ &#x00A0;<br />VDisplay(); 
+</div>
+<!--l. 17--><p class="nopar" >
+<!--l. 19--><p class="indent" >  The first form initialises the display from one of the
+standard VIPS display types. For example:
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-37">
+VDisplay&#x00A0;fred(&#x00A0;"sRGB"&#x00A0;);
+&#x00A0;<br />VDisplay&#x00A0;jim(&#x00A0;"ultra2-20/2/98"&#x00A0;);
+</div>
+<!--l. 25--><p class="nopar" >
+<!--l. 27--><p class="indent" >  Makes <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">fred</span></span></span> a profile for making images in sRGB
+format, and <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">jim</span></span></span> a profile representing my workstation
+display, as of 20/2/98. The second form of constructor
+makes an uninitialised display.
+<!--l. 31--><p class="noindent" >
+  <h4 class="subsectionHead"><span class="titlemark">1.5.2    </span> <a 
+ id="x10-290001.5.2"></a>Projection functions</h4>
+<!--l. 33--><p class="noindent" >A set of member functions of <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VDisplay</span></span></span> provide read and
+write access to the fields in the display.
+                                                 <div class="verbatim" id="verbatim-38">
+  char&#x00A0;&#x22C6;name();
+ &#x00A0;<br />VDisplayType&#x00A0;&amp;type();
+ &#x00A0;<br />matrix&#x00A0;&amp;mat();
+ &#x00A0;<br />float&#x00A0;&amp;YCW();
+ &#x00A0;<br />float&#x00A0;&amp;xCW();
+ &#x00A0;<br />float&#x00A0;&amp;yCW();
+ &#x00A0;<br />float&#x00A0;&amp;YCR();
+ &#x00A0;<br />float&#x00A0;&amp;YCG();
+ &#x00A0;<br />float&#x00A0;&amp;YCB();
+ &#x00A0;<br />int&#x00A0;&amp;Vrwr();
+ &#x00A0;<br />int&#x00A0;&amp;Vrwg();
+ &#x00A0;<br />int&#x00A0;&amp;Vrwb();
+ &#x00A0;<br />float&#x00A0;&amp;Y0R();
+ &#x00A0;<br />float&#x00A0;&amp;Y0G();
+ &#x00A0;<br />float&#x00A0;&amp;Y0B();
+ &#x00A0;<br />float&#x00A0;&amp;gammaR();
+ &#x00A0;<br />float&#x00A0;&amp;gammaG();
+ &#x00A0;<br />float&#x00A0;&amp;gammaB();
+ &#x00A0;<br />float&#x00A0;&amp;B();
+ &#x00A0;<br />float&#x00A0;&amp;P(); 
+</div>
+<!--l. 57--><p class="nopar" >
+<!--l. 59--><p class="indent" >  Where <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VDisplayType</span></span></span> is defined as:
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-39">
+enum&#x00A0;VDisplayType&#x00A0;{
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;BARCO,
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;DUMB
+&#x00A0;<br />};
+</div>
+<!--l. 66--><p class="nopar" >
+<!--l. 68--><p class="indent" >  And <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">matrix</span></span></span> is defined as:
+                                                 <div class="verbatim" id="verbatim-40">
+  typedef&#x00A0;float&#x00A0;matrix[3][3]; 
+</div>
+<!--l. 72--><p class="nopar" >
+<!--l. 74--><p class="indent" >  For a description of all the fields in a VIPS display
+profile, see the manual page for <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_XYZ2RGB()</span></span></span>.
+                                                                                       
+
+                                                                                       
+  <!--l. 1--><div class="crosslinks"><p class="noindent">[<a 
+href="vipsmanualse6.html" >next</a>] [<a 
+href="vipsmanualse4.html" >prev</a>] [<a 
+href="vipsmanualse4.html#tailvipsmanualse4.html" >prev-tail</a>] [<a 
+href="vipsmanualse5.html" >front</a>] [<a 
+href="vipsmanualch1.html#vipsmanualse5.html" >up</a>] </p></div>
+<!--l. 1--><p class="indent" >  <a 
+ id="tailvipsmanualse5.html"></a>   
+</body></html> 

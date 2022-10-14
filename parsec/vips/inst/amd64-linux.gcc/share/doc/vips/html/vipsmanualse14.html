@@ -1,0 +1,503 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html > 
+<head><title>Programming WIO operations</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (http://www.cse.ohio-state.edu/~gurari/TeX4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.cse.ohio-state.edu/~gurari/TeX4ht/)"> 
+<!-- 3,html --> 
+<meta name="src" content="vipsmanual.tex"> 
+<meta name="date" content="2010-06-09 21:39:00"> 
+<link rel="stylesheet" type="text/css" href="vipsmanual.css"> 
+</head><body 
+>
+  <!--l. 1--><div class="crosslinks"><p class="noindent">[<a 
+href="vipsmanualse15.html" >next</a>] [<a 
+href="vipsmanualse13.html" >prev</a>] [<a 
+href="vipsmanualse13.html#tailvipsmanualse13.html" >prev-tail</a>] [<a 
+href="#tailvipsmanualse14.html">tail</a>] [<a 
+href="vipsmanualch3.html#vipsmanualse14.html" >up</a>] </p></div>
+  <h3 class="sectionHead"><span class="titlemark">3.2    </span> <a 
+ id="x21-880003.2"></a>Programming WIO operations</h3>
+<!--l. 3--><p class="noindent" >WIO is the style for you if you want ease of programming,
+or if your algorithm must have the whole of the input image
+available at the same time. For example, a Fourier transform
+operation is unable to produce any output until it has seen
+the whole of the input image.
+<!--l. 8--><p class="noindent" >
+  <h4 class="subsectionHead"><span class="titlemark">3.2.1    </span> <a 
+ id="x21-890003.2.1"></a>Input from an image</h4>
+<!--l. 10--><p class="noindent" >In WIO input, the whole of the image data is made available
+to the program via the <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">data</span></span></span> field of the descriptor. To make
+an image ready for reading in this style, programs should
+call <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_incheck()</span></span></span>:
+                                                 <div class="verbatim" id="verbatim-127">
+  int&#x00A0;im_incheck(&#x00A0;IMAGE&#x00A0;&#x22C6;im&#x00A0;) 
+</div>
+<!--l. 16--><p class="nopar" >
+<!--l. 18--><p class="noindent" >If it succeeds, it returns 0, if it fails, it returns non-zero and
+sets <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_error()</span></span></span>. On success, VIPS guarantees that all of
+the user-accessible fields in the descriptor contain valid
+data, and that all of the image data may be read by simply
+reading from the <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">data</span></span></span> field (see below for an example).
+This will only work for images less than about 2GB in
+size.
+<!--l. 26--><p class="indent" >    VIPS has some simple macros to help address calculations
+on images:
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-128">
+int&#x00A0;IM_IMAGE_SIZEOF_ELEMENT(&#x00A0;IMAGE&#x00A0;&#x22C6;&#x00A0;)
+&#x00A0;<br />int&#x00A0;IM_IMAGE_SIZEOF_PEL(&#x00A0;IMAGE&#x00A0;&#x22C6;&#x00A0;)
+&#x00A0;<br />int&#x00A0;IM_IMAGE_SIZEOF_LINE(&#x00A0;IMAGE&#x00A0;&#x22C6;&#x00A0;)
+&#x00A0;<br />int&#x00A0;IM_IMAGE_N_ELEMENTS(&#x00A0;IMAGE&#x00A0;&#x22C6;&#x00A0;)
+&#x00A0;<br />char&#x00A0;&#x22C6;IM_IMAGE_ADDR(&#x00A0;IMAGE&#x00A0;&#x22C6;,
+&#x00A0;<br />&#x00A0;&#x00A0;int&#x00A0;x,&#x00A0;int&#x00A0;y&#x00A0;)
+</div>
+<!--l. 35--><p class="nopar" >
+<!--l. 37--><p class="noindent" >These macros calculate <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">sizeof()</span></span></span> a band element, a pel
+and a horizontal line of pels. <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">IM_IMAGE_N_ELEMENTS</span></span></span>
+returns the number of band elements across an image.
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">IM_IMAGE_ADDR</span></span></span> calculates the address of a pixel in an
+image. If <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">DEBUG</span></span></span> is defined, it does bounds checking
+too.
+                                           
+                                                                                       
+
+                                                                                       
+<!--l. 44--><p class="indent" >  <a 
+ id="x21-890011"></a><hr class="float"><div class="float" 
+>
+                                           
+                                                                                       
+
+                                                                                       
+<div class="verbatim" id="verbatim-129">
+#include&#x00A0;&#x003C;stdio.h&#x003E;
+&#x00A0;<br />#include&#x00A0;&#x003C;stdlib.h&#x003E;
+&#x00A0;<br />
+&#x00A0;<br />#include&#x00A0;&#x003C;vips/vips.h&#x003E;
+&#x00A0;<br />
+&#x00A0;<br />int
+&#x00A0;<br />average(&#x00A0;IMAGE&#x00A0;&#x22C6;im,&#x00A0;double&#x00A0;&#x22C6;out&#x00A0;)
+&#x00A0;<br />{
+&#x00A0;<br />&#x00A0;&#x00A0;int&#x00A0;x,&#x00A0;y;
+&#x00A0;<br />&#x00A0;&#x00A0;long&#x00A0;total;
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Prepare&#x00A0;for&#x00A0;reading.
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;if(&#x00A0;im_incheck(&#x00A0;im&#x00A0;)&#x00A0;)
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;return(&#x00A0;-1&#x00A0;);
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Check&#x00A0;that&#x00A0;this&#x00A0;is&#x00A0;the&#x00A0;kind&#x00A0;of&#x00A0;image&#x00A0;we&#x00A0;can&#x00A0;process.
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;if(&#x00A0;im-&#x003E;BandFmt&#x00A0;!=&#x00A0;IM_BANDFMT_UCHAR&#x00A0;||
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;im-&#x003E;Coding&#x00A0;!=&#x00A0;IM_CODING_NONE&#x00A0;)&#x00A0;{
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;im_error(&#x00A0;"average",&#x00A0;"uncoded&#x00A0;uchar&#x00A0;images&#x00A0;only"&#x00A0;);
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;return(&#x00A0;-1&#x00A0;);
+&#x00A0;<br />&#x00A0;&#x00A0;}
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Loop&#x00A0;over&#x00A0;the&#x00A0;image,&#x00A0;summing&#x00A0;pixels.
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;total&#x00A0;=&#x00A0;0;
+&#x00A0;<br />&#x00A0;&#x00A0;for(&#x00A0;y&#x00A0;=&#x00A0;0;&#x00A0;y&#x00A0;&#x003C;&#x00A0;im-&#x003E;Ysize;&#x00A0;y++&#x00A0;)&#x00A0;{
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;unsigned&#x00A0;char&#x00A0;&#x22C6;p&#x00A0;=&#x00A0;(unsigned&#x00A0;char&#x00A0;&#x22C6;)&#x00A0;IM_IMAGE_ADDR(&#x00A0;im,&#x00A0;0,&#x00A0;y&#x00A0;);
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;for(&#x00A0;x&#x00A0;=&#x00A0;0;&#x00A0;x&#x00A0;&#x003C;&#x00A0;IM_IMAGE_N_ELEMENTS(&#x00A0;im&#x00A0;);&#x00A0;x++&#x00A0;)
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;total&#x00A0;+=&#x00A0;p[x];
+&#x00A0;<br />&#x00A0;&#x00A0;}
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Calculate&#x00A0;average.
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;&#x22C6;out&#x00A0;=&#x00A0;(double)&#x00A0;total&#x00A0;/
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;(IM_IMAGE_N_ELEMENTS(&#x00A0;im&#x00A0;)&#x00A0;&#x22C6;&#x00A0;im-&#x003E;Ysize));
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Success!
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;return(&#x00A0;0&#x00A0;);
+&#x00A0;<br />}
+</div>
+<!--l. 88--><p class="nopar" >
+<br /><div class="caption" 
+><span class="id">Figure&#x00A0;3.1: </span><span  
+class="content">Find average of image</span></div><!--tex4ht:label?: x21-890011 -->                
+                                                                                       
+
+                                                                                       
+  </div><hr class="endfloat" />
+<!--l. 93--><p class="indent" >  Figure&#x00A0;<a 
+href="#x21-890011">3.1<!--tex4ht:ref: fg:average --></a> is a simple WIO operation which calculates
+the average of an unsigned char image. It will work for any
+size image, with any number of bands. See&#x00A0;<span 
+class="cmsy-10">§</span><a 
+href="#x21-910003.2.3">3.2.3<!--tex4ht:ref: sec:poly --></a> for
+techniques for making operations which will work for any
+image type. This operation might be called from an
+application with:
+                                                 <div class="verbatim" id="verbatim-130">
+  #include&#x00A0;&#x003C;stdio.h&#x003E;
+ &#x00A0;<br />#include&#x00A0;&#x003C;stdlib.h&#x003E;
+ &#x00A0;<br />
+ &#x00A0;<br />#include&#x00A0;&#x003C;vips/vips.h&#x003E;
+ &#x00A0;<br />
+ &#x00A0;<br />void
+ &#x00A0;<br />find_average(&#x00A0;char&#x00A0;&#x22C6;name&#x00A0;)
+ &#x00A0;<br />{
+ &#x00A0;<br />&#x00A0;&#x00A0;IMAGE&#x00A0;&#x22C6;im;
+ &#x00A0;<br />&#x00A0;&#x00A0;double&#x00A0;avg;
+ &#x00A0;<br />
+ &#x00A0;<br />&#x00A0;&#x00A0;if(&#x00A0;!(im&#x00A0;=&#x00A0;im_open(&#x00A0;name,&#x00A0;"r"&#x00A0;))&#x00A0;||
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;average(&#x00A0;im,&#x00A0;&amp;avg&#x00A0;)&#x00A0;||
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;im_close(&#x00A0;im&#x00A0;)&#x00A0;)
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;error_exit(&#x00A0;"failure!"&#x00A0;);
+ &#x00A0;<br />
+ &#x00A0;<br />&#x00A0;&#x00A0;printf(&#x00A0;"Average&#x00A0;of&#x00A0;\"%s\"&#x00A0;is&#x00A0;%G\n",
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;name,&#x00A0;avg&#x00A0;);
+ &#x00A0;<br />} 
+</div>
+<!--l. 119--><p class="nopar" >
+<!--l. 121--><p class="noindent" >When you write an image processing operation, you can test
+it by writing a VIPS function descriptor and calling it from
+the <span 
+class="pcrr7t-">vips </span>universal main program, or from the <span 
+class="pcrr7t-">nip2</span>
+interface. See <span 
+class="cmsy-10">§</span><a 
+href="vipsmanualse7.html#x13-360002.1">2.1<!--tex4ht:ref: sec:appl --></a>.
+    <h4 class="subsectionHead"><span class="titlemark">3.2.2    </span> <a 
+ id="x21-900003.2.2"></a>Output to an image</h4>
+<!--l. 128--><p class="noindent" >Before attempting WIO output, programs should call
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_outcheck()</span></span></span>. It has type:
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-131">
+int&#x00A0;im_outcheck(&#x00A0;IMAGE&#x00A0;&#x22C6;im&#x00A0;)
+</div>
+<!--l. 133--><p class="nopar" >
+<!--l. 135--><p class="noindent" >If <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_outcheck()</span></span></span> succeeds, VIPS guarantees that WIO
+output is sensible.
+<!--l. 138--><p class="indent" >  Programs should then set fields in the output descriptor to
+describe the sort of image they wish to write (size,
+type, and so on) and call <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_setupout()</span></span></span>. It has
+type:
+                                                 <div class="verbatim" id="verbatim-132">
+  int&#x00A0;im_setupout(&#x00A0;IMAGE&#x00A0;&#x22C6;im&#x00A0;) 
+</div>
+<!--l. 144--><p class="nopar" >
+<!--l. 146--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_setupout()</span></span></span> creates the output file or memory buffer,
+using the size and type fields that were filled in by the
+program between the calls to <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_outcheck()</span></span></span> and
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_setupout()</span></span></span>, and gets it ready for writing.
+<!--l. 151--><p class="indent" >    Pels are written with <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_writeline()</span></span></span>. This takes a y
+position (pel (0,0) is in the top-left-hand corner of the
+image), a descriptor and a pointer to a line of pels. It has
+type:
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-133">
+int&#x00A0;im_writeline(&#x00A0;int&#x00A0;y,
+&#x00A0;<br />&#x00A0;&#x00A0;IMAGE&#x00A0;&#x22C6;im,&#x00A0;unsigned&#x00A0;char&#x00A0;&#x22C6;pels&#x00A0;)
+</div>
+<!--l. 158--><p class="nopar" >
+<!--l. 160--><p class="indent" >  Two convenience functions are available to make this
+process slightly easier. <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_iocheck()</span></span></span> is useful for
+programs which take one input image and produce one
+image output. It simply calls <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_incheck()</span></span></span> and
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_outcheck()</span></span></span>. It has type:
+                                                 <div class="verbatim" id="verbatim-134">
+  int&#x00A0;im_iocheck(&#x00A0;IMAGE&#x00A0;&#x22C6;in,&#x00A0;IMAGE&#x00A0;&#x22C6;out&#x00A0;) 
+</div>
+<!--l. 167--><p class="nopar" >
+<!--l. 169--><p class="indent" >  The second convenience function copies the fields
+describing size, type, metadata and history from one image
+descriptor to another. It is useful when the output image will
+be similar in size and type to the input image. It has
+type:
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-135">
+int&#x00A0;im_cp_desc(&#x00A0;IMAGE&#x00A0;&#x22C6;out,&#x00A0;IMAGE&#x00A0;&#x22C6;in&#x00A0;)
+</div>
+<!--l. 176--><p class="nopar" >
+<!--l. 178--><p class="noindent" >There&#8217;s also <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_cp_descv()</span></span></span>, see the man page.
+                                           
+                                                                                       
+
+                                                                                       
+<!--l. 182--><p class="indent" >  <a 
+ id="x21-900012"></a><hr class="float"><div class="float" 
+>
+                                           
+                                                                                       
+
+                                                                                       
+<div class="verbatim" id="verbatim-136">
+#include&#x00A0;&#x003C;stdio.h&#x003E;
+&#x00A0;<br />#include&#x00A0;&#x003C;stdlib.h&#x003E;
+&#x00A0;<br />
+&#x00A0;<br />#include&#x00A0;&#x003C;vips/vips.h&#x003E;
+&#x00A0;<br />#include&#x00A0;&#x003C;vips/util.h&#x003E;
+&#x00A0;<br />
+&#x00A0;<br />int
+&#x00A0;<br />invert(&#x00A0;IMAGE&#x00A0;&#x22C6;in,&#x00A0;IMAGE&#x00A0;&#x22C6;out&#x00A0;)
+&#x00A0;<br />{
+&#x00A0;<br />&#x00A0;&#x00A0;int&#x00A0;x,&#x00A0;y;
+&#x00A0;<br />&#x00A0;&#x00A0;unsigned&#x00A0;char&#x00A0;&#x22C6;buffer;
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Check&#x00A0;images.
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;if(&#x00A0;im_iocheck(&#x00A0;in,&#x00A0;out&#x00A0;)&#x00A0;)
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;return(&#x00A0;-1&#x00A0;);
+&#x00A0;<br />&#x00A0;&#x00A0;if(&#x00A0;in-&#x003E;BandFmt&#x00A0;!=&#x00A0;IM_BANDFMT_UCHAR&#x00A0;||&#x00A0;in-&#x003E;Coding&#x00A0;!=&#x00A0;IM_CODING_NONE&#x00A0;)&#x00A0;{
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;im_error(&#x00A0;"invert",&#x00A0;"uncoded&#x00A0;uchar&#x00A0;images&#x00A0;only"&#x00A0;);
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;return(&#x00A0;-1&#x00A0;);
+&#x00A0;<br />&#x00A0;&#x00A0;}
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Make&#x00A0;output&#x00A0;image.
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;if(&#x00A0;im_cp_desc(&#x00A0;out,&#x00A0;in&#x00A0;)&#x00A0;)
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;return(&#x00A0;-1&#x00A0;);
+&#x00A0;<br />&#x00A0;&#x00A0;if(&#x00A0;im_setupout(&#x00A0;out&#x00A0;)&#x00A0;)
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;return(&#x00A0;-1&#x00A0;);
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Allocate&#x00A0;a&#x00A0;line&#x00A0;buffer&#x00A0;and&#x00A0;make&#x00A0;sure&#x00A0;it&#x00A0;will&#x00A0;be&#x00A0;freed&#x00A0;correctly.
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;if(&#x00A0;!(buffer&#x00A0;=&#x00A0;IM_ARRAY(&#x00A0;out,
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;IM_IMAGE_SIZEOF_LINE(&#x00A0;in&#x00A0;),&#x00A0;unsigned&#x00A0;char&#x00A0;))&#x00A0;)
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;return(&#x00A0;-1&#x00A0;);
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Loop&#x00A0;over&#x00A0;the&#x00A0;image!
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;for(&#x00A0;y&#x00A0;=&#x00A0;0;&#x00A0;y&#x00A0;&#x003C;&#x00A0;in-&#x003E;Ysize;&#x00A0;y++&#x00A0;)&#x00A0;{
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;unsigned&#x00A0;char&#x00A0;&#x22C6;p&#x00A0;=&#x00A0;(unsigned&#x00A0;char&#x00A0;&#x22C6;)&#x00A0;IM_IMAGE_ADDR(&#x00A0;in,&#x00A0;0,&#x00A0;y&#x00A0;);
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;for(&#x00A0;x&#x00A0;=&#x00A0;0;&#x00A0;x&#x00A0;&#x003C;&#x00A0;IM_IMAGE_N_ELEMENTS(&#x00A0;in&#x00A0;);&#x00A0;x++&#x00A0;)
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;buffer[x]&#x00A0;=&#x00A0;255&#x00A0;-&#x00A0;p[x];
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;if(&#x00A0;im_writeline(&#x00A0;y,&#x00A0;out,&#x00A0;buffer&#x00A0;)&#x00A0;)
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;return(&#x00A0;-1&#x00A0;);
+&#x00A0;<br />&#x00A0;&#x00A0;}
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;return(&#x00A0;0&#x00A0;);                           &#x00A0;<br />} 
+</div>
+<!--l. 230--><p class="nopar" >
+<br /><div class="caption" 
+><span class="id">Figure&#x00A0;3.2: </span><span  
+class="content">Invert an image</span></div><!--tex4ht:label?: x21-900012 -->
+                                                                                       
+
+                                                                                       
+  </div><hr class="endfloat" />
+<!--l. 235--><p class="indent" >  Figure&#x00A0;<a 
+href="#x21-900012">3.2<!--tex4ht:ref: fg:invert --></a> is a WIO VIPS operation which finds the
+photographic negative of an unsigned char image. See
+<span 
+class="cmsy-10">§</span><a 
+href="vipsmanualse8.html#x14-490002.2.10">2.2.10<!--tex4ht:ref: sec:malloc --></a> for an explanation of <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">IM_ARRAY</span></span></span>. This operation
+might be called from an application with:
+                                                 <div class="verbatim" id="verbatim-137">
+  #include&#x00A0;&#x003C;stdio.h&#x003E;
+ &#x00A0;<br />#include&#x00A0;&#x003C;stdlib.h&#x003E;
+ &#x00A0;<br />
+ &#x00A0;<br />#include&#x00A0;&#x003C;vips/vips.h&#x003E;
+ &#x00A0;<br />
+ &#x00A0;<br />void
+ &#x00A0;<br />find_negative(&#x00A0;char&#x00A0;&#x22C6;inn,&#x00A0;char&#x00A0;&#x22C6;outn&#x00A0;)
+ &#x00A0;<br />{
+ &#x00A0;<br />&#x00A0;&#x00A0;IMAGE&#x00A0;&#x22C6;in,&#x00A0;&#x22C6;out;
+ &#x00A0;<br />
+ &#x00A0;<br />&#x00A0;&#x00A0;if(&#x00A0;!(in&#x00A0;=&#x00A0;im_open(&#x00A0;inn,&#x00A0;"r"&#x00A0;))&#x00A0;||
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;!(out&#x00A0;=&#x00A0;im_open(&#x00A0;outn,&#x00A0;"w"&#x00A0;))&#x00A0;||
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;invert(&#x00A0;in,&#x00A0;out&#x00A0;)&#x00A0;||
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;im_updatehist(&#x00A0;out,&#x00A0;"invert"&#x00A0;)&#x00A0;||
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;im_close(&#x00A0;in&#x00A0;)&#x00A0;||
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;im_close(&#x00A0;out&#x00A0;)&#x00A0;)
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;error_exit(&#x00A0;"failure!"&#x00A0;);
+ &#x00A0;<br />} 
+</div>
+<!--l. 259--><p class="nopar" >
+<!--l. 261--><p class="indent" >  See <span 
+class="cmsy-10">§</span><a 
+href="vipsmanualse8.html#x14-440002.2.7">2.2.7<!--tex4ht:ref: sec:history --></a> for an explanation of the call to
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_updatehist()</span></span></span>.
+    <h4 class="subsectionHead"><span class="titlemark">3.2.3    </span> <a 
+ id="x21-910003.2.3"></a>Polymorphism</h4>
+<!--l. 266--><p class="noindent" >Most image processing operations in the VIPS library can
+operate on images of any type (<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">IM_BANDFMT_UCHAR</span></span></span>, as
+in our examples above, also <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">IM_BANDFMT_UINT</span></span></span> etc.).
+This is usually implemented with code replication: the
+operation contains loops for processing every kind of image,
+and when called, invokes the appropriate loop for the image
+it is given.
+<!--l. 272--><p class="indent" >    As an example, figure&#x00A0;<a 
+href="#x21-910013">3.3<!--tex4ht:ref: fg:exp --></a> calculates <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">exp()</span></span></span> for every
+pel in an image. If the input image is <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">double</span></span></span>, we write
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">double</span></span></span> output. If it is any other non-complex type, we
+write <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">float</span></span></span>. If it is complex, we flag an error (<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">exp()</span></span></span> of
+a complex number is fiddly). The example uses an
+image type predicate, <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_iscomplex()</span></span></span>. There are a
+number of these predicate functions, see the manual
+page.
+                                                                                       
+
+                                                                                       
+<!--l. 280--><p class="indent" >  <a 
+ id="x21-910013"></a><hr class="float"><div class="float" 
+>
+                                           
+                                                                                       
+
+                                                                                       
+<div class="verbatim" id="verbatim-138">
+#include&#x00A0;&#x003C;stdio.h&#x003E;
+&#x00A0;<br />#include&#x00A0;&#x003C;stdlib.h&#x003E;
+&#x00A0;<br />#include&#x00A0;&#x003C;math.h&#x003E;
+&#x00A0;<br />
+&#x00A0;<br />#include&#x00A0;&#x003C;vips/vips.h&#x003E;
+&#x00A0;<br />#include&#x00A0;&#x003C;vips/util.h&#x003E;
+&#x00A0;<br />
+&#x00A0;<br />/&#x22C6;&#x00A0;Exponential&#x00A0;transform.
+&#x00A0;<br />&#x00A0;&#x22C6;/
+&#x00A0;<br />int
+&#x00A0;<br />exptra(&#x00A0;IMAGE&#x00A0;&#x22C6;in,&#x00A0;IMAGE&#x00A0;&#x22C6;out&#x00A0;)
+&#x00A0;<br />{
+&#x00A0;<br />&#x00A0;&#x00A0;int&#x00A0;x,&#x00A0;y;
+&#x00A0;<br />&#x00A0;&#x00A0;unsigned&#x00A0;char&#x00A0;&#x22C6;buffer;
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Check&#x00A0;descriptors.
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;if(&#x00A0;im_iocheck(&#x00A0;in,&#x00A0;out&#x00A0;)&#x00A0;)
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;return(&#x00A0;-1&#x00A0;);
+&#x00A0;<br />&#x00A0;&#x00A0;if(&#x00A0;in-&#x003E;Coding&#x00A0;!=&#x00A0;IM_CODING_NONE&#x00A0;||&#x00A0;im_iscomplex(&#x00A0;in&#x00A0;)&#x00A0;)&#x00A0;{
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;im_error(&#x00A0;"exptra",&#x00A0;"uncoded&#x00A0;non-complex&#x00A0;only"&#x00A0;);
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;return(&#x00A0;-1&#x00A0;);
+&#x00A0;<br />&#x00A0;&#x00A0;}
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Make&#x00A0;output&#x00A0;image.
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;if(&#x00A0;im_cp_desc(&#x00A0;out,&#x00A0;in&#x00A0;)&#x00A0;)
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;return(&#x00A0;-1&#x00A0;);
+&#x00A0;<br />&#x00A0;&#x00A0;if(&#x00A0;in-&#x003E;BandFmt&#x00A0;!=&#x00A0;IM_BANDFMT_DOUBLE&#x00A0;)
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;out-&#x003E;BandFmt&#x00A0;=&#x00A0;IM_BANDFMT_FLOAT;
+&#x00A0;<br />&#x00A0;&#x00A0;if(&#x00A0;im_setupout(&#x00A0;out&#x00A0;)&#x00A0;)
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;return(&#x00A0;-1&#x00A0;);
+</div>
+<!--l. 313--><p class="nopar" >
+<br /><div class="caption" 
+><span class="id">Figure&#x00A0;3.3: </span><span  
+class="content">Calculate <span 
+class="pcrr7t-">exp() </span>for an image</span></div><!--tex4ht:label?: x21-910013 -->
+                                           
+                                                                                       
+
+                                                                                       
+  </div><hr class="endfloat" />
+                                           
+                                                                                       
+
+                                                                                       
+<!--l. 319--><p class="indent" >  <a 
+ id="x21-910024"></a><hr class="float"><div class="float" 
+>
+                                           
+                                                                                       
+
+                                                                                       
+<div class="verbatim" id="verbatim-139">
+&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Allocate&#x00A0;a&#x00A0;line&#x00A0;buffer.
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;if(&#x00A0;!(buffer&#x00A0;=&#x00A0;IM_ARRAY(&#x00A0;out,&#x00A0;IM_IMAGE_SIZEOF_LINE(&#x00A0;in&#x00A0;),&#x00A0;unsigned&#x00A0;char&#x00A0;))&#x00A0;)
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;return(&#x00A0;-1&#x00A0;);
+&#x00A0;<br />
+&#x00A0;<br />/&#x22C6;&#x00A0;Our&#x00A0;inner&#x00A0;loop,&#x00A0;parameterised&#x00A0;for&#x00A0;both&#x00A0;the&#x00A0;input&#x00A0;and&#x00A0;output
+&#x00A0;<br />&#x00A0;&#x22C6;&#x00A0;types.&#x00A0;Note&#x00A0;the&#x00A0;use&#x00A0;of&#x00A0;&#8216;\',&#x00A0;since&#x00A0;macros&#x00A0;have&#x00A0;to&#x00A0;be&#x00A0;all&#x00A0;on
+&#x00A0;<br />&#x00A0;&#x22C6;&#x00A0;one&#x00A0;line.
+&#x00A0;<br />&#x00A0;&#x22C6;/
+&#x00A0;<br />#define&#x00A0;loop(IN,&#x00A0;OUT)&#x00A0;{&#x00A0;\
+&#x00A0;<br />&#x00A0;&#x00A0;for(&#x00A0;y&#x00A0;=&#x00A0;0;&#x00A0;y&#x00A0;&#x003C;&#x00A0;in-&#x003E;Ysize;&#x00A0;y++&#x00A0;)&#x00A0;{&#x00A0;\
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;IN&#x00A0;&#x22C6;p&#x00A0;=&#x00A0;(IN&#x00A0;&#x22C6;)&#x00A0;IM_IMAGE_ADDR(&#x00A0;in,&#x00A0;0,&#x00A0;y&#x00A0;);&#x00A0;\
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;OUT&#x00A0;&#x22C6;q&#x00A0;=&#x00A0;(OUT&#x00A0;&#x22C6;)&#x00A0;buffer;&#x00A0;\
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;\
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;for(&#x00A0;x&#x00A0;=&#x00A0;0;&#x00A0;x&#x00A0;&#x003C;&#x00A0;IM_IMAGE_N_ELEMENTS(&#x00A0;in&#x00A0;);&#x00A0;x++&#x00A0;)&#x00A0;\
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;q[x]&#x00A0;=&#x00A0;exp(&#x00A0;p[x]&#x00A0;);&#x00A0;\
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;if(&#x00A0;im_writeline(&#x00A0;y,&#x00A0;out,&#x00A0;buffer&#x00A0;)&#x00A0;)&#x00A0;\
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;return(&#x00A0;-1&#x00A0;);&#x00A0;\
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;}&#x00A0;\
+&#x00A0;<br />}
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Switch&#x00A0;for&#x00A0;all&#x00A0;the&#x00A0;types&#x00A0;we&#x00A0;can&#x00A0;handle.
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;switch(&#x00A0;in-&#x003E;BandFmt&#x00A0;)&#x00A0;{
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;case&#x00A0;IM_BANDFMT_UCHAR:&#x00A0;loop(&#x00A0;unsigned&#x00A0;char,&#x00A0;float&#x00A0;);&#x00A0;break;
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;case&#x00A0;IM_BANDFMT_CHAR:&#x00A0;&#x00A0;loop(&#x00A0;char,&#x00A0;float&#x00A0;);&#x00A0;break;
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;case&#x00A0;IM_BANDFMT_USHORT:loop(&#x00A0;unsigned&#x00A0;short,&#x00A0;float&#x00A0;);&#x00A0;break;
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;case&#x00A0;IM_BANDFMT_SHORT:&#x00A0;loop(&#x00A0;short,&#x00A0;float&#x00A0;);&#x00A0;break;
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;case&#x00A0;IM_BANDFMT_UINT:&#x00A0;&#x00A0;loop(&#x00A0;unsigned&#x00A0;int,&#x00A0;float&#x00A0;);&#x00A0;break;
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;case&#x00A0;IM_BANDFMT_INT:&#x00A0;&#x00A0;&#x00A0;loop(&#x00A0;int,&#x00A0;float&#x00A0;);&#x00A0;break;
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;case&#x00A0;IM_BANDFMT_FLOAT:&#x00A0;loop(&#x00A0;float,&#x00A0;float&#x00A0;);&#x00A0;break;
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;case&#x00A0;IM_BANDFMT_DOUBLE:loop(&#x00A0;double,&#x00A0;double&#x00A0;);&#x00A0;break;
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;default:
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;im_error(&#x00A0;"exptra",&#x00A0;"internal&#x00A0;error"&#x00A0;);
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;return(&#x00A0;-1&#x00A0;);
+&#x00A0;<br />&#x00A0;&#x00A0;}
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Success.
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;return(&#x00A0;0&#x00A0;);
+&#x00A0;<br />}
+</div>
+<!--l. 361--><p class="nopar" >
+<br /><div class="caption" 
+><span class="id">Figure&#x00A0;3.4: </span><span  
+class="content">Calculate <span 
+class="pcrr7t-">exp() </span>for an image (cont)</span></div><!--tex4ht:label?: x21-910024 -->
+                                           
+                                                                                       
+
+                                                                                       
+  </div><hr class="endfloat" />
+                                           
+                                                                                       
+
+                                                                                       
+  <!--l. 1--><div class="crosslinks"><p class="noindent">[<a 
+href="vipsmanualse15.html" >next</a>] [<a 
+href="vipsmanualse13.html" >prev</a>] [<a 
+href="vipsmanualse13.html#tailvipsmanualse13.html" >prev-tail</a>] [<a 
+href="vipsmanualse14.html" >front</a>] [<a 
+href="vipsmanualch3.html#vipsmanualse14.html" >up</a>] </p></div>
+<!--l. 1--><p class="indent" >  <a 
+ id="tailvipsmanualse14.html"></a>   
+</body></html> 

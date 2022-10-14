@@ -1,0 +1,15 @@
+
+control
+gcc-pp.c
+gcc-pp.opts-O5_-finline-limit_1000_-fselective-scheduling_-fselective-scheduling2.err
+gcc-pp.opts-O5_-finline-limit_1000_-fselective-scheduling_-fselective-scheduling2.out
+gcc-pp.opts-O5_-finline-limit_1000_-fselective-scheduling_-fselective-scheduling2.s
+gcc-pp.opts-O5_-fipa-pta.err
+gcc-pp.opts-O5_-fipa-pta.out
+gcc-pp.opts-O5_-fipa-pta.s
+sgcc_base.mytest-m64
+speccmds.cmd
+speccmds.err
+speccmds.out
+speccmds.stdout
+OLD

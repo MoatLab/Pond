@@ -1,0 +1,1386 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html > 
+<head><title>VIPS packages</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (http://www.cse.ohio-state.edu/~gurari/TeX4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.cse.ohio-state.edu/~gurari/TeX4ht/)"> 
+<!-- 3,html --> 
+<meta name="src" content="vipsmanual.tex"> 
+<meta name="date" content="2010-06-09 21:39:00"> 
+<link rel="stylesheet" type="text/css" href="vipsmanual.css"> 
+</head><body 
+>
+  <!--l. 1--><div class="crosslinks"><p class="noindent">[<a 
+href="vipsmanualse17.html" >prev</a>] [<a 
+href="vipsmanualse17.html#tailvipsmanualse17.html" >prev-tail</a>] [<a 
+href="#tailvipsmanualse18.html">tail</a>] [<a 
+href="vipsmanualch4.html#vipsmanualse18.html" >up</a>] </p></div>
+  <h3 class="sectionHead"><span class="titlemark">4.2    </span> <a 
+ id="x26-1060004.2"></a>VIPS packages</h3>
+<!--l. 2--><p class="noindent" ><a name="nip_label_sec:packages"></a>
+<!--l. 4--><p class="noindent" >
+  <h4 class="subsectionHead"><span class="titlemark">4.2.1    </span> <a 
+ id="x26-1070004.2.1"></a>Arithmetic</h4>
+<!--l. 6--><p class="noindent" >See Figure&#x00A0;<a 
+href="#x26-1070011">4.1<!--tex4ht:ref: fg:arithmetic --></a>.
+<!--l. 8--><p class="indent" >  Arithmetic functions work on images as if each band
+element were a separate number. All operations are
+point-to-point &#8212; each output element depends exactly upon
+the corresponding input element. All (except in a few cases
+noted in the manual pages) will work with images of any
+type (or any mixture of types), of any size and of any
+number of bands.
+<!--l. 14--><p class="indent" >  Arithmetic operations try to preserve precision by
+increasing the number of bits in the output image
+when necessary. Generally, this follows the ANSI C
+conventions for type promotion &#8212; so multiplying two
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">IM_BANDFMT_UCHAR</span></span></span> images together, for example,
+produces a <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">IM_BANDFMT_USHORT</span></span></span> image, and taking the
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_costra()</span></span></span> of a <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">IM_BANDFMT_USHORT</span></span></span> image
+produces a <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">IM_BANDFMT_FLOAT</span></span></span> image. The details of
+the type conversions are in the manual pages.
+                                           
+                                                                                       
+
+                                                                                       
+<!--l. 23--><p class="indent" >  <a 
+ id="x26-1070011"></a><hr class="float"><div class="float" 
+>
+                                           
+                                                                                       
+
+                                                                                       
+<div class="verbatim" id="verbatim-177">
+$&#x00A0;vips&#x00A0;--list&#x00A0;arithmetic
+&#x00A0;<br />im_abs&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;absolute&#x00A0;value
+&#x00A0;<br />im_acostra&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;acos&#x00A0;of&#x00A0;image&#x00A0;(result&#x00A0;in&#x00A0;degrees)
+&#x00A0;<br />im_add&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;add&#x00A0;two&#x00A0;images
+&#x00A0;<br />im_asintra&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;asin&#x00A0;of&#x00A0;image&#x00A0;(result&#x00A0;in&#x00A0;degrees)
+&#x00A0;<br />im_atantra&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;atan&#x00A0;of&#x00A0;image&#x00A0;(result&#x00A0;in&#x00A0;degrees)
+&#x00A0;<br />im_avg&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;average&#x00A0;value&#x00A0;of&#x00A0;image
+&#x00A0;<br />im_point_bilinear&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;interpolate&#x00A0;value&#x00A0;at&#x00A0;single&#x00A0;point,&#x00A0;linearly
+&#x00A0;<br />im_bandmean&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;average&#x00A0;image&#x00A0;bands
+&#x00A0;<br />im_ceil&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;round&#x00A0;to&#x00A0;smallest&#x00A0;integal&#x00A0;value&#x00A0;not&#x00A0;less&#x00A0;than
+&#x00A0;<br />im_cmulnorm&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;multiply&#x00A0;two&#x00A0;complex&#x00A0;images,&#x00A0;normalising&#x00A0;output
+&#x00A0;<br />im_costra&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;cos&#x00A0;of&#x00A0;image&#x00A0;(angles&#x00A0;in&#x00A0;degrees)
+&#x00A0;<br />im_cross_phase&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;phase&#x00A0;of&#x00A0;cross&#x00A0;power&#x00A0;spectrum&#x00A0;of&#x00A0;two&#x00A0;complex&#x00A0;images
+&#x00A0;<br />im_deviate&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;standard&#x00A0;deviation&#x00A0;of&#x00A0;image
+&#x00A0;<br />im_divide&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;divide&#x00A0;two&#x00A0;images
+&#x00A0;<br />im_exp10tra&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;10^pel&#x00A0;of&#x00A0;image
+&#x00A0;<br />im_expntra&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;x^pel&#x00A0;of&#x00A0;image
+&#x00A0;<br />im_expntra_vec&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;[x,y,z]^pel&#x00A0;of&#x00A0;image
+&#x00A0;<br />im_exptra&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;e^pel&#x00A0;of&#x00A0;image
+&#x00A0;<br />im_fav4&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;average&#x00A0;of&#x00A0;4&#x00A0;images
+&#x00A0;<br />im_floor&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;round&#x00A0;to&#x00A0;largest&#x00A0;integal&#x00A0;value&#x00A0;not&#x00A0;greater&#x00A0;than
+&#x00A0;<br />im_gadd&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;calculate&#x00A0;a&#x22C6;in1&#x00A0;+&#x00A0;b&#x22C6;in2&#x00A0;+&#x00A0;c&#x00A0;=&#x00A0;outfile
+&#x00A0;<br />im_invert&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;photographic&#x00A0;negative
+&#x00A0;<br />im_lintra&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;calculate&#x00A0;a&#x22C6;in&#x00A0;+&#x00A0;b&#x00A0;=&#x00A0;outfile
+&#x00A0;<br />im_linreg&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;pixelwise&#x00A0;linear&#x00A0;regression
+&#x00A0;<br />im_lintra_vec&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;calculate&#x00A0;a&#x22C6;in&#x00A0;+&#x00A0;b&#x00A0;-&#x003E;&#x00A0;out,&#x00A0;a&#x00A0;and&#x00A0;b&#x00A0;vectors
+&#x00A0;<br />im_litecor&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;calculate&#x00A0;max(white)&#x22C6;factor&#x22C6;(in/white),&#x00A0;if&#x00A0;clip&#x00A0;==&#x00A0;1
+&#x00A0;<br />im_log10tra&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;log10&#x00A0;of&#x00A0;image
+&#x00A0;<br />im_logtra&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;ln&#x00A0;of&#x00A0;image
+&#x00A0;<br />im_max&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;maximum&#x00A0;value&#x00A0;of&#x00A0;image
+&#x00A0;<br />im_maxpos&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;position&#x00A0;of&#x00A0;maximum&#x00A0;value&#x00A0;of&#x00A0;image
+&#x00A0;<br />im_maxpos_avg&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;position&#x00A0;of&#x00A0;maximum&#x00A0;value&#x00A0;of&#x00A0;image,&#x00A0;averaging&#x00A0;in&#x00A0;case&#x00A0;of&#x00A0;draw
+&#x00A0;<br />im_maxpos_vec&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;position&#x00A0;and&#x00A0;value&#x00A0;of&#x00A0;n&#x00A0;maxima&#x00A0;of&#x00A0;image
+&#x00A0;<br />im_measure&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;measure&#x00A0;averages&#x00A0;of&#x00A0;a&#x00A0;grid&#x00A0;of&#x00A0;patches
+&#x00A0;<br />im_min&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;minimum&#x00A0;value&#x00A0;of&#x00A0;image
+&#x00A0;<br />im_minpos&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;position&#x00A0;of&#x00A0;minimum&#x00A0;value&#x00A0;of&#x00A0;image
+&#x00A0;<br />im_minpos_vec&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;position&#x00A0;and&#x00A0;value&#x00A0;of&#x00A0;n&#x00A0;minima&#x00A0;of&#x00A0;image
+&#x00A0;<br />im_multiply&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;multiply&#x00A0;two&#x00A0;images
+&#x00A0;<br />im_powtra&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;pel^x&#x00A0;ofbuildimage
+&#x00A0;<br />im_powtra_vec&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;pel^[x,y,z]&#x00A0;of&#x00A0;image
+&#x00A0;<br />im_remainder&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;remainder&#x00A0;after&#x00A0;integer&#x00A0;division
+&#x00A0;<br />im_remainderconst&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;remainder&#x00A0;after&#x00A0;integer&#x00A0;division&#x00A0;by&#x00A0;a&#x00A0;constant
+&#x00A0;<br />im_remainderconst_vec&#x00A0;-&#x00A0;remainder&#x00A0;after&#x00A0;integer&#x00A0;division&#x00A0;by&#x00A0;a&#x00A0;vector&#x00A0;of&#x00A0;constants
+&#x00A0;<br />im_rint&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;round&#x00A0;to&#x00A0;nearest&#x00A0;integal&#x00A0;value
+&#x00A0;<br />im_sign&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;unit&#x00A0;vector&#x00A0;in&#x00A0;direction&#x00A0;of&#x00A0;value
+&#x00A0;<br />im_sintra&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;sin&#x00A0;of&#x00A0;image&#x00A0;(angles&#x00A0;in&#x00A0;degrees)&#x00A0;<br />im_stats&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;many&#x00A0;image&#x00A0;statistics&#x00A0;in&#x00A0;one&#x00A0;pass
+ &#x00A0;<br />im_subtract&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;subtract&#x00A0;two&#x00A0;images
+ &#x00A0;<br />im_tantra&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;tan&#x00A0;of&#x00A0;image&#x00A0;(angles&#x00A0;in&#x00A0;degrees)
+</div>
+<!--l. 73--><p class="nopar" >
+<br /><div class="caption" 
+><span class="id">Figure&#x00A0;4.1: </span><span  
+class="content">Arithmetic functions</span></div><!--tex4ht:label?: x26-1070011 -->
+                                                                                       
+
+                                                                                       
+  </div><hr class="endfloat" />
+  <h4 class="subsectionHead"><span class="titlemark">4.2.2    </span> <a 
+ id="x26-1080004.2.2"></a>Relational</h4>
+<!--l. 80--><p class="noindent" >See Figure&#x00A0;<a 
+href="#x26-1080012">4.2<!--tex4ht:ref: fg:relational --></a>.
+<!--l. 82--><p class="indent" >  Relational functions compare images to other images or
+to constants. They accept any image or pair of images
+(provided they are the same size and have the same
+number of bands &#8212; their types may differ) and produce a
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">IM_BANDFMT_UCHAR</span></span></span> image with the same number of
+bands as the input image, with 255 in every band element
+for which the condition is true and 0 elsewhere.
+<!--l. 89--><p class="indent" >  They may be combined with the boolean functions to
+form complex relational conditions. Use <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_max()</span></span></span> (or
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_min()</span></span></span>) to find out if a condition is true (or false) for a
+whole image.
+                                           
+                                                                                       
+
+                                                                                       
+<!--l. 94--><p class="indent" >  <a 
+ id="x26-1080012"></a><hr class="float"><div class="float" 
+>
+                                           
+                                                                                       
+
+                                                                                       
+<div class="verbatim" id="verbatim-178">
+$&#x00A0;vips&#x00A0;--list&#x00A0;relational
+&#x00A0;<br />im_blend&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;use&#x00A0;cond&#x00A0;image&#x00A0;to&#x00A0;blend&#x00A0;between&#x00A0;images&#x00A0;in1&#x00A0;and&#x00A0;in2
+&#x00A0;<br />im_equal&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;two&#x00A0;images&#x00A0;equal&#x00A0;in&#x00A0;value
+&#x00A0;<br />im_equal_vec&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;image&#x00A0;equals&#x00A0;doublevec
+&#x00A0;<br />im_equalconst&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;image&#x00A0;equals&#x00A0;const
+&#x00A0;<br />im_ifthenelse&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;use&#x00A0;cond&#x00A0;image&#x00A0;to&#x00A0;choose&#x00A0;pels&#x00A0;from&#x00A0;image&#x00A0;in1&#x00A0;or&#x00A0;in2
+&#x00A0;<br />im_less&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;in1&#x00A0;less&#x00A0;than&#x00A0;in2&#x00A0;in&#x00A0;value
+&#x00A0;<br />im_less_vec&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;in&#x00A0;less&#x00A0;than&#x00A0;doublevec
+&#x00A0;<br />im_lessconst&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;in&#x00A0;less&#x00A0;than&#x00A0;const
+&#x00A0;<br />im_lesseq&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;in1&#x00A0;less&#x00A0;than&#x00A0;or&#x00A0;equal&#x00A0;to&#x00A0;in2&#x00A0;in&#x00A0;value
+&#x00A0;<br />im_lesseq_vec&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;in&#x00A0;less&#x00A0;than&#x00A0;or&#x00A0;equal&#x00A0;to&#x00A0;doublevec
+&#x00A0;<br />im_lesseqconst&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;in&#x00A0;less&#x00A0;than&#x00A0;or&#x00A0;equal&#x00A0;to&#x00A0;const
+&#x00A0;<br />im_more&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;in1&#x00A0;more&#x00A0;than&#x00A0;in2&#x00A0;in&#x00A0;value
+&#x00A0;<br />im_more_vec&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;in&#x00A0;more&#x00A0;than&#x00A0;doublevec
+&#x00A0;<br />im_moreconst&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;in&#x00A0;more&#x00A0;than&#x00A0;const
+&#x00A0;<br />im_moreeq&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;in1&#x00A0;more&#x00A0;than&#x00A0;or&#x00A0;equal&#x00A0;to&#x00A0;in2&#x00A0;in&#x00A0;value
+&#x00A0;<br />im_moreeq_vec&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;in&#x00A0;more&#x00A0;than&#x00A0;or&#x00A0;equal&#x00A0;to&#x00A0;doublevec
+&#x00A0;<br />im_moreeqconst&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;in&#x00A0;more&#x00A0;than&#x00A0;or&#x00A0;equal&#x00A0;to&#x00A0;const
+&#x00A0;<br />im_notequal&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;two&#x00A0;images&#x00A0;not&#x00A0;equal&#x00A0;in&#x00A0;value
+&#x00A0;<br />im_notequal_vec&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;image&#x00A0;does&#x00A0;not&#x00A0;equal&#x00A0;doublevec
+&#x00A0;<br />im_notequalconst&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;image&#x00A0;does&#x00A0;not&#x00A0;equal&#x00A0;const
+</div>
+<!--l. 116--><p class="nopar" >
+<br /><div class="caption" 
+><span class="id">Figure&#x00A0;4.2: </span><span  
+class="content">Relational functions</span></div><!--tex4ht:label?: x26-1080012 -->
+                                           
+                                                                                       
+
+                                                                                       
+  </div><hr class="endfloat" />
+  <h4 class="subsectionHead"><span class="titlemark">4.2.3    </span> <a 
+ id="x26-1090004.2.3"></a>Boolean</h4>
+<!--l. 123--><p class="noindent" >See Figure&#x00A0;<a 
+href="#x26-1090013">4.3<!--tex4ht:ref: fg:boolean --></a>.
+<!--l. 125--><p class="indent" >  The boolean functions perform boolean arithmetic on
+pairs of <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">IM_BANDFMT_UCHAR</span></span></span> images. They are useful for
+combining the results of the relational and morphological
+functions. You can use <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_eorconst()</span></span></span> with 255 as
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_not()</span></span></span>.
+                                           
+                                                                                       
+
+                                                                                       
+<!--l. 131--><p class="indent" >  <a 
+ id="x26-1090013"></a><hr class="float"><div class="float" 
+>
+                                           
+                                                                                       
+
+                                                                                       
+<div class="verbatim" id="verbatim-179">
+$&#x00A0;vips&#x00A0;--list&#x00A0;boolean
+&#x00A0;<br />im_andimage&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;bitwise&#x00A0;and&#x00A0;of&#x00A0;two&#x00A0;images
+&#x00A0;<br />im_andimageconst&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;bitwise&#x00A0;and&#x00A0;of&#x00A0;an&#x00A0;image&#x00A0;with&#x00A0;a&#x00A0;constant
+&#x00A0;<br />im_andimage_vec&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;bitwise&#x00A0;and&#x00A0;of&#x00A0;an&#x00A0;image&#x00A0;with&#x00A0;a&#x00A0;vector&#x00A0;constant
+&#x00A0;<br />im_orimage&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;bitwise&#x00A0;or&#x00A0;of&#x00A0;two&#x00A0;images
+&#x00A0;<br />im_orimageconst&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;bitwise&#x00A0;or&#x00A0;of&#x00A0;an&#x00A0;image&#x00A0;with&#x00A0;a&#x00A0;constant
+&#x00A0;<br />im_orimage_vec&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;bitwise&#x00A0;or&#x00A0;of&#x00A0;an&#x00A0;image&#x00A0;with&#x00A0;a&#x00A0;vector&#x00A0;constant
+&#x00A0;<br />im_eorimage&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;bitwise&#x00A0;eor&#x00A0;of&#x00A0;two&#x00A0;images
+&#x00A0;<br />im_eorimageconst&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;bitwise&#x00A0;eor&#x00A0;of&#x00A0;an&#x00A0;image&#x00A0;with&#x00A0;a&#x00A0;constant
+&#x00A0;<br />im_eorimage_vec&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;bitwise&#x00A0;eor&#x00A0;of&#x00A0;an&#x00A0;image&#x00A0;with&#x00A0;a&#x00A0;vector&#x00A0;constant
+&#x00A0;<br />im_shiftleft&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;shift&#x00A0;integer&#x00A0;image&#x00A0;n&#x00A0;bits&#x00A0;to&#x00A0;left
+&#x00A0;<br />im_shiftright&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;shift&#x00A0;integer&#x00A0;image&#x00A0;n&#x00A0;bits&#x00A0;to&#x00A0;right
+</div>
+<!--l. 144--><p class="nopar" >
+<br /><div class="caption" 
+><span class="id">Figure&#x00A0;4.3: </span><span  
+class="content">Boolean functions</span></div><!--tex4ht:label?: x26-1090013 -->
+                                           
+                                                                                       
+
+                                                                                       
+  </div><hr class="endfloat" />
+  <h4 class="subsectionHead"><span class="titlemark">4.2.4    </span> <a 
+ id="x26-1100004.2.4"></a>Colour</h4>
+<!--l. 152--><p class="noindent" >See Figure&#x00A0;<a 
+href="#x26-1100025">4.5<!--tex4ht:ref: fg:colour --></a>.
+<!--l. 154--><p class="indent" >  The colour functions can be divided into two main types.
+First, functions to transform images between the different
+colour spaces supported by VIPS: <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">RGB</span></span></span> (also referred to as
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">disp</span></span></span>), <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">sRGB</span></span></span>, <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">XYZ</span></span></span>, <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">Yxy</span></span></span>, <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">Lab</span></span></span>, <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">LabQ</span></span></span>, <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">LabS</span></span></span>, <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">LCh</span></span></span> and
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">UCS</span></span></span>), and second, functions for calculating colour
+difference metrics. Figure&#x00A0;<a 
+href="#x26-1100014">4.4<!--tex4ht:ref: fg:convert --></a> shows how the VIPS colour
+spaces interconvert.
+                                           
+                                                                                       
+
+                                                                                       
+<!--l. 163--><p class="indent" >  <a 
+ id="x26-1100014"></a><hr class="float"><div class="float" 
+>
+                                           
+                                                                                       
+
+                                                                                       
+<div class="center" 
+>
+<!--l. 163--><p class="noindent" >
+
+<!--l. 163--><p class="noindent" ><img 
+src="figs/interconvert.png" alt="PIC"  
+></div>
+<br /> <div class="caption" 
+><span class="id">Figure&#x00A0;4.4: </span><span  
+class="content">VIPS colour space conversion</span></div><!--tex4ht:label?: x26-1100014 -->
+                                           
+                                                                                       
+
+                                                                                       
+  </div><hr class="endfloat" />
+<!--l. 168--><p class="indent" >  The colour spaces supported by VIPS are:
+    <dl class="description"><dt class="description">
+<span 
+class="pcrb7t-">LabQ</span> </dt><dd 
+class="description">This is the principal VIPS colorimetric storage
+    format. See the man page for <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_LabQ2Lab()</span></span></span>
+    for     an     explanation.     You     cannot     perform
+    calculations on <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">LabQ</span></span></span> images. They are for storage
+    only. Also refered to as <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">LABPACK</span></span></span>.
+    </dd><dt class="description">
+<span 
+class="pcrb7t-">LabS</span> </dt><dd 
+class="description">This                                                            format
+    represents coordinates in <span 
+class="ptmri7t-">CIE</span><span 
+class="ptmri7t-">&#x00A0;</span><span 
+class="cmmi-10">L</span><span 
+class="cmsy-7">*</span><span 
+class="cmmi-10">a</span><span 
+class="cmsy-7">*</span><span 
+class="cmmi-10">b</span><span 
+class="cmsy-7">*</span> space as a
+    three- band <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">IM_BANDFMT_SHORT</span></span></span> image, scaled
+    to fit the full range of bits. It is the best format for
+    computation, being relatively compact, quick, and
+    accurate. Colour values expressed in this way are
+    hard to visualise.
+    </dd><dt class="description">
+<span 
+class="pcrb7t-">Lab</span> </dt><dd 
+class="description"><span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">Lab</span></span></span> colourspace  represents  <span 
+class="ptmri7t-">CIE</span><span 
+class="ptmri7t-">&#x00A0;</span><span 
+class="cmmi-10">L</span><span 
+class="cmsy-7">*</span><span 
+class="cmmi-10">a</span><span 
+class="cmsy-7">*</span><span 
+class="cmmi-10">b</span><span 
+class="cmsy-7">*</span> colour
+    values  with  a  three-band  <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">IM_BANDFMT_FLOAT</span></span></span>
+    image.  This  is  the  simplest  format  for  general
+    work: adding the constant 50 to the L channel, for
+    example, has the expected result.
+    </dd><dt class="description">
+<span 
+class="pcrb7t-">XYZ</span> </dt><dd 
+class="description"><span 
+class="ptmri7t-">CIE XYZ </span>colour space represented as a three-band
+    <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">IM_BANDFMT_FLOAT</span></span></span> image.
+    </dd><dt class="description">
+<span 
+class="pcrb7t-">XYZ</span> </dt><dd 
+class="description"><span 
+class="ptmri7t-">CIE Yxy </span>colour space represented as a three-band
+    <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">IM_BANDFMT_FLOAT</span></span></span> image.
+    </dd><dt class="description">
+<span 
+class="pcrb7t-">RGB</span> </dt><dd 
+class="description">(also   refered   to   as   <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">disp</span></span></span>)   This   format   is
+    similar   to   the   RGB   colour   systems   used   in
+    other   packages.   If   you   want   to   export   your
+    image   to   a   PC,   for   example,   convert   your
+    colorimetric  image  to  <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">RGB</span></span></span>,  then  turn  it  to  TIFF
+    with  <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_vips2tiff()</span></span></span>.  You  need  to  supply  a
+    structure which characterises your display. See the
+    manual page for <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_col_XYZ2rgb()</span></span></span> for hints
+    on these guys.
+    <!--l. 205--><p class="noindent" >VIPS   also   supports   <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">sRGB</span></span></span>.   This   is   a   version
+    of  RGB  with  a  carefully  defined  and  standard
+    conversion from XYZ. See:
+                                                     <div class="verbatim" id="verbatim-180">
+          http://www.color.org/ 
+</div>
+   <!--l. 210--><p class="nopar" >
+   </dd><dt class="description">
+<span 
+class="pcrb7t-">LCh</span> </dt><dd 
+class="description">Like <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">Lab</span></span></span>, but rectangular <span 
+class="cmmi-10">ab </span>coordinates are replaced
+        with polar <span 
+class="cmmi-10">Ch </span>(Chroma and hue) coordinates. Hue
+        angles are expressed in degrees.
+        </dd><dt class="description">
+<span 
+class="pcrb7t-">UCS</span> </dt><dd 
+class="description">A colour space based on the CMC(1:1) colour
+        difference measurement. This is a highly uniform
+        colour space, much better than <span 
+class="ptmri7t-">CIE</span><span 
+class="ptmri7t-">&#x00A0;</span><span 
+class="cmmi-10">L</span><span 
+class="cmsy-7">*</span><span 
+class="cmmi-10">a</span><span 
+class="cmsy-7">*</span><span 
+class="cmmi-10">b</span><span 
+class="cmsy-7">*</span> for
+        expressing small differences. Conversions to and from
+        <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">UCS</span></span></span> are extremely slow.
+        </dd></dl>
+<!--l. 223--><p class="indent" >    All VIPS colourspaces assume a D65 illuminant.
+<!--l. 225--><p class="indent" >    The colour-difference functions calculate either <span 
+class="cmr-10">&#x0394;</span><span 
+class="cmmi-10">E</span>
+<span 
+class="ptmri7t-">CIE</span><span 
+class="ptmri7t-">&#x00A0;</span><span 
+class="cmmi-10">L</span><span 
+class="cmsy-7">*</span><span 
+class="cmmi-10">a</span><span 
+class="cmsy-7">*</span><span 
+class="cmmi-10">b</span><span 
+class="cmsy-7">*</span> (1976 or 2000) or <span 
+class="cmr-10">&#x0394;</span><span 
+class="cmmi-10">E </span>CMC(1:1) on two
+images in <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">Lab</span></span></span>, <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">XYZ</span></span></span> or <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">disp</span></span></span> colour space.
+                                                                                       
+
+                                                                                       
+<!--l. 230--><p class="indent" >  <a 
+ id="x26-1100025"></a><hr class="float"><div class="float" 
+>
+                                           
+                                                                                       
+
+                                                                                       
+<div class="verbatim" id="verbatim-181">
+$&#x00A0;vips&#x00A0;--list&#x00A0;colour
+&#x00A0;<br />im_LCh2Lab&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;convert&#x00A0;LCh&#x00A0;to&#x00A0;Lab
+&#x00A0;<br />im_LCh2UCS&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;convert&#x00A0;LCh&#x00A0;to&#x00A0;UCS
+&#x00A0;<br />im_Lab2LCh&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;convert&#x00A0;Lab&#x00A0;to&#x00A0;LCh
+&#x00A0;<br />im_Lab2LabQ&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;convert&#x00A0;Lab&#x00A0;to&#x00A0;LabQ
+&#x00A0;<br />im_Lab2LabS&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;convert&#x00A0;Lab&#x00A0;to&#x00A0;LabS
+&#x00A0;<br />im_Lab2UCS&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;convert&#x00A0;Lab&#x00A0;to&#x00A0;UCS
+&#x00A0;<br />im_Lab2XYZ&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;convert&#x00A0;D65&#x00A0;Lab&#x00A0;to&#x00A0;XYZ
+&#x00A0;<br />im_Lab2XYZ_temp&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;convert&#x00A0;Lab&#x00A0;to&#x00A0;XYZ,&#x00A0;with&#x00A0;a&#x00A0;specified&#x00A0;colour&#x00A0;temperature
+&#x00A0;<br />im_Lab2disp&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;convert&#x00A0;Lab&#x00A0;to&#x00A0;displayable
+&#x00A0;<br />im_LabQ2LabS&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;convert&#x00A0;LabQ&#x00A0;to&#x00A0;LabS
+&#x00A0;<br />im_LabQ2Lab&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;convert&#x00A0;LabQ&#x00A0;to&#x00A0;Lab
+&#x00A0;<br />im_LabQ2XYZ&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;convert&#x00A0;LabQ&#x00A0;to&#x00A0;XYZ
+&#x00A0;<br />im_LabQ2disp&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;convert&#x00A0;LabQ&#x00A0;to&#x00A0;displayable
+&#x00A0;<br />im_LabS2LabQ&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;convert&#x00A0;LabS&#x00A0;to&#x00A0;LabQ
+&#x00A0;<br />im_LabS2Lab&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;convert&#x00A0;LabS&#x00A0;to&#x00A0;Lab
+&#x00A0;<br />im_UCS2LCh&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;convert&#x00A0;UCS&#x00A0;to&#x00A0;LCh
+&#x00A0;<br />im_UCS2Lab&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;convert&#x00A0;UCS&#x00A0;to&#x00A0;Lab
+&#x00A0;<br />im_UCS2XYZ&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;convert&#x00A0;UCS&#x00A0;to&#x00A0;XYZ
+&#x00A0;<br />im_XYZ2Lab&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;convert&#x00A0;D65&#x00A0;XYZ&#x00A0;to&#x00A0;Lab
+&#x00A0;<br />im_XYZ2Lab_temp&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;convert&#x00A0;XYZ&#x00A0;to&#x00A0;Lab,&#x00A0;with&#x00A0;a&#x00A0;specified&#x00A0;colour&#x00A0;temperature
+&#x00A0;<br />im_XYZ2UCS&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;convert&#x00A0;XYZ&#x00A0;to&#x00A0;UCS
+&#x00A0;<br />im_XYZ2Yxy&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;convert&#x00A0;XYZ&#x00A0;to&#x00A0;Yxy
+&#x00A0;<br />im_XYZ2disp&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;convert&#x00A0;XYZ&#x00A0;to&#x00A0;displayble
+&#x00A0;<br />im_XYZ2sRGB&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;convert&#x00A0;XYZ&#x00A0;to&#x00A0;sRGB
+&#x00A0;<br />im_Yxy2XYZ&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;convert&#x00A0;Yxy&#x00A0;to&#x00A0;XYZ
+&#x00A0;<br />im_dE00_fromLab&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;calculate&#x00A0;delta-E&#x00A0;CIE2000&#x00A0;for&#x00A0;two&#x00A0;Lab&#x00A0;images
+&#x00A0;<br />im_dECMC_fromLab&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;calculate&#x00A0;delta-E&#x00A0;CMC(1:1)&#x00A0;for&#x00A0;two&#x00A0;Lab&#x00A0;images
+&#x00A0;<br />im_dECMC_fromdisp&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;calculate&#x00A0;delta-E&#x00A0;CMC(1:1)&#x00A0;for&#x00A0;two&#x00A0;displayable&#x00A0;images
+&#x00A0;<br />im_dE_fromLab&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;calculate&#x00A0;delta-E&#x00A0;for&#x00A0;two&#x00A0;Lab&#x00A0;images
+&#x00A0;<br />im_dE_fromXYZ&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;calculate&#x00A0;delta-E&#x00A0;for&#x00A0;two&#x00A0;XYZ&#x00A0;images
+&#x00A0;<br />im_dE_fromdisp&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;calculate&#x00A0;delta-E&#x00A0;for&#x00A0;two&#x00A0;displayable&#x00A0;images
+&#x00A0;<br />im_disp2Lab&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;convert&#x00A0;displayable&#x00A0;to&#x00A0;Lab
+&#x00A0;<br />im_disp2XYZ&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;convert&#x00A0;displayable&#x00A0;to&#x00A0;XYZ
+&#x00A0;<br />im_float2rad&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;convert&#x00A0;float&#x00A0;to&#x00A0;Radiance&#x00A0;packed
+&#x00A0;<br />im_icc_ac2rc&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;convert&#x00A0;LAB&#x00A0;from&#x00A0;AC&#x00A0;to&#x00A0;RC&#x00A0;using&#x00A0;an&#x00A0;ICC&#x00A0;profile
+&#x00A0;<br />im_icc_export&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;convert&#x00A0;a&#x00A0;float&#x00A0;LAB&#x00A0;to&#x00A0;an&#x00A0;8-bit&#x00A0;device&#x00A0;image&#x00A0;with&#x00A0;an&#x00A0;ICC&#x00A0;profile
+&#x00A0;<br />im_icc_export_depth&#x00A0;&#x00A0;-&#x00A0;convert&#x00A0;a&#x00A0;float&#x00A0;LAB&#x00A0;to&#x00A0;device&#x00A0;space&#x00A0;with&#x00A0;an&#x00A0;ICC&#x00A0;profile
+&#x00A0;<br />im_icc_import&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;convert&#x00A0;a&#x00A0;device&#x00A0;image&#x00A0;to&#x00A0;float&#x00A0;LAB&#x00A0;with&#x00A0;an&#x00A0;ICC&#x00A0;profile
+&#x00A0;<br />im_icc_import_embedded&#x00A0;-&#x00A0;convert&#x00A0;a&#x00A0;device&#x00A0;image&#x00A0;to&#x00A0;float&#x00A0;LAB&#x00A0;using&#x00A0;the&#x00A0;embedded&#x00A0;profile
+&#x00A0;<br />im_icc_present&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;test&#x00A0;for&#x00A0;presence&#x00A0;of&#x00A0;ICC&#x00A0;library
+&#x00A0;<br />im_icc_transform&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;convert&#x00A0;between&#x00A0;two&#x00A0;device&#x00A0;images&#x00A0;with&#x00A0;a&#x00A0;pair&#x00A0;of&#x00A0;ICC&#x00A0;profiles
+&#x00A0;<br />im_lab_morph&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;morph&#x00A0;colourspace&#x00A0;of&#x00A0;a&#x00A0;LAB&#x00A0;image
+&#x00A0;<br />im_rad2float&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;convert&#x00A0;Radiance&#x00A0;packed&#x00A0;to&#x00A0;float
+&#x00A0;<br />im_sRGB2XYZ&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;convert&#x00A0;sRGB&#x00A0;to&#x00A0;XYZ
+</div>                                            <!--l. 276--><p class="nopar" >
+ <br /><div class="caption" 
+><span class="id">Figure&#x00A0;4.5: </span><span  
+class="content">Colour functions</span></div><!--tex4ht:label?: x26-1100025 -->
+                                                                                       
+
+                                                                                       
+  </div><hr class="endfloat" />
+  <h4 class="subsectionHead"><span class="titlemark">4.2.5    </span> <a 
+ id="x26-1110004.2.5"></a>Conversion</h4>
+<!--l. 283--><p class="noindent" >See Figure&#x00A0;<a 
+href="#x26-1110016">4.6<!--tex4ht:ref: fg:conversion --></a>.
+<!--l. 285--><p class="indent" >  These functions may be split into three broad groups:
+functions which convert between the VIPS numeric formats
+(<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_clip2fmt()</span></span></span>, for example, converts an image of
+any type to the specified <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">IM_BANDFMT</span></span></span>), functions
+supporting complex arithmetic (<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_c2amph()</span></span></span>, for
+example, converts a complex image from rectangular to
+polar co ordinates) and functions which perform some
+simple geometric conversion (<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_extract()</span></span></span> forms a
+sub-image).
+<!--l. 293--><p class="indent" >  <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">gbandjoin</span></span></span> and the C function <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_gbandjoin()</span></span></span>
+will do a bandwise join of many images at the same time.
+See the manual pages.
+                                           
+                                                                                       
+
+                                                                                       
+<!--l. 297--><p class="indent" >  <a 
+ id="x26-1110016"></a><hr class="float"><div class="float" 
+>
+                                           
+                                                                                       
+
+                                                                                       
+<div class="verbatim" id="verbatim-182">
+$&#x00A0;vips&#x00A0;--list&#x00A0;conversion
+&#x00A0;<br />im_bandjoin&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;bandwise&#x00A0;join&#x00A0;of&#x00A0;two&#x00A0;images
+&#x00A0;<br />im_bernd&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;extract&#x00A0;from&#x00A0;pyramid&#x00A0;as&#x00A0;jpeg
+&#x00A0;<br />im_black&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;generate&#x00A0;black&#x00A0;image
+&#x00A0;<br />im_c2amph&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;convert&#x00A0;real&#x00A0;and&#x00A0;imaginary&#x00A0;to&#x00A0;phase&#x00A0;and&#x00A0;amplitude
+&#x00A0;<br />im_c2imag&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;extract&#x00A0;imaginary&#x00A0;part&#x00A0;of&#x00A0;complex&#x00A0;image
+&#x00A0;<br />im_c2ps&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;find&#x00A0;power&#x00A0;spectrum&#x00A0;of&#x00A0;complex&#x00A0;image
+&#x00A0;<br />im_c2real&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;extract&#x00A0;real&#x00A0;part&#x00A0;of&#x00A0;complex&#x00A0;image
+&#x00A0;<br />im_c2rect&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;convert&#x00A0;phase&#x00A0;and&#x00A0;amplitude&#x00A0;to&#x00A0;real&#x00A0;and&#x00A0;imaginary
+&#x00A0;<br />im_clip2c&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;convert&#x00A0;to&#x00A0;signed&#x00A0;8-bit&#x00A0;integer
+&#x00A0;<br />im_clip2cm&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;convert&#x00A0;to&#x00A0;complex
+&#x00A0;<br />im_clip2d&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;convert&#x00A0;to&#x00A0;double-precision&#x00A0;float
+&#x00A0;<br />im_clip2dcm&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;convert&#x00A0;to&#x00A0;double&#x00A0;complex
+&#x00A0;<br />im_clip2f&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;convert&#x00A0;to&#x00A0;single-precision&#x00A0;float
+&#x00A0;<br />im_clip2fmt&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;convert&#x00A0;image&#x00A0;format&#x00A0;to&#x00A0;ofmt
+&#x00A0;<br />im_clip2i&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;convert&#x00A0;to&#x00A0;signed&#x00A0;32-bit&#x00A0;integer
+&#x00A0;<br />im_clip2s&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;convert&#x00A0;to&#x00A0;signed&#x00A0;16-bit&#x00A0;integer
+&#x00A0;<br />im_clip2ui&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;convert&#x00A0;to&#x00A0;unsigned&#x00A0;32-bit&#x00A0;integer
+&#x00A0;<br />im_clip2us&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;convert&#x00A0;to&#x00A0;unsigned&#x00A0;16-bit&#x00A0;integer
+&#x00A0;<br />im_clip&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;convert&#x00A0;to&#x00A0;unsigned&#x00A0;8-bit&#x00A0;integer
+&#x00A0;<br />im_copy&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;copy&#x00A0;image
+&#x00A0;<br />im_copy_morph&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;copy&#x00A0;image,&#x00A0;setting&#x00A0;pixel&#x00A0;layout
+&#x00A0;<br />im_copy_swap&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;copy&#x00A0;image,&#x00A0;swapping&#x00A0;byte&#x00A0;order
+&#x00A0;<br />im_copy_set&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;copy&#x00A0;image,&#x00A0;setting&#x00A0;informational&#x00A0;fields
+&#x00A0;<br />im_copy_set_meta&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;copy&#x00A0;image,&#x00A0;setting&#x00A0;a&#x00A0;meta&#x00A0;field
+&#x00A0;<br />im_extract_area&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;extract&#x00A0;area
+&#x00A0;<br />im_extract_areabands&#x00A0;-&#x00A0;extract&#x00A0;area&#x00A0;and&#x00A0;bands
+&#x00A0;<br />im_extract_band&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;extract&#x00A0;band
+&#x00A0;<br />im_extract_bands&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;extract&#x00A0;several&#x00A0;bands
+&#x00A0;<br />im_extract&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;extract&#x00A0;area/band
+&#x00A0;<br />im_falsecolour&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;turn&#x00A0;luminance&#x00A0;changes&#x00A0;into&#x00A0;chrominance&#x00A0;changes
+&#x00A0;<br />im_fliphor&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;flip&#x00A0;image&#x00A0;left-right
+&#x00A0;<br />im_flipver&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;flip&#x00A0;image&#x00A0;top-bottom
+&#x00A0;<br />im_gbandjoin&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;bandwise&#x00A0;join&#x00A0;of&#x00A0;many&#x00A0;images
+&#x00A0;<br />im_grid&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;chop&#x00A0;a&#x00A0;tall&#x00A0;thin&#x00A0;image&#x00A0;into&#x00A0;a&#x00A0;grid&#x00A0;of&#x00A0;images
+&#x00A0;<br />im_insert&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;insert&#x00A0;sub-image&#x00A0;into&#x00A0;main&#x00A0;image&#x00A0;at&#x00A0;position
+&#x00A0;<br />im_insert_noexpand&#x00A0;&#x00A0;&#x00A0;-&#x00A0;insert&#x00A0;sub-image&#x00A0;into&#x00A0;main&#x00A0;image&#x00A0;at&#x00A0;position,&#x00A0;no&#x00A0;expansion
+&#x00A0;<br />im_lrjoin&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;join&#x00A0;two&#x00A0;images&#x00A0;left-right
+&#x00A0;<br />im_mask2vips&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;convert&#x00A0;DOUBLEMASK&#x00A0;to&#x00A0;VIPS&#x00A0;image
+&#x00A0;<br />im_msb&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;convert&#x00A0;to&#x00A0;uchar&#x00A0;by&#x00A0;discarding&#x00A0;bits
+&#x00A0;<br />im_msb_band&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;convert&#x00A0;to&#x00A0;single&#x00A0;band&#x00A0;uchar&#x00A0;by&#x00A0;discarding&#x00A0;bits
+&#x00A0;<br />im_print&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;print&#x00A0;string&#x00A0;to&#x00A0;stdout
+&#x00A0;<br />im_recomb&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;linear&#x00A0;recombination&#x00A0;with&#x00A0;mask
+&#x00A0;<br />im_replicate&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;replicate&#x00A0;an&#x00A0;image&#x00A0;horizontally&#x00A0;and&#x00A0;vertically
+&#x00A0;<br />im_ri2c&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;join&#x00A0;two&#x00A0;non-complex&#x00A0;images&#x00A0;to&#x00A0;form&#x00A0;complex
+</div>                                            <!--l. 343--><p class="nopar" >
+ <br /><div class="caption" 
+><span class="id">Figure&#x00A0;4.6: </span><span  
+class="content">Conversion functions</span></div><!--tex4ht:label?: x26-1110016 -->
+                                                                                       
+
+                                                                                       
+  </div><hr class="endfloat" />
+                                           
+                                                                                       
+
+                                                                                       
+<!--l. 349--><p class="indent" >  <a 
+ id="x26-1110027"></a><hr class="float"><div class="float" 
+>
+                                           
+                                                                                       
+
+                                                                                       
+<div class="verbatim" id="verbatim-183">
+im_rot180&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;rotate&#x00A0;image&#x00A0;180&#x00A0;degrees
+&#x00A0;<br />im_rot270&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;rotate&#x00A0;image&#x00A0;270&#x00A0;degrees&#x00A0;clockwise
+&#x00A0;<br />im_rot90&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;rotate&#x00A0;image&#x00A0;90&#x00A0;degrees&#x00A0;clockwise
+&#x00A0;<br />im_scale&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;scale&#x00A0;image&#x00A0;linearly&#x00A0;to&#x00A0;fit&#x00A0;range&#x00A0;0-255
+&#x00A0;<br />im_scaleps&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;logarithmic&#x00A0;scale&#x00A0;of&#x00A0;image&#x00A0;to&#x00A0;fit&#x00A0;range&#x00A0;0-255
+&#x00A0;<br />im_rightshift_size&#x00A0;&#x00A0;&#x00A0;-&#x00A0;decrease&#x00A0;size&#x00A0;by&#x00A0;a&#x00A0;power-of-two&#x00A0;factor
+&#x00A0;<br />im_slice&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;slice&#x00A0;an&#x00A0;image&#x00A0;using&#x00A0;two&#x00A0;thresholds
+&#x00A0;<br />im_subsample&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;subsample&#x00A0;image&#x00A0;by&#x00A0;integer&#x00A0;factors
+&#x00A0;<br />im_system&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;run&#x00A0;command&#x00A0;on&#x00A0;image
+&#x00A0;<br />im_tbjoin&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;join&#x00A0;two&#x00A0;images&#x00A0;top-bottom
+&#x00A0;<br />im_text&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;generate&#x00A0;text&#x00A0;image
+&#x00A0;<br />im_thresh&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;slice&#x00A0;an&#x00A0;image&#x00A0;at&#x00A0;a&#x00A0;threshold
+&#x00A0;<br />im_vips2mask&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;convert&#x00A0;VIPS&#x00A0;image&#x00A0;to&#x00A0;DOUBLEMASK
+&#x00A0;<br />im_wrap&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;shift&#x00A0;image&#x00A0;origin,&#x00A0;wrapping&#x00A0;at&#x00A0;sides
+&#x00A0;<br />im_zoom&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;simple&#x00A0;zoom&#x00A0;of&#x00A0;an&#x00A0;image&#x00A0;by&#x00A0;integer&#x00A0;factors
+</div>
+<!--l. 365--><p class="nopar" >
+<br /><div class="caption" 
+><span class="id">Figure&#x00A0;4.7: </span><span  
+class="content">Conversion functions (cont.)</span></div><!--tex4ht:label?: x26-1110027 -->
+                                           
+                                                                                       
+
+                                                                                       
+  </div><hr class="endfloat" />
+  <h4 class="subsectionHead"><span class="titlemark">4.2.6    </span> <a 
+ id="x26-1120004.2.6"></a>Matricies</h4>
+<!--l. 371--><p class="noindent" >See Figure&#x00A0;<a 
+href="#x26-1120018">4.8<!--tex4ht:ref: fg:matricies --></a>.
+<!--l. 373--><p class="indent" >  VIPS uses matricies for morphological operations, for
+convolutions, and for some colour-space conversions. There
+are two types of matrix: integer (<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">INTMASK</span></span></span>) and double
+precision floating point (<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">DOUBLEMASK</span></span></span>).
+<!--l. 377--><p class="indent" >  For convenience, both types are stored in files as ASCII.
+The first line of the file should start with the matrix
+dimensions, width first, then on the same line an optional
+scale and offset. The two size fields should be integers; the
+scale and offset may be floats. Subsequent lines should
+contain the matrix elements, one row per line. The scale
+and offset are the conventional ones used to represent
+non-integer values in convolution masks &#8212; in other
+words:
+  <center class="par-math-display" >
+<img 
+src="vipsmanual0x.png" alt="       value
+result =-scale + of fset
+" class="par-math-display" ></center>
+<!--l. 387--><p class="nopar" >
+<!--l. 389--><p class="indent" >  If the scale and offset are missing, they default to 1.0 and
+0.0. See the sections on convolution for more on the use of
+these fields. So as an example, a 4 by 4 identity matrix
+would be stored as:
+                                                 <div class="verbatim" id="verbatim-184">
+  4&#x00A0;4
+ &#x00A0;<br />1&#x00A0;0&#x00A0;0&#x00A0;0
+ &#x00A0;<br />0&#x00A0;1&#x00A0;0&#x00A0;0
+ &#x00A0;<br />0&#x00A0;0&#x00A0;1&#x00A0;0
+ &#x00A0;<br />0&#x00A0;0&#x00A0;0&#x00A0;1 
+</div>
+<!--l. 399--><p class="nopar" >
+<!--l. 401--><p class="indent" >  And a 3 by 3 mask for block averaging with convolution
+might be stored as:
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-185">
+3&#x00A0;3&#x00A0;9&#x00A0;0
+&#x00A0;<br />1&#x00A0;1&#x00A0;1
+&#x00A0;<br />1&#x00A0;1&#x00A0;1
+&#x00A0;<br />1&#x00A0;1&#x00A0;1
+</div>
+<!--l. 408--><p class="nopar" >
+<!--l. 410--><p class="noindent" >(in other words, sum all the pels in every 3 by 3 area, and
+divide by 9).
+<!--l. 413--><p class="indent" >  This matrix contains only integer elements and so could
+be used as an argument to functions expecting both
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">INTMASK</span></span></span> and <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">DOUBLEMASK</span></span></span> matricies. However, masks
+containing floating-point values (such as the output of
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_matinv()</span></span></span>) can only be used as arguments to
+functions expecting <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">DOUBLEMASK</span></span></span>s.
+<!--l. 419--><p class="indent" >  A set of functions for mask input and output are also
+available for C-programmers &#8212; see the manual pages for
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_read_dmask()</span></span></span>. For other matrix functions,
+see also the convolution sections and the arithmetic
+sections.
+                                           
+                                                                                       
+
+                                                                                       
+<!--l. 425--><p class="indent" >  <a 
+ id="x26-1120018"></a><hr class="float"><div class="float" 
+>
+                                           
+                                                                                       
+
+                                                                                       
+<div class="verbatim" id="verbatim-186">
+$&#x00A0;vips&#x00A0;--list&#x00A0;matrix
+&#x00A0;<br />im_matcat&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;append&#x00A0;matrix&#x00A0;in2&#x00A0;to&#x00A0;the&#x00A0;end&#x00A0;of&#x00A0;matrix&#x00A0;in1
+&#x00A0;<br />im_matinv&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;invert&#x00A0;matrix
+&#x00A0;<br />im_matmul&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;multiply&#x00A0;matrix&#x00A0;in1&#x00A0;by&#x00A0;matrix&#x00A0;in2
+&#x00A0;<br />im_mattrn&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;transpose&#x00A0;matrix
+</div>
+<!--l. 431--><p class="nopar" >
+<br /><div class="caption" 
+><span class="id">Figure&#x00A0;4.8: </span><span  
+class="content">Matrix functions</span></div><!--tex4ht:label?: x26-1120018 -->
+                                           
+                                                                                       
+
+                                                                                       
+  </div><hr class="endfloat" />
+  <h4 class="subsectionHead"><span class="titlemark">4.2.7    </span> <a 
+ id="x26-1130004.2.7"></a>Convolution</h4>
+<!--l. 438--><p class="noindent" >See Figure&#x00A0;<a 
+href="#x26-1130019">4.9<!--tex4ht:ref: fg:convolution --></a>.
+<!--l. 440--><p class="indent" >  The functions available in the convolution package can be
+split into five main groups.
+<!--l. 443--><p class="indent" >  First, are the convolution functions. The most useful
+function is <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_conv()</span></span></span> which will convolve any
+non-complex type with an <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">INTMASK</span></span></span> matrix. The output
+image will have the same size, type, and number of bands as
+the input image. Of the other <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_conv()</span></span></span> functions,
+functions whose name ends in <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">_raw</span></span></span> do not add a black
+border around the output image, functions ending in <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">f</span></span></span> use
+a <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">DOUBLEMASK</span></span></span> matrix and write float (or double)
+output, and functions containing <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">sep</span></span></span> are for seperable
+convolutions. <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_compass()</span></span></span>, <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_lindetect()</span></span></span>
+and <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_gradient()</span></span></span> convolve with rotating masks.
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_embed()</span></span></span> is used by the convolution functions to add
+the border to the output.
+<!--l. 454--><p class="indent" >  Next, are the build functions. <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_gauss_&#x22C6;mask()</span></span></span> and
+its ilk generate gaussian masks, <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_log_&#x22C6;mask()</span></span></span>
+generate logs of Laplacians. <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_addgnoise()</span></span></span> and
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_gaussnoise()</span></span></span> create or add gaussian noise to an
+image.
+<!--l. 459--><p class="indent" >  Two functions do correlation: <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_fastcor()</span></span></span> does a
+quick and dirty correlation, <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_spcor()</span></span></span> calculates true
+spatial correlation, and is rather slow.
+<!--l. 463--><p class="indent" >  Some functions are provided for analysing images:
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_zerox()</span></span></span> counts zero-crossing points in an image,
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_mpercent()</span></span></span> finds a threshold that will isolate a
+percentage of points in an image.
+<!--l. 467--><p class="indent" >  Finally, <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_resize_linear()</span></span></span> and <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_shrink()</span></span></span>
+do as you would expect.
+                                           
+                                                                                       
+
+                                                                                       
+<!--l. 471--><p class="indent" >  <a 
+ id="x26-1130019"></a><hr class="float"><div class="float" 
+>
+                                           
+                                                                                       
+
+                                                                                       
+<div class="verbatim" id="verbatim-187">
+$&#x00A0;vips&#x00A0;--list&#x00A0;convolution
+&#x00A0;<br />im_addgnoise&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;add&#x00A0;gaussian&#x00A0;noise&#x00A0;with&#x00A0;mean&#x00A0;0&#x00A0;and&#x00A0;std.&#x00A0;dev.&#x00A0;sigma
+&#x00A0;<br />im_compass&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;convolve&#x00A0;with&#x00A0;8-way&#x00A0;rotating&#x00A0;integer&#x00A0;mask
+&#x00A0;<br />im_contrast_surface&#x00A0;&#x00A0;-&#x00A0;find&#x00A0;high-contrast&#x00A0;points&#x00A0;in&#x00A0;an&#x00A0;image
+&#x00A0;<br />im_contrast_surface_raw&#x00A0;-&#x00A0;find&#x00A0;high-contrast&#x00A0;points&#x00A0;in&#x00A0;an&#x00A0;image
+&#x00A0;<br />im_conv&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;convolve
+&#x00A0;<br />im_conv_raw&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;convolve,&#x00A0;no&#x00A0;border
+&#x00A0;<br />im_convf&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;convolve,&#x00A0;with&#x00A0;DOUBLEMASK
+&#x00A0;<br />im_convf_raw&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;convolve,&#x00A0;with&#x00A0;DOUBLEMASK,&#x00A0;no&#x00A0;border
+&#x00A0;<br />im_convsep&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;seperable&#x00A0;convolution
+&#x00A0;<br />im_convsep_raw&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;seperable&#x00A0;convolution,&#x00A0;no&#x00A0;border
+&#x00A0;<br />im_convsepf&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;seperable&#x00A0;convolution,&#x00A0;with&#x00A0;DOUBLEMASK
+&#x00A0;<br />im_convsepf_raw&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;seperable&#x00A0;convolution,&#x00A0;with&#x00A0;DOUBLEMASK,&#x00A0;no&#x00A0;border
+&#x00A0;<br />im_convsub&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;convolve&#x00A0;uchar&#x00A0;to&#x00A0;uchar,&#x00A0;sub-sampling&#x00A0;by&#x00A0;xskip,&#x00A0;yskip
+&#x00A0;<br />im_dmask_xsize&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;horizontal&#x00A0;size&#x00A0;of&#x00A0;a&#x00A0;doublemask
+&#x00A0;<br />im_dmask_ysize&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;vertical&#x00A0;size&#x00A0;of&#x00A0;a&#x00A0;doublemask
+&#x00A0;<br />im_embed&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;embed&#x00A0;in&#x00A0;within&#x00A0;a&#x00A0;set&#x00A0;of&#x00A0;borders
+&#x00A0;<br />im_fastcor&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;fast&#x00A0;correlate&#x00A0;in2&#x00A0;within&#x00A0;in1
+&#x00A0;<br />im_fastcor_raw&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;fast&#x00A0;correlate&#x00A0;in2&#x00A0;within&#x00A0;in1,&#x00A0;no&#x00A0;border
+&#x00A0;<br />im_gauss_dmask&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;generate&#x00A0;gaussian&#x00A0;DOUBLEMASK
+&#x00A0;<br />im_gauss_imask&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;generate&#x00A0;gaussian&#x00A0;INTMASK
+&#x00A0;<br />im_gauss_imask_sep&#x00A0;&#x00A0;&#x00A0;-&#x00A0;generate&#x00A0;separable&#x00A0;gaussian&#x00A0;INTMASK
+&#x00A0;<br />im_gaussnoise&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;generate&#x00A0;image&#x00A0;of&#x00A0;gaussian&#x00A0;noise&#x00A0;with&#x00A0;specified&#x00A0;statistics
+&#x00A0;<br />im_grad_x&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;horizontal&#x00A0;difference&#x00A0;image
+&#x00A0;<br />im_grad_y&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;vertical&#x00A0;difference&#x00A0;image
+&#x00A0;<br />im_gradcor&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;non-normalised&#x00A0;correlation&#x00A0;of&#x00A0;gradient&#x00A0;of&#x00A0;in2&#x00A0;within&#x00A0;in1
+&#x00A0;<br />im_gradcor_raw&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;non-normalised&#x00A0;correlation&#x00A0;of&#x00A0;gradient&#x00A0;of&#x00A0;in2&#x00A0;within&#x00A0;in1,&#x00A0;no&#x00A0;padding
+&#x00A0;<br />im_gradient&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;convolve&#x00A0;with&#x00A0;2-way&#x00A0;rotating&#x00A0;mask
+&#x00A0;<br />im_imask_xsize&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;horizontal&#x00A0;size&#x00A0;of&#x00A0;an&#x00A0;intmask
+&#x00A0;<br />im_imask_ysize&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;vertical&#x00A0;size&#x00A0;of&#x00A0;an&#x00A0;intmask
+&#x00A0;<br />im_rank_image&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;point-wise&#x00A0;pixel&#x00A0;rank
+&#x00A0;<br />im_lindetect&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;convolve&#x00A0;with&#x00A0;4-way&#x00A0;rotating&#x00A0;mask
+&#x00A0;<br />im_log_dmask&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;generate&#x00A0;laplacian&#x00A0;of&#x00A0;gaussian&#x00A0;DOUBLEMASK
+&#x00A0;<br />im_log_imask&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;generate&#x00A0;laplacian&#x00A0;of&#x00A0;gaussian&#x00A0;INTMASK
+&#x00A0;<br />im_maxvalue&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;point-wise&#x00A0;maximum&#x00A0;value
+&#x00A0;<br />im_mpercent&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;find&#x00A0;threshold&#x00A0;above&#x00A0;which&#x00A0;there&#x00A0;are&#x00A0;percent&#x00A0;values
+&#x00A0;<br />im_phasecor_fft&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;non-normalised&#x00A0;correlation&#x00A0;of&#x00A0;gradient&#x00A0;of&#x00A0;in2&#x00A0;within&#x00A0;in1
+&#x00A0;<br />im_rank&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;rank&#x00A0;filter&#x00A0;nth&#x00A0;element&#x00A0;of&#x00A0;xsize/ysize&#x00A0;window
+&#x00A0;<br />im_rank_raw&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;rank&#x00A0;filter&#x00A0;nth&#x00A0;element&#x00A0;of&#x00A0;xsize/ysize&#x00A0;window,&#x00A0;no&#x00A0;border
+&#x00A0;<br />im_read_dmask&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;read&#x00A0;matrix&#x00A0;of&#x00A0;double&#x00A0;from&#x00A0;file
+&#x00A0;<br />im_resize_linear&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;resize&#x00A0;to&#x00A0;X&#x00A0;by&#x00A0;Y&#x00A0;pixels&#x00A0;with&#x00A0;linear&#x00A0;interpolation
+&#x00A0;<br />im_rotate_dmask45&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;rotate&#x00A0;DOUBLEMASK&#x00A0;clockwise&#x00A0;by&#x00A0;45&#x00A0;degrees
+&#x00A0;<br />im_rotate_dmask90&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;rotate&#x00A0;DOUBLEMASK&#x00A0;clockwise&#x00A0;by&#x00A0;90&#x00A0;degrees
+&#x00A0;<br />im_rotate_imask45&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;rotate&#x00A0;INTMASK&#x00A0;clockwise&#x00A0;by&#x00A0;45&#x00A0;degrees
+&#x00A0;<br />im_rotate_imask90&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;rotate&#x00A0;INTMASK&#x00A0;clockwise&#x00A0;by&#x00A0;90&#x00A0;degrees
+&#x00A0;<br />im_sharpen&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;sharpen&#x00A0;high&#x00A0;frequencies&#x00A0;of&#x00A0;L&#x00A0;channel&#x00A0;of&#x00A0;LabQ&#x00A0;<br />im_shrink&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;shrink&#x00A0;image&#x00A0;by&#x00A0;xfac,&#x00A0;yfac&#x00A0;times
+ &#x00A0;<br />im_spcor&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;normalised&#x00A0;correlation&#x00A0;of&#x00A0;in2&#x00A0;within&#x00A0;in1
+ &#x00A0;<br />im_spcor_raw&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;normalised&#x00A0;correlation&#x00A0;of&#x00A0;in2&#x00A0;within&#x00A0;in1,&#x00A0;no&#x00A0;black&#x00A0;padding
+ &#x00A0;<br />im_stretch3&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;stretch&#x00A0;3%,&#x00A0;sub-pixel&#x00A0;displace&#x00A0;by&#x00A0;xdisp/ydisp
+ &#x00A0;<br />im_zerox&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;find&#x00A0;+ve&#x00A0;or&#x00A0;-ve&#x00A0;zero&#x00A0;crossings&#x00A0;in&#x00A0;image
+</div>
+<!--l. 523--><p class="nopar" >
+<br /><div class="caption" 
+><span class="id">Figure&#x00A0;4.9: </span><span  
+class="content">Convolution functions</span></div><!--tex4ht:label?: x26-1130019 -->
+                                                                                       
+
+                                                                                       
+  </div><hr class="endfloat" />
+  <h4 class="subsectionHead"><span class="titlemark">4.2.8    </span> <a 
+ id="x26-1140004.2.8"></a>In-place operations</h4>
+<!--l. 531--><p class="noindent" >See Figure&#x00A0;<a 
+href="#x26-11400110">4.10<!--tex4ht:ref: fg:inplace --></a>.
+<!--l. 533--><p class="indent" >  A few of the in-place operations are available from the
+command-line. Most are not.
+                                           
+                                                                                       
+
+                                                                                       
+<!--l. 537--><p class="indent" >  <a 
+ id="x26-11400110"></a><hr class="float"><div class="float" 
+>
+                                           
+                                                                                       
+
+                                                                                       
+<div class="verbatim" id="verbatim-188">
+$&#x00A0;vips&#x00A0;--list&#x00A0;inplace
+&#x00A0;<br />im_circle&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;plot&#x00A0;circle&#x00A0;on&#x00A0;image
+&#x00A0;<br />im_flood_blob_copy&#x00A0;-&#x00A0;flood&#x00A0;while&#x00A0;pixel&#x00A0;==&#x00A0;start&#x00A0;pixel
+&#x00A0;<br />im_insertplace&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;draw&#x00A0;image&#x00A0;sub&#x00A0;inside&#x00A0;image&#x00A0;main&#x00A0;at&#x00A0;position&#x00A0;(x,y)
+&#x00A0;<br />im_line&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;draw&#x00A0;line&#x00A0;between&#x00A0;points&#x00A0;(x1,y1)&#x00A0;and&#x00A0;(x2,y2)
+&#x00A0;<br />im_lineset&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;draw&#x00A0;line&#x00A0;between&#x00A0;points&#x00A0;(x1,y1)&#x00A0;and&#x00A0;(x2,y2)
+</div>
+<!--l. 544--><p class="nopar" >
+<br /><div class="caption" 
+><span class="id">Figure&#x00A0;4.10: </span><span  
+class="content">In-place operations</span></div><!--tex4ht:label?: x26-11400110 -->
+                                           
+                                                                                       
+
+                                                                                       
+  </div><hr class="endfloat" />
+  <h4 class="subsectionHead"><span class="titlemark">4.2.9    </span> <a 
+ id="x26-1150004.2.9"></a>Frequency filtering</h4>
+<!--l. 551--><p class="noindent" >See Figure&#x00A0;<a 
+href="#x26-11500111">4.11<!--tex4ht:ref: fg:freq --></a>.
+<!--l. 553--><p class="indent" >  The basic Fourier functions are <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_fwfft()</span></span></span> and
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_invfft()</span></span></span>, which calculate the fast-fourier transform
+and inverse transform of an image. Also <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_invfftr()</span></span></span>,
+which just returns the real part of the inverse transform. The
+Fourier image has its origin at pel (0,0) &#8212; for viewing, use
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_rotquad()</span></span></span> to move the origin to the centre of the
+image.
+<!--l. 561--><p class="indent" >  Once an image is in the frequency domain, it can be
+filtered by multiplying it with a mask image. The VIPS
+mask generator is <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_create_fmask()</span></span></span> see the manual
+page for details of the arguments, but it will create low pass,
+high pass, ring pass and band pass filters, which may each
+be ideal, Gaussian or Butterworth. There is also a fractal
+mask option.
+<!--l. 567--><p class="indent" >  The other functions in the package build on these base
+facilities. <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_freqflt()</span></span></span> transforms an input image
+to Fourier space, multiplies it by a mask image, and
+transforms it back again. <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_flt_image_freq()</span></span></span> will
+create a mask image of the correct size for you, and call
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_freqflt()</span></span></span>. <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_disp_ps()</span></span></span> will call the right
+combinations of functions to make a displayable power
+spectrum for an image.
+                                           
+                                                                                       
+
+                                                                                       
+<!--l. 576--><p class="indent" >  <a 
+ id="x26-11500111"></a><hr class="float"><div class="float" 
+>
+                                           
+                                                                                       
+
+                                                                                       
+<div class="verbatim" id="verbatim-189">
+$&#x00A0;vips&#x00A0;--list&#x00A0;freq_filt
+&#x00A0;<br />im_create_fmask&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;create&#x00A0;frequency&#x00A0;domain&#x00A0;filter&#x00A0;mask
+&#x00A0;<br />im_disp_ps&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;make&#x00A0;displayable&#x00A0;power&#x00A0;spectrum
+&#x00A0;<br />im_flt_image_freq&#x00A0;&#x00A0;-&#x00A0;frequency&#x00A0;domain&#x00A0;filter&#x00A0;image
+&#x00A0;<br />im_fractsurf&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;generate&#x00A0;a&#x00A0;fractal&#x00A0;surface&#x00A0;of&#x00A0;given&#x00A0;dimension
+&#x00A0;<br />im_freqflt&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;frequency-domain&#x00A0;filter&#x00A0;of&#x00A0;in&#x00A0;with&#x00A0;mask
+&#x00A0;<br />im_fwfft&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;forward&#x00A0;fast-fourier&#x00A0;transform
+&#x00A0;<br />im_rotquad&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;rotate&#x00A0;image&#x00A0;quadrants&#x00A0;to&#x00A0;move&#x00A0;origin&#x00A0;to&#x00A0;centre
+&#x00A0;<br />im_invfft&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;inverse&#x00A0;fast-fourier&#x00A0;transform
+&#x00A0;<br />im_invfftr&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;real&#x00A0;part&#x00A0;of&#x00A0;inverse&#x00A0;fast-fourier&#x00A0;transform
+</div>
+<!--l. 587--><p class="nopar" >
+<br /><div class="caption" 
+><span class="id">Figure&#x00A0;4.11: </span><span  
+class="content">Fourier functions</span></div><!--tex4ht:label?: x26-11500111 -->
+                                           
+                                                                                       
+
+                                                                                       
+  </div><hr class="endfloat" />
+  <h4 class="subsectionHead"><span class="titlemark">4.2.10    </span> <a 
+ id="x26-1160004.2.10"></a>Histograms and LUTs</h4>
+<!--l. 594--><p class="noindent" >See Figure&#x00A0;<a 
+href="#x26-11600112">4.12<!--tex4ht:ref: fg:hist --></a>.
+<!--l. 596--><p class="indent" >  VIPS represents histograms and look-up tables in the
+same way &#8212; as images.
+<!--l. 598--><p class="indent" >  They should have either <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">Xsize</span></span></span> or <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">Ysize</span></span></span> set to 1, and
+the other dimension set to the number of elements in the
+table. The table can be of any size, have any band format,
+and have any number of bands.
+<!--l. 602--><p class="indent" >  Use <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_histgr()</span></span></span> to find the histogram of an
+image. Use <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_histnD()</span></span></span> to find the n-dimensional
+histogram of an n-band image. Perform operations on
+histograms with <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_histcum()</span></span></span>, <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_histnorm()</span></span></span>,
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_histspec()</span></span></span>, <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_invertlut()</span></span></span>. Visualise
+histograms with <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_histplot()</span></span></span>. Use a histogram (or
+LUT) to transform an image with <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_maplut()</span></span></span>. Build a
+histogram from scratch with <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_identity()</span></span></span> or
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_identity_ushort()</span></span></span>.
+<!--l. 610--><p class="indent" >  Use <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_lhist&#x22C6;()</span></span></span> for local histogram equalisation,
+and <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_stdif&#x22C6;()</span></span></span> for statisticaol differencing. The
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_tone_&#x22C6;()</span></span></span> functions are for operations on the L
+channel of a LAB image. Other functions are useful
+combinations of these basic operations.
+                                           
+                                                                                       
+
+                                                                                       
+<!--l. 616--><p class="indent" >  <a 
+ id="x26-11600112"></a><hr class="float"><div class="float" 
+>
+                                           
+                                                                                       
+
+                                                                                       
+<div class="verbatim" id="verbatim-190">
+$&#x00A0;vips&#x00A0;--list&#x00A0;histograms_lut
+&#x00A0;<br />im_gammacorrect&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;gamma-correct&#x00A0;image
+&#x00A0;<br />im_heq&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;histogram-equalise&#x00A0;image
+&#x00A0;<br />im_hist&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;find&#x00A0;and&#x00A0;graph&#x00A0;histogram&#x00A0;of&#x00A0;image
+&#x00A0;<br />im_histcum&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;turn&#x00A0;histogram&#x00A0;to&#x00A0;cumulative&#x00A0;histogram
+&#x00A0;<br />im_histeq&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;form&#x00A0;histogram&#x00A0;equalistion&#x00A0;LUT
+&#x00A0;<br />im_histgr&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;find&#x00A0;histogram&#x00A0;of&#x00A0;image
+&#x00A0;<br />im_histnD&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;find&#x00A0;1D,&#x00A0;2D&#x00A0;or&#x00A0;3D&#x00A0;histogram&#x00A0;of&#x00A0;image
+&#x00A0;<br />im_histnorm&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;form&#x00A0;normalised&#x00A0;histogram
+&#x00A0;<br />im_histplot&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;plot&#x00A0;graph&#x00A0;of&#x00A0;histogram
+&#x00A0;<br />im_histspec&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;find&#x00A0;histogram&#x00A0;which&#x00A0;will&#x00A0;make&#x00A0;pdf&#x00A0;of&#x00A0;in&#x00A0;match&#x00A0;ref
+&#x00A0;<br />im_hsp&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;match&#x00A0;stats&#x00A0;of&#x00A0;in&#x00A0;to&#x00A0;stats&#x00A0;of&#x00A0;ref
+&#x00A0;<br />im_identity&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;generate&#x00A0;identity&#x00A0;histogram
+&#x00A0;<br />im_identity_ushort&#x00A0;&#x00A0;&#x00A0;-&#x00A0;generate&#x00A0;ushort&#x00A0;identity&#x00A0;histogram
+&#x00A0;<br />im_ismonotonic&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;test&#x00A0;LUT&#x00A0;for&#x00A0;monotonicity
+&#x00A0;<br />im_lhisteq&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;local&#x00A0;histogram&#x00A0;equalisation
+&#x00A0;<br />im_lhisteq_raw&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;local&#x00A0;histogram&#x00A0;equalisation,&#x00A0;no&#x00A0;border
+&#x00A0;<br />im_invertlut&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;generate&#x00A0;correction&#x00A0;table&#x00A0;from&#x00A0;set&#x00A0;of&#x00A0;measures
+&#x00A0;<br />im_buildlut&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;generate&#x00A0;LUT&#x00A0;table&#x00A0;from&#x00A0;set&#x00A0;of&#x00A0;x/y&#x00A0;positions
+&#x00A0;<br />im_maplut&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;map&#x00A0;image&#x00A0;through&#x00A0;LUT
+&#x00A0;<br />im_project&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;find&#x00A0;horizontal&#x00A0;and&#x00A0;vertical&#x00A0;projections&#x00A0;of&#x00A0;an&#x00A0;image
+&#x00A0;<br />im_stdif&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;statistical&#x00A0;differencing
+&#x00A0;<br />im_stdif_raw&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;statistical&#x00A0;differencing,&#x00A0;no&#x00A0;border
+&#x00A0;<br />im_tone_analyse&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;analyse&#x00A0;in&#x00A0;and&#x00A0;create&#x00A0;LUT&#x00A0;for&#x00A0;tone&#x00A0;adjustment
+&#x00A0;<br />im_tone_build&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;create&#x00A0;LUT&#x00A0;for&#x00A0;tone&#x00A0;adjustment&#x00A0;of&#x00A0;LabS&#x00A0;images
+&#x00A0;<br />im_tone_build_range&#x00A0;&#x00A0;-&#x00A0;create&#x00A0;LUT&#x00A0;for&#x00A0;tone&#x00A0;adjustment
+&#x00A0;<br />im_tone_map&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;map&#x00A0;L&#x00A0;channel&#x00A0;of&#x00A0;LabS&#x00A0;or&#x00A0;LabQ&#x00A0;image&#x00A0;through&#x00A0;LUT
+</div>
+<!--l. 644--><p class="nopar" >
+<br /><div class="caption" 
+><span class="id">Figure&#x00A0;4.12: </span><span  
+class="content">Histogram/LUT functions</span></div><!--tex4ht:label?: x26-11600112 -->
+                                           
+                                                                                       
+
+                                                                                       
+  </div><hr class="endfloat" />
+  <h4 class="subsectionHead"><span class="titlemark">4.2.11    </span> <a 
+ id="x26-1170004.2.11"></a>Morphology</h4>
+<!--l. 651--><p class="noindent" >See Figure&#x00A0;<a 
+href="#x26-11700113">4.13<!--tex4ht:ref: fg:morph --></a>.
+<!--l. 653--><p class="indent" >  The morphological functions are used on one-band
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">IM_BANDFMT_UCHAR</span></span></span> binary images (images containing
+only zero and not-zero). They search images for particular
+patterns of pixels (specified with the mask argument), either
+adding or removing pixels when they find a match. They are
+useful for cleaning up images &#8212; for example, you might
+threshold an image, and then use one of the morphological
+functions to remove all single isolated pixels from the
+result.
+<!--l. 661--><p class="indent" >  If you combine the morphological operators with
+the mask rotators (<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_rotate_imask45()</span></span></span>, for
+example) and apply them repeatedly, you can achieve
+very complicated effects: you can thin, prune, fill, open
+edges, close gaps, and many others. For example, see
+&#8216;Fundamentals of Digital Image Processing&#8217; by A. Jain, pp
+384-388, Prentice-Hall, 1989 for more ideas.
+<!--l. 667--><p class="indent" >  Beware that VIPS reverses the usual image processing
+convention, by assuming white objects on a black
+background.
+<!--l. 670--><p class="indent" >  The mask you give to the morphological functions should
+contain only the values 0 (for background), 128 (for don&#8217;t
+care) and 255 (for object). The mask must have odd length
+sides &#8212; the origin of the mask is taken to be the centre
+value. For example, the mask:
+                                                 <div class="verbatim" id="verbatim-191">
+  3&#x00A0;3
+ &#x00A0;<br />128&#x00A0;255&#x00A0;128
+ &#x00A0;<br />255&#x00A0;0&#x00A0;&#x00A0;&#x00A0;255
+ &#x00A0;<br />128&#x00A0;255&#x00A0;128 
+</div>
+<!--l. 680--><p class="nopar" >
+<!--l. 682--><p class="noindent" >applied to an image with <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_erode()</span></span></span>, will find all black
+pixels 4-way connected with white pixels. Essentially,
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_dilate()</span></span></span> sets pixels in the output if any part of the
+mask matches, whereas <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_erode()</span></span></span> sets pixels only if all
+of the mask matches.
+<!--l. 688--><p class="indent" >    The <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">_raw()</span></span></span> version of the functions do not add a
+black border to the output. <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_cntlines()</span></span></span> and
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_profile</span></span></span> are occasionally useful for analysing
+results.
+<!--l. 692--><p class="indent" >    See the boolean operations <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_and()</span></span></span>, <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_or()</span></span></span> and
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_eor()</span></span></span> for analogues of the usual set difference and set
+union operations.
+                                                                                       
+
+                                                                                       
+<!--l. 697--><p class="indent" >  <a 
+ id="x26-11700113"></a><hr class="float"><div class="float" 
+>
+                                           
+                                                                                       
+
+                                                                                       
+<div class="verbatim" id="verbatim-192">
+$&#x00A0;vips&#x00A0;--list&#x00A0;morphology
+&#x00A0;<br />im_cntlines&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;count&#x00A0;horizontal&#x00A0;or&#x00A0;vertical&#x00A0;lines
+&#x00A0;<br />im_dilate&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;dilate&#x00A0;image&#x00A0;with&#x00A0;mask,&#x00A0;adding&#x00A0;a&#x00A0;black&#x00A0;border
+&#x00A0;<br />im_dilate_raw&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;dilate&#x00A0;image&#x00A0;with&#x00A0;mask
+&#x00A0;<br />im_erode&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;erode&#x00A0;image&#x00A0;with&#x00A0;mask,&#x00A0;adding&#x00A0;a&#x00A0;black&#x00A0;border
+&#x00A0;<br />im_erode_raw&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;erode&#x00A0;image&#x00A0;with&#x00A0;mask
+&#x00A0;<br />im_profile&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;find&#x00A0;first&#x00A0;horizontal/vertical&#x00A0;edge
+</div>
+<!--l. 705--><p class="nopar" >
+<br /><div class="caption" 
+><span class="id">Figure&#x00A0;4.13: </span><span  
+class="content">Morphological functions</span></div><!--tex4ht:label?: x26-11700113 -->
+                                           
+                                                                                       
+
+                                                                                       
+  </div><hr class="endfloat" />
+  <h4 class="subsectionHead"><span class="titlemark">4.2.12    </span> <a 
+ id="x26-1180004.2.12"></a>Mosaicing</h4>
+<!--l. 712--><p class="noindent" >See Figure&#x00A0;<a 
+href="#x26-11800114">4.14<!--tex4ht:ref: fg:mosaicing --></a>.
+<!--l. 714--><p class="indent" >  These functions are useful for joining many small images
+together to make one large image. They can cope with
+unstable contrast, and arbitary sub-image layout, but will
+not do any geometric correction. The mosaicing functions
+can be grouped into layers:
+<!--l. 719--><p class="indent" >  The lowest level functions are <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_correl()</span></span></span>. and
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_affine()</span></span></span>. <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_correl()</span></span></span> searches a large image
+for a small sub-image, returning the position of the best
+sub-image match. <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_affine()</span></span></span> performs a general
+affine transform on an image: that is, any transform in
+which parallel lines remain parallel.
+<!--l. 725--><p class="indent" >  Next, <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_lrmerge()</span></span></span> and <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_tbmerge()</span></span></span> blend two
+images together left-right or up-down.
+<!--l. 728--><p class="indent" >  Next up are <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_lrmosaic()</span></span></span> and <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_tbmosaic()</span></span></span>.
+These use the two low-level merge operations to join two
+images given just an approximate overlap as a start point.
+Optional extra parameters let you do &#8217;balancing&#8217; too: if
+your images have come from a source where there
+is no precise control over the exposure (for example,
+images from a tube camera, or a set of images scanned
+from photographic sources), <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_lrmosaic()</span></span></span> and
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_tbmosaic()</span></span></span> will adjust the contrast of the left image
+to match the right, the right to the left, or both to some
+middle value.
+<!--l. 737--><p class="indent" >  The functions <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_lrmosaic1()</span></span></span> and <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_tbmosaic1()</span></span></span>
+are first-order analogues of the basic mosaic functions:
+they take two tie-points and use them to rotate and
+scale the right-hand or bottom image before starting to
+join.
+<!--l. 741--><p class="indent" >  Finally, <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_global_balance()</span></span></span> can be used to
+re-balance a mosaic which has been assembled with
+these functions. It will generally do a better job than the
+low-level balancer built into <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_lrmosaic()</span></span></span> and
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_tbmosaic()</span></span></span>. See the man page. <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_remosaic()</span></span></span>
+uses the same techniques, but will reassemble the image
+from a different set of source images.
+                                           
+                                                                                       
+
+                                                                                       
+<!--l. 749--><p class="indent" >  <a 
+ id="x26-11800114"></a><hr class="float"><div class="float" 
+>
+                                           
+                                                                                       
+
+                                                                                       
+<div class="verbatim" id="verbatim-193">
+$&#x00A0;vips&#x00A0;--list&#x00A0;mosaicing
+&#x00A0;<br />im_align_bands&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;align&#x00A0;the&#x00A0;bands&#x00A0;of&#x00A0;an&#x00A0;image
+&#x00A0;<br />im_correl&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;search&#x00A0;area&#x00A0;around&#x00A0;sec&#x00A0;for&#x00A0;match&#x00A0;for&#x00A0;area&#x00A0;around&#x00A0;ref
+&#x00A0;<br />im__find_lroverlap&#x00A0;&#x00A0;&#x00A0;-&#x00A0;search&#x00A0;for&#x00A0;left-right&#x00A0;overlap&#x00A0;of&#x00A0;ref&#x00A0;and&#x00A0;sec
+&#x00A0;<br />im__find_tboverlap&#x00A0;&#x00A0;&#x00A0;-&#x00A0;search&#x00A0;for&#x00A0;top-bottom&#x00A0;overlap&#x00A0;of&#x00A0;ref&#x00A0;and&#x00A0;sec
+&#x00A0;<br />im_global_balance&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;automatically&#x00A0;rebuild&#x00A0;mosaic&#x00A0;with&#x00A0;balancing
+&#x00A0;<br />im_global_balancef&#x00A0;&#x00A0;&#x00A0;-&#x00A0;automatically&#x00A0;rebuild&#x00A0;mosaic&#x00A0;with&#x00A0;balancing,&#x00A0;float&#x00A0;output
+&#x00A0;<br />im_lrmerge&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;left-right&#x00A0;merge&#x00A0;of&#x00A0;in1&#x00A0;and&#x00A0;in2
+&#x00A0;<br />im_lrmerge1&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;first-order&#x00A0;left-right&#x00A0;merge&#x00A0;of&#x00A0;ref&#x00A0;and&#x00A0;sec
+&#x00A0;<br />im_lrmosaic&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;left-right&#x00A0;mosaic&#x00A0;of&#x00A0;ref&#x00A0;and&#x00A0;sec
+&#x00A0;<br />im_lrmosaic1&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;first-order&#x00A0;left-right&#x00A0;mosaic&#x00A0;of&#x00A0;ref&#x00A0;and&#x00A0;sec
+&#x00A0;<br />im_match_linear&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;resample&#x00A0;ref&#x00A0;so&#x00A0;that&#x00A0;tie-points&#x00A0;match
+&#x00A0;<br />im_match_linear_search&#x00A0;-&#x00A0;search&#x00A0;sec,&#x00A0;then&#x00A0;resample&#x00A0;so&#x00A0;that&#x00A0;tie-points&#x00A0;match
+&#x00A0;<br />im_maxpos_subpel&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;subpixel&#x00A0;position&#x00A0;of&#x00A0;maximum&#x00A0;of&#x00A0;(phase&#x00A0;correlation)&#x00A0;image
+&#x00A0;<br />im_remosaic&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;automatically&#x00A0;rebuild&#x00A0;mosaic&#x00A0;with&#x00A0;new&#x00A0;files
+&#x00A0;<br />im_tbmerge&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;top-bottom&#x00A0;merge&#x00A0;of&#x00A0;in1&#x00A0;and&#x00A0;in2
+&#x00A0;<br />im_tbmerge1&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;first-order&#x00A0;top-bottom&#x00A0;merge&#x00A0;of&#x00A0;in1&#x00A0;and&#x00A0;in2
+&#x00A0;<br />im_tbmosaic&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;top-bottom&#x00A0;mosaic&#x00A0;of&#x00A0;in1&#x00A0;and&#x00A0;in2
+&#x00A0;<br />im_tbmosaic1&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;first-order&#x00A0;top-bottom&#x00A0;mosaic&#x00A0;of&#x00A0;ref&#x00A0;and&#x00A0;sec
+</div>
+<!--l. 769--><p class="nopar" >
+<br /><div class="caption" 
+><span class="id">Figure&#x00A0;4.14: </span><span  
+class="content">Mosaic functions</span></div><!--tex4ht:label?: x26-11800114 -->
+                                           
+                                                                                       
+
+                                                                                       
+  </div><hr class="endfloat" />
+  <h4 class="subsectionHead"><span class="titlemark">4.2.13    </span> <a 
+ id="x26-1190004.2.13"></a>CImg functions</h4>
+<!--l. 776--><p class="noindent" >See Figure&#x00A0;<a 
+href="#x26-11900115">4.15<!--tex4ht:ref: fg:cimg --></a>.
+<!--l. 778--><p class="indent" >  These operations wrap the anisotropic blur function from
+the CImg library. They are useful for removing noise from
+images.
+                                           
+                                                                                       
+
+                                                                                       
+<!--l. 782--><p class="indent" >  <a 
+ id="x26-11900115"></a><hr class="float"><div class="float" 
+>
+                                           
+                                                                                       
+
+                                                                                       
+<div class="verbatim" id="verbatim-194">
+$&#x00A0;vips&#x00A0;--list&#x00A0;cimg
+&#x00A0;<br />im_greyc&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;noise-removing&#x00A0;filter
+&#x00A0;<br />im_greyc_mask&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;noise-removing&#x00A0;filter,&#x00A0;with&#x00A0;a&#x00A0;mask
+</div>
+<!--l. 786--><p class="nopar" >
+<br /><div class="caption" 
+><span class="id">Figure&#x00A0;4.15: </span><span  
+class="content">CImg functions</span></div><!--tex4ht:label?: x26-11900115 -->
+                                           
+                                                                                       
+
+                                                                                       
+  </div><hr class="endfloat" />
+  <h4 class="subsectionHead"><span class="titlemark">4.2.14    </span> <a 
+ id="x26-1200004.2.14"></a>Other</h4>
+<!--l. 793--><p class="noindent" >See Figure&#x00A0;<a 
+href="#x26-12000116">4.16<!--tex4ht:ref: fg:other --></a>.
+<!--l. 795--><p class="indent" >  These functions generate various test images. You can
+combine them with the arithmetic and rotate functions to
+build more complicated images.
+<!--l. 798--><p class="indent" >  The <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_benchmark&#x22C6;()</span></span></span> operations are for testing the
+VIPS SMP system.
+                                           
+                                                                                       
+
+                                                                                       
+<!--l. 801--><p class="indent" >  <a 
+ id="x26-12000116"></a><hr class="float"><div class="float" 
+>
+                                           
+                                                                                       
+
+                                                                                       
+<div class="verbatim" id="verbatim-195">
+$&#x00A0;vips&#x00A0;--list&#x00A0;other
+&#x00A0;<br />im_benchmark&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;do&#x00A0;something&#x00A0;complicated&#x00A0;for&#x00A0;testing
+&#x00A0;<br />im_benchmark2&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;do&#x00A0;something&#x00A0;complicated&#x00A0;for&#x00A0;testing
+&#x00A0;<br />im_benchmarkn&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;do&#x00A0;something&#x00A0;complicated&#x00A0;for&#x00A0;testing
+&#x00A0;<br />im_eye&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;generate&#x00A0;IM_BANDFMT_UCHAR&#x00A0;[0,255]&#x00A0;frequency/amplitude&#x00A0;image
+&#x00A0;<br />im_grey&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;generate&#x00A0;IM_BANDFMT_UCHAR&#x00A0;[0,255]&#x00A0;grey&#x00A0;scale&#x00A0;image
+&#x00A0;<br />im_feye&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;generate&#x00A0;IM_BANDFMT_FLOAT&#x00A0;[-1,1]&#x00A0;frequency/amplitude&#x00A0;image
+&#x00A0;<br />im_fgrey&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;generate&#x00A0;IM_BANDFMT_FLOAT&#x00A0;[0,1]&#x00A0;grey&#x00A0;scale&#x00A0;image
+&#x00A0;<br />im_fzone&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;generate&#x00A0;IM_BANDFMT_FLOAT&#x00A0;[-1,1]&#x00A0;zone&#x00A0;plate&#x00A0;image
+&#x00A0;<br />im_make_xy&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;generate&#x00A0;image&#x00A0;with&#x00A0;pixel&#x00A0;value&#x00A0;equal&#x00A0;to&#x00A0;coordinate
+&#x00A0;<br />im_zone&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;generate&#x00A0;IM_BANDFMT_UCHAR&#x00A0;[0,255]&#x00A0;zone&#x00A0;plate&#x00A0;image
+</div>
+<!--l. 813--><p class="nopar" >
+<br /><div class="caption" 
+><span class="id">Figure&#x00A0;4.16: </span><span  
+class="content">Other functions</span></div><!--tex4ht:label?: x26-12000116 -->
+                                           
+                                                                                       
+
+                                                                                       
+  </div><hr class="endfloat" />
+  <h4 class="subsectionHead"><span class="titlemark">4.2.15    </span> <a 
+ id="x26-1210004.2.15"></a>IO functions</h4>
+<!--l. 820--><p class="noindent" >See Figure&#x00A0;<a 
+href="#x26-12100117">4.17<!--tex4ht:ref: fg:io --></a>.
+<!--l. 822--><p class="indent" >  These functions are related to the image IO system.
+                                           
+                                                                                       
+
+                                                                                       
+<!--l. 825--><p class="indent" >  <a 
+ id="x26-12100117"></a><hr class="float"><div class="float" 
+>
+                                           
+                                                                                       
+
+                                                                                       
+<div class="verbatim" id="verbatim-196">
+$&#x00A0;vips&#x00A0;--list&#x00A0;iofuncs
+&#x00A0;<br />im_binfile&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;open&#x00A0;a&#x00A0;headerless&#x00A0;binary&#x00A0;file
+&#x00A0;<br />im_cache&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;cache&#x00A0;results&#x00A0;of&#x00A0;an&#x00A0;operation
+&#x00A0;<br />im_guess_prefix&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;guess&#x00A0;install&#x00A0;area
+&#x00A0;<br />im_guess_libdir&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;guess&#x00A0;library&#x00A0;area
+&#x00A0;<br />im_header_get_type&#x00A0;-&#x00A0;return&#x00A0;field&#x00A0;type
+&#x00A0;<br />im_header_int&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;extract&#x00A0;int&#x00A0;fields&#x00A0;from&#x00A0;header
+&#x00A0;<br />im_header_double&#x00A0;&#x00A0;&#x00A0;-&#x00A0;extract&#x00A0;double&#x00A0;fields&#x00A0;from&#x00A0;header
+&#x00A0;<br />im_header_string&#x00A0;&#x00A0;&#x00A0;-&#x00A0;extract&#x00A0;string&#x00A0;fields&#x00A0;from&#x00A0;header
+&#x00A0;<br />im_version&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;VIPS&#x00A0;version&#x00A0;number
+&#x00A0;<br />im_version_string&#x00A0;&#x00A0;-&#x00A0;VIPS&#x00A0;version&#x00A0;string
+</div>
+<!--l. 837--><p class="nopar" >
+<br /><div class="caption" 
+><span class="id">Figure&#x00A0;4.17: </span><span  
+class="content">IO functions</span></div><!--tex4ht:label?: x26-12100117 -->
+                                           
+                                                                                       
+
+                                                                                       
+  </div><hr class="endfloat" />
+  <h4 class="subsectionHead"><span class="titlemark">4.2.16    </span> <a 
+ id="x26-1220004.2.16"></a>Format functions</h4>
+<!--l. 844--><p class="noindent" >See Figure&#x00A0;<a 
+href="#x26-12200118">4.18<!--tex4ht:ref: fg:format --></a>.
+<!--l. 846--><p class="indent" >  These functions convert to and from various image
+formats. See <span 
+class="cmsy-10">§</span><a 
+href="vipsmanualse11.html#x17-740002.5">2.5<!--tex4ht:ref: sec:format --></a> for a nice API over these. VIPS can
+read more than these formats, see the man page for
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VipsFormat</span></span></span>.
+                                           
+                                                                                       
+
+                                                                                       
+<!--l. 851--><p class="indent" >  <a 
+ id="x26-12200118"></a><hr class="float"><div class="float" 
+>
+                                           
+                                                                                       
+
+                                                                                       
+<div class="verbatim" id="verbatim-197">
+$&#x00A0;vips&#x00A0;--list&#x00A0;format
+&#x00A0;<br />im_csv2vips&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;read&#x00A0;a&#x00A0;file&#x00A0;in&#x00A0;csv&#x00A0;format
+&#x00A0;<br />im_jpeg2vips&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;convert&#x00A0;from&#x00A0;jpeg
+&#x00A0;<br />im_magick2vips&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;load&#x00A0;file&#x00A0;with&#x00A0;libMagick
+&#x00A0;<br />im_png2vips&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;convert&#x00A0;PNG&#x00A0;file&#x00A0;to&#x00A0;VIPS&#x00A0;image
+&#x00A0;<br />im_exr2vips&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;convert&#x00A0;an&#x00A0;OpenEXR&#x00A0;file&#x00A0;to&#x00A0;VIPS
+&#x00A0;<br />im_ppm2vips&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;read&#x00A0;a&#x00A0;file&#x00A0;in&#x00A0;pbm/pgm/ppm&#x00A0;format
+&#x00A0;<br />im_analyze2vips&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;read&#x00A0;a&#x00A0;file&#x00A0;in&#x00A0;analyze&#x00A0;format
+&#x00A0;<br />im_tiff2vips&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;convert&#x00A0;TIFF&#x00A0;file&#x00A0;to&#x00A0;VIPS&#x00A0;image
+&#x00A0;<br />im_vips2csv&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;write&#x00A0;an&#x00A0;image&#x00A0;in&#x00A0;csv&#x00A0;format
+&#x00A0;<br />im_vips2jpeg&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;convert&#x00A0;to&#x00A0;jpeg
+&#x00A0;<br />im_vips2mimejpeg&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;convert&#x00A0;to&#x00A0;jpeg&#x00A0;as&#x00A0;mime&#x00A0;type&#x00A0;on&#x00A0;stdout
+&#x00A0;<br />im_vips2png&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;convert&#x00A0;VIPS&#x00A0;image&#x00A0;to&#x00A0;PNG&#x00A0;file
+&#x00A0;<br />im_vips2ppm&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;write&#x00A0;a&#x00A0;file&#x00A0;in&#x00A0;pbm/pgm/ppm&#x00A0;format
+&#x00A0;<br />im_vips2tiff&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;convert&#x00A0;VIPS&#x00A0;image&#x00A0;to&#x00A0;TIFF&#x00A0;file
+</div>
+<!--l. 867--><p class="nopar" >
+<br /><div class="caption" 
+><span class="id">Figure&#x00A0;4.18: </span><span  
+class="content">Format functions</span></div><!--tex4ht:label?: x26-12200118 -->
+                                           
+                                                                                       
+
+                                                                                       
+  </div><hr class="endfloat" />
+  <h4 class="subsectionHead"><span class="titlemark">4.2.17    </span> <a 
+ id="x26-1230004.2.17"></a>Resample functions</h4>
+<!--l. 874--><p class="noindent" >See Figure&#x00A0;<a 
+href="#x26-12300119">4.19<!--tex4ht:ref: fg:resample --></a>.
+<!--l. 876--><p class="indent" >  These functions resample images with various
+interpolators.
+                                           
+                                                                                       
+
+                                                                                       
+<!--l. 879--><p class="indent" >  <a 
+ id="x26-12300119"></a><hr class="float"><div class="float" 
+>
+                                           
+                                                                                       
+
+                                                                                       
+<div class="verbatim" id="verbatim-198">
+$&#x00A0;vips&#x00A0;--list&#x00A0;resample
+&#x00A0;<br />im_affine&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;affine&#x00A0;transform
+&#x00A0;<br />im_affinei&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;affine&#x00A0;transform
+&#x00A0;<br />im_affinei_all&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;affine&#x00A0;transform&#x00A0;of&#x00A0;whole&#x00A0;image
+&#x00A0;<br />im_similarity_area&#x00A0;&#x00A0;&#x00A0;-&#x00A0;output&#x00A0;area&#x00A0;xywh&#x00A0;of&#x00A0;similarity&#x00A0;transformation
+&#x00A0;<br />im_similarity&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;-&#x00A0;similarity&#x00A0;transformation
+</div>
+<!--l. 886--><p class="nopar" >
+<br /><div class="caption" 
+><span class="id">Figure&#x00A0;4.19: </span><span  
+class="content">Resample functions</span></div><!--tex4ht:label?: x26-12300119 -->
+                                           
+                                                                                       
+
+                                                                                       
+  </div><hr class="endfloat" />
+  <!--l. 91--><div class="crosslinks"><p class="noindent">[<a 
+href="vipsmanualse17.html" >prev</a>] [<a 
+href="vipsmanualse17.html#tailvipsmanualse17.html" >prev-tail</a>] [<a 
+href="vipsmanualse18.html" >front</a>] [<a 
+href="vipsmanualch4.html#vipsmanualse18.html" >up</a>] </p></div>
+<!--l. 91--><p class="indent" >  <a 
+ id="tailvipsmanualse18.html"></a>   
+</body></html> 

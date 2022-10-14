@@ -1,0 +1,17 @@
+
+apoa1.input
+apoa1.ref.output
+apoa1.ref.output.cmp
+compare.cmd
+compare.err
+compare.out
+compare.stdout
+namd.err
+namd.in
+namd.out
+namd_r_base.mytest-m64
+speccmds.cmd
+speccmds.err
+speccmds.out
+speccmds.stdout
+OLD

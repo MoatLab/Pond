@@ -1,0 +1,283 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html > 
+<head><title>Introduction</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (http://www.cse.ohio-state.edu/~gurari/TeX4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.cse.ohio-state.edu/~gurari/TeX4ht/)"> 
+<!-- 3,html --> 
+<meta name="src" content="vipsmanual.tex"> 
+<meta name="date" content="2010-06-09 21:39:00"> 
+<link rel="stylesheet" type="text/css" href="vipsmanual.css"> 
+</head><body 
+>
+  <!--l. 1--><div class="crosslinks"><p class="noindent">[<a 
+href="vipsmanualse18.html" >next</a>] [<a 
+href="#tailvipsmanualse17.html">tail</a>] [<a 
+href="vipsmanualch4.html#vipsmanualse17.html" >up</a>] </p></div>
+  <h3 class="sectionHead"><span class="titlemark">4.1    </span> <a 
+ id="x25-1050004.1"></a>Introduction</h3>
+<!--l. 2--><p class="noindent" ><a name="nip_label_sec:ref"></a>
+<!--l. 4--><p class="indent" >  /bf VIPS reference documentation is in the process of
+switching to gtkdoc. Half-done manuals are distributed
+with VIPS, and they should be all done by the next
+version.
+<!--l. 9--><p class="indent" >  In the meantime, this old and slightly outdated chapter
+has been left unchanged from the previous version.
+<!--l. 13--><p class="indent" >  This chapter introduces the functions available in the
+VIPS image processing library. For detailed information on
+particular functions, refer to the UNIX on-line manual
+pages. Enter (for example):
+                                                 <div class="verbatim" id="verbatim-173">
+  example%&#x00A0;man&#x00A0;im_abs 
+</div>
+<!--l. 19--><p class="nopar" >
+<!--l. 21--><p class="indent" >  for information on the function <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_abs()</span></span></span>.
+<!--l. 23--><p class="indent" >    All the comand-line vips operations will print help text
+too. For example:
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-174">
+example%&#x00A0;vips&#x00A0;im_extract
+&#x00A0;<br />usage:&#x00A0;vips&#x00A0;im_extract&#x00A0;input&#x00A0;output
+&#x00A0;<br />&#x00A0;&#x00A0;left&#x00A0;top&#x00A0;width&#x00A0;height&#x00A0;band
+&#x00A0;<br />where:
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;input&#x00A0;is&#x00A0;of&#x00A0;type&#x00A0;"image"
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;output&#x00A0;is&#x00A0;of&#x00A0;type&#x00A0;"image"
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;left&#x00A0;is&#x00A0;of&#x00A0;type&#x00A0;"integer"
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;top&#x00A0;is&#x00A0;of&#x00A0;type&#x00A0;"integer"
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;width&#x00A0;is&#x00A0;of&#x00A0;type&#x00A0;"integer"
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;height&#x00A0;is&#x00A0;of&#x00A0;type&#x00A0;"integer"
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;band&#x00A0;is&#x00A0;of&#x00A0;type&#x00A0;"integer"
+&#x00A0;<br />extract&#x00A0;area/band,&#x00A0;from&#x00A0;package
+&#x00A0;<br />&#x00A0;&#x00A0;"conversion"
+&#x00A0;<br />flags:&#x00A0;(PIO&#x00A0;function)
+&#x00A0;<br />&#x00A0;&#x00A0;(coordinate&#x00A0;transformer)
+&#x00A0;<br />&#x00A0;&#x00A0;(area&#x00A0;operation)
+&#x00A0;<br />&#x00A0;&#x00A0;(result&#x00A0;can&#x00A0;be&#x00A0;cached)
+&#x00A0;<br />vips:&#x00A0;error&#x00A0;calling&#x00A0;function
+&#x00A0;<br />im_run_command:&#x00A0;too&#x00A0;few&#x00A0;arguments
+</div>
+<!--l. 45--><p class="nopar" >
+<!--l. 47--><p class="indent" >  Once you have found a function you need to use, you can
+call it from a C program (see <span 
+class="cmsy-10">§</span><a 
+href="vipsmanualse7.html#x13-360002.1">2.1<!--tex4ht:ref: sec:appl --></a>), you can call it from C++
+or Python (see <span 
+class="cmsy-10">§</span><a 
+href="vipsmanualse1.html#x6-50001.1">1.1<!--tex4ht:ref: sec:cpp --></a>), you can call it from the <span 
+class="pcrr7t-">nip2 </span>((see the
+<span 
+class="ptmri7t-">nip Manual</span>), or SIAM graphical user-interfaces, or you can
+run it from the UNIX command line with the <span 
+class="pcrr7t-">vips</span>
+program. For example:
+                                                 <div class="verbatim" id="verbatim-175">
+  $&#x00A0;vips&#x00A0;im_vips2tiff&#x00A0;cam.v&#x00A0;t1.tif&#x00A0;none
+ &#x00A0;<br />$&#x00A0;vips&#x00A0;im_tiff2vips&#x00A0;t1.tif&#x00A0;t2.v.v&#x00A0;0
+ &#x00A0;<br />$&#x00A0;vips&#x00A0;im_equal&#x00A0;cam.v&#x00A0;t2.v&#x00A0;t3.v
+ &#x00A0;<br />$&#x00A0;vips&#x00A0;im_min&#x00A0;t3.v
+ &#x00A0;<br />255 
+</div>
+<!--l. 60--><p class="nopar" >
+<!--l. 62--><p class="indent" >  VIPS may have been set up at your site with a set of links
+which call the vips program for you. You may also be able
+to type:
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-176">
+$&#x00A0;im_vips2tiff&#x00A0;cam.v&#x00A0;t1.tif&#x00A0;none
+&#x00A0;<br />$&#x00A0;im_tiff2vips&#x00A0;t1.tif&#x00A0;t2.v.v&#x00A0;0
+&#x00A0;<br />$&#x00A0;im_equal&#x00A0;cam.v&#x00A0;t2.v&#x00A0;t3.v
+&#x00A0;<br />$&#x00A0;im_min&#x00A0;t3.v
+</div>
+<!--l. 70--><p class="nopar" >
+<!--l. 72--><p class="indent" >  There are a few VIPS programs which you cannot run
+with <span 
+class="pcrr7t-">vips</span>, either because their arguments are a very
+strange, or because they are complete mini-applications
+(like <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">vips2dj</span></span></span>). These programs are listed in table&#x00A0;<a 
+href="#x25-1050011">4.1<!--tex4ht:ref: tb:nondb --></a>, see
+the man pages for full details.
+                                           
+                                                                                       
+
+                                                                                       
+<!--l. 78--><p class="indent" >  <a 
+ id="x25-1050011"></a><hr class="float"><div class="float" 
+>
+                                           
+                                                                                       
+
+                                                                                       
+<div  
+class="centerline"><!--tex4ht:inline--><div class="tabular"> <table id="TBL-6" class="tabular" 
+cellspacing="0" cellpadding="0" rules="groups" 
+><colgroup id="TBL-6-1g"><col 
+id="TBL-6-1"></colgroup><colgroup id="TBL-6-2g"><col 
+id="TBL-6-2"></colgroup><tr 
+class="hline"><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-6-1-"><td  style="white-space:nowrap; text-align:left;" id="TBL-6-1-1"  
+class="td11">Name                                   </td><td  style="white-space:nowrap; text-align:left;" id="TBL-6-1-2"  
+class="td11">Description                                                                   </td>
+</tr><tr 
+class="hline"><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-6-2-"><td  style="white-space:nowrap; text-align:left;" id="TBL-6-2-1"  
+class="td11"><span 
+class="pcrr7t-">binfile            </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-6-2-2"  
+class="td11">Read RAW image                                                         </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-6-3-"><td  style="white-space:nowrap; text-align:left;" id="TBL-6-3-1"  
+class="td11"><span 
+class="pcrr7t-">debugim            </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-6-3-2"  
+class="td11">Print an image pixel by pixel                                       </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-6-4-"><td  style="white-space:nowrap; text-align:left;" id="TBL-6-4-1"  
+class="td11"><span 
+class="pcrr7t-">edvips             </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-6-4-2"  
+class="td11">Change fields in a VIPS header                                    </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-6-5-"><td  style="white-space:nowrap; text-align:left;" id="TBL-6-5-1"  
+class="td11"><span 
+class="pcrr7t-">header             </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-6-5-2"  
+class="td11">Print fields from a VIPS header                                   </td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-6-6-"><td  style="white-space:nowrap; text-align:left;" id="TBL-6-6-1"  
+class="td11"><span 
+class="pcrr7t-">printlines </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-6-6-2"  
+class="td11">Print an image a line at a time</td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-6-7-"><td  style="white-space:nowrap; text-align:left;" id="TBL-6-7-1"  
+class="td11"><span 
+class="pcrr7t-">vips               </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-6-7-2"  
+class="td11">VIPS universal main program                                      </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-6-8-"><td  style="white-space:nowrap; text-align:left;" id="TBL-6-8-1"  
+class="td11"><span 
+class="pcrr7t-">vips-7.14          </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-6-8-2"  
+class="td11">VIPS wrapper script                                                     </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-6-9-"><td  style="white-space:nowrap; text-align:left;" id="TBL-6-9-1"  
+class="td11"><span 
+class="pcrr7t-">find</span><span 
+class="pcrr7t-">_mosaic        </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-6-9-2"  
+class="td11">Analyse a set of images for overlaps                            </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-6-10-"><td  style="white-space:nowrap; text-align:left;" id="TBL-6-10-1"  
+class="td11"><span 
+class="pcrr7t-">mergeup            </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-6-10-2"  
+class="td11">Join a set of images together                                        </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-6-11-"><td  style="white-space:nowrap; text-align:left;" id="TBL-6-11-1"  
+class="td11"><span 
+class="pcrr7t-">cooc</span><span 
+class="pcrr7t-">_features      </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-6-11-2"  
+class="td11">Calculate features of a co-occurence matrix                </td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-6-12-"><td  style="white-space:nowrap; text-align:left;" id="TBL-6-12-1"  
+class="td11"><span 
+class="pcrr7t-">cooc </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-6-12-2"  
+class="td11">Calculate a co-occurence matrix</td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-6-13-"><td  style="white-space:nowrap; text-align:left;" id="TBL-6-13-1"  
+class="td11"><span 
+class="pcrr7t-">glds</span><span 
+class="pcrr7t-">_features      </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-6-13-2"  
+class="td11">Calculate features of a grey-level distribution matrix  </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-6-14-"><td  style="white-space:nowrap; text-align:left;" id="TBL-6-14-1"  
+class="td11"><span 
+class="pcrr7t-">glds               </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-6-14-2"  
+class="td11">Calculate a grey-level distribution matrix                    </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-6-15-"><td  style="white-space:nowrap; text-align:left;" id="TBL-6-15-1"  
+class="td11"><span 
+class="pcrr7t-">simcontr           </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-6-15-2"  
+class="td11">Demonstrate simultaneous contrast                             </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-6-16-"><td  style="white-space:nowrap; text-align:left;" id="TBL-6-16-1"  
+class="td11"><span 
+class="pcrr7t-">sines              </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-6-16-2"  
+class="td11">Generate a sinusoidal test pattern                                 </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-6-17-"><td  style="white-space:nowrap; text-align:left;" id="TBL-6-17-1"  
+class="td11"><span 
+class="pcrr7t-">spatres            </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-6-17-2"  
+class="td11">Generate a spatial resolution test pattern                     </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-6-18-"><td  style="white-space:nowrap; text-align:left;" id="TBL-6-18-1"  
+class="td11"><span 
+class="pcrr7t-">squares            </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-6-18-2"  
+class="td11">Generate some squares                                                 </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-6-19-"><td  style="white-space:nowrap; text-align:left;" id="TBL-6-19-1"  
+class="td11"><span 
+class="pcrr7t-">batch</span><span 
+class="pcrr7t-">_crop         </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-6-19-2"  
+class="td11">Crop a lot of images                                                     </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-6-20-"><td  style="white-space:nowrap; text-align:left;" id="TBL-6-20-1"  
+class="td11"><span 
+class="pcrr7t-">batch</span><span 
+class="pcrr7t-">_image</span><span 
+class="pcrr7t-">_convert</span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-6-20-2"  
+class="td11">File format convert a lot of images                              </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-6-21-"><td  style="white-space:nowrap; text-align:left;" id="TBL-6-21-1"  
+class="td11"><span 
+class="pcrr7t-">batch</span><span 
+class="pcrr7t-">_rubber</span><span 
+class="pcrr7t-">_sheet </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-6-21-2"  
+class="td11">Warp a lot of images                                                    </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-6-22-"><td  style="white-space:nowrap; text-align:left;" id="TBL-6-22-1"  
+class="td11"><span 
+class="pcrr7t-">light</span><span 
+class="pcrr7t-">_correct      </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-6-22-2"  
+class="td11">Correct a set of images for shading errors                   </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-6-23-"><td  style="white-space:nowrap; text-align:left;" id="TBL-6-23-1"  
+class="td11"><span 
+class="pcrr7t-">mitsub             </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-6-23-2"  
+class="td11">Format a VIPS image for output to a Mitsubishi 3600</td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-6-24-"><td  style="white-space:nowrap; text-align:left;" id="TBL-6-24-1"  
+class="td11"><span 
+class="pcrr7t-">shrink</span><span 
+class="pcrr7t-">_width       </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-6-24-2"  
+class="td11">Shrink to a specific width                                             </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-6-25-"><td  style="white-space:nowrap; text-align:left;" id="TBL-6-25-1"  
+class="td11"><span 
+class="pcrr7t-">vdump              </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-6-25-2"  
+class="td11">VIPS to mono Postscript                                              </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-6-26-"><td  style="white-space:nowrap; text-align:left;" id="TBL-6-26-1"  
+class="td11"><span 
+class="pcrr7t-">vips2dj            </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-6-26-2"  
+class="td11">VIPS to high-quality colour Postscript                        </td>
+</tr><tr 
+class="hline"><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-6-27-"><td  style="white-space:nowrap; text-align:left;" id="TBL-6-27-1"  
+class="td11">                   </td></tr></table>                                                               </div></div>
+<br /><div class="caption" 
+><span class="id">Table&#x00A0;4.1: </span><span  
+class="content">Miscellaneous programs</span></div><!--tex4ht:label?: x25-1050011 -->
+                                           
+                                                                                       
+
+                                                                                       
+  </div><hr class="endfloat" />
+                                           
+                                                                                       
+
+                                                                                       
+  <!--l. 1--><div class="crosslinks"><p class="noindent">[<a 
+href="vipsmanualse18.html" >next</a>] [<a 
+href="vipsmanualse17.html" >front</a>] [<a 
+href="vipsmanualch4.html#vipsmanualse17.html" >up</a>] </p></div>
+<!--l. 1--><p class="indent" >  <a 
+ id="tailvipsmanualse17.html"></a>  
+</body></html> 

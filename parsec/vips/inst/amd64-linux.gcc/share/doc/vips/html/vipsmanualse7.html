@@ -1,0 +1,107 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html > 
+<head><title>Introduction</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (http://www.cse.ohio-state.edu/~gurari/TeX4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.cse.ohio-state.edu/~gurari/TeX4ht/)"> 
+<!-- 3,html --> 
+<meta name="src" content="vipsmanual.tex"> 
+<meta name="date" content="2010-06-09 21:39:00"> 
+<link rel="stylesheet" type="text/css" href="vipsmanual.css"> 
+</head><body 
+>
+  <!--l. 1--><div class="crosslinks"><p class="noindent">[<a 
+href="vipsmanualse8.html" >next</a>] [<a 
+href="#tailvipsmanualse7.html">tail</a>] [<a 
+href="vipsmanualch2.html#vipsmanualse7.html" >up</a>] </p></div>
+  <h3 class="sectionHead"><span class="titlemark">2.1    </span> <a 
+ id="x13-360002.1"></a>Introduction</h3>
+<!--l. 2--><p class="noindent" ><a name="nip_label_sec:appl"></a>
+<!--l. 4--><p class="indent" >  This chapter explains how to call VIPS functions from C
+programs. It does not explain how to write new image
+processing operations (see <span 
+class="cmsy-10">§</span><a 
+href="vipsmanualse13.html#x20-850003.1">3.1<!--tex4ht:ref: sec:oper --></a>), only how to call the ones
+that VIPS provides. If you want to call VIPS functions fromC++ programs, you can either use the interface described
+ here or you can try out the much nicer C++ interface
+ described in <span 
+class="cmsy-10">§</span><a 
+href="vipsmanualse1.html#x6-50001.1">1.1<!--tex4ht:ref: sec:cpp --></a>.
+ <!--l. 10--><p class="indent" >    See <span 
+class="cmsy-10">§</span><a 
+href="vipsmanualse17.html#x25-1050004.1">4.1<!--tex4ht:ref: sec:ref --></a> for an introduction to the image processing
+ operations available in the library. Figure&#x00A0;<a 
+href="#x13-360011">2.1<!--tex4ht:ref: fg:architecture --></a> tries to show
+ an overview of this structure.
+                                                                                       
+
+                                                                                       
+<!--l. 15--><p class="indent" >  <a 
+ id="x13-360011"></a><hr class="float"><div class="float" 
+>
+                                           
+                                                                                       
+
+                                                                                       
+<div class="center" 
+>
+<!--l. 15--><p class="noindent" >
+
+<!--l. 15--><p class="noindent" ><img 
+src="figs/arch.png" alt="PIC"  
+></div>
+<br /> <div class="caption" 
+><span class="id">Figure&#x00A0;2.1: </span><span  
+class="content">VIPS software architecture</span></div><!--tex4ht:label?: x13-360011 -->
+                                           
+                                                                                       
+
+                                                                                       
+  </div><hr class="endfloat" />
+<!--l. 20--><p class="indent" >  VIPS includes a set of UNIX manual pages. Enter (for
+example):
+                                                 <div class="verbatim" id="verbatim-49">
+  example%&#x00A0;man&#x00A0;im_extract 
+</div>
+<!--l. 24--><p class="nopar" >
+<!--l. 26--><p class="noindent" >to get an explanation of the <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_extract()</span></span></span> function.
+<!--l. 29--><p class="indent" >    All the command-line VIPS operations will print help
+text too. For example:
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-50">
+example%&#x00A0;vips&#x00A0;im_extract
+&#x00A0;<br />usage:&#x00A0;vips&#x00A0;im_extract&#x00A0;input&#x00A0;output
+&#x00A0;<br />&#x00A0;&#x00A0;left&#x00A0;top&#x00A0;width&#x00A0;height&#x00A0;band
+&#x00A0;<br />where:
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;input&#x00A0;is&#x00A0;of&#x00A0;type&#x00A0;"image"
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;output&#x00A0;is&#x00A0;of&#x00A0;type&#x00A0;"image"
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;left&#x00A0;is&#x00A0;of&#x00A0;type&#x00A0;"integer"
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;top&#x00A0;is&#x00A0;of&#x00A0;type&#x00A0;"integer"
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;width&#x00A0;is&#x00A0;of&#x00A0;type&#x00A0;"integer"
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;height&#x00A0;is&#x00A0;of&#x00A0;type&#x00A0;"integer"
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;band&#x00A0;is&#x00A0;of&#x00A0;type&#x00A0;"integer"
+&#x00A0;<br />extract&#x00A0;area/band,&#x00A0;from&#x00A0;package
+&#x00A0;<br />&#x00A0;&#x00A0;"conversion"
+&#x00A0;<br />flags:&#x00A0;(PIO&#x00A0;function)
+&#x00A0;<br />&#x00A0;&#x00A0;(coordinate&#x00A0;transformer)
+&#x00A0;<br />&#x00A0;&#x00A0;(area&#x00A0;operation)
+&#x00A0;<br />&#x00A0;&#x00A0;(result&#x00A0;can&#x00A0;be&#x00A0;cached)
+&#x00A0;<br />vips:&#x00A0;error&#x00A0;calling&#x00A0;function
+&#x00A0;<br />im_run_command:&#x00A0;too&#x00A0;few&#x00A0;arguments
+</div>
+<!--l. 51--><p class="nopar" >
+                                           
+                                                                                       
+
+                                                                                       
+  <!--l. 1--><div class="crosslinks"><p class="noindent">[<a 
+href="vipsmanualse8.html" >next</a>] [<a 
+href="vipsmanualse7.html" >front</a>] [<a 
+href="vipsmanualch2.html#vipsmanualse7.html" >up</a>] </p></div>
+<!--l. 1--><p class="indent" >  <a 
+ id="tailvipsmanualse7.html"></a>  
+</body></html> 

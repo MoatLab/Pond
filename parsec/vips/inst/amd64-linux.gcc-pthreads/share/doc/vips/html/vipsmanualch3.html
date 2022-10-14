@@ -1,0 +1,75 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html > 
+<head><title>3 Writing VIPS operations</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (http://www.cse.ohio-state.edu/~gurari/TeX4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.cse.ohio-state.edu/~gurari/TeX4ht/)"> 
+<!-- 3,html --> 
+<meta name="src" content="vipsmanual.tex"> 
+<meta name="date" content="2010-06-09 21:39:00"> 
+<link rel="stylesheet" type="text/css" href="vipsmanual.css"> 
+</head><body 
+>
+  <!--l. 79--><div class="crosslinks"><p class="noindent">[<a 
+href="vipsmanualch4.html" >next</a>] [<a 
+href="vipsmanualch2.html" >prev</a>] [<a 
+href="vipsmanualch2.html#tailvipsmanualch2.html" >prev-tail</a>] [<a 
+href="#tailvipsmanualch3.html">tail</a>] [<a 
+href="vipsmanual.html#vipsmanualch3.html" >up</a>] </p></div>
+  <h2 class="chapterHead"><span class="titlemark">Chapter&#x00A0;3</span><br /><a 
+ id="x19-840003"></a>Writing VIPS operations</h2>
+  <div class="sectionTOCS">
+  &#x00A0;<span class="sectionToc" >3.1 <a 
+href="vipsmanualse13.html#x20-850003.1">Introduction</a></span>
+<br />  &#x00A0;&#x00A0;<span class="subsectionToc" >3.1.1 <a 
+href="vipsmanualse13.html#x20-860003.1.1">Why use VIPS?</a></span>
+<br />  &#x00A0;&#x00A0;<span class="subsectionToc" >3.1.2 <a 
+href="vipsmanualse13.html#x20-870003.1.2">I/O styles</a></span>
+<br />  &#x00A0;<span class="sectionToc" >3.2 <a 
+href="vipsmanualse14.html#x21-880003.2">Programming WIO operations</a></span>
+<br />  &#x00A0;&#x00A0;<span class="subsectionToc" >3.2.1 <a 
+href="vipsmanualse14.html#x21-890003.2.1">Input from an image</a></span>
+<br />  &#x00A0;&#x00A0;<span class="subsectionToc" >3.2.2 <a 
+href="vipsmanualse14.html#x21-900003.2.2">Output to an image</a></span>
+<br />  &#x00A0;&#x00A0;<span class="subsectionToc" >3.2.3 <a 
+href="vipsmanualse14.html#x21-910003.2.3">Polymorphism</a></span>
+<br />  &#x00A0;<span class="sectionToc" >3.3 <a 
+href="vipsmanualse15.html#x22-920003.3">Programming PIO functions</a></span>
+<br />  &#x00A0;&#x00A0;<span class="subsectionToc" >3.3.1 <a 
+href="vipsmanualse15.html#x22-930003.3.1">Easy PIO with <span 
+class="pcrr7t-">im</span><span 
+class="pcrr7t-">_wrapone() </span>and <span 
+class="pcrr7t-">im</span><span 
+class="pcrr7t-">_wrapmany()</span></a></span>
+<br />  &#x00A0;&#x00A0;<span class="subsectionToc" >3.3.2 <a 
+href="vipsmanualse15.html#x22-940003.3.2">Region descriptors</a></span>
+<br />  &#x00A0;&#x00A0;<span class="subsectionToc" >3.3.3 <a 
+href="vipsmanualse15.html#x22-950003.3.3">Image input with regions</a></span>
+<br />  &#x00A0;&#x00A0;<span class="subsectionToc" >3.3.4 <a 
+href="vipsmanualse15.html#x22-960003.3.4">Splitting into sequences</a></span>
+<br />  &#x00A0;&#x00A0;<span class="subsectionToc" >3.3.5 <a 
+href="vipsmanualse15.html#x22-970003.3.5">Output to regions</a></span>
+<br />  &#x00A0;&#x00A0;<span class="subsectionToc" >3.3.6 <a 
+href="vipsmanualse15.html#x22-980003.3.6">Callbacks</a></span>
+<br />  &#x00A0;&#x00A0;<span class="subsectionToc" >3.3.7 <a 
+href="vipsmanualse15.html#x22-1020003.3.7">Memory allocation revisited</a></span>
+<br />  &#x00A0;<span class="sectionToc" >3.4 <a 
+href="vipsmanualse16.html#x23-1030003.4">Programming in-place functions</a></span>
+  </div>
+
+
+
+                                           
+                                                                                       
+
+                                                                                       
+  <!--l. 86--><div class="crosslinks"><p class="noindent">[<a 
+href="vipsmanualch4.html" >next</a>] [<a 
+href="vipsmanualch2.html" >prev</a>] [<a 
+href="vipsmanualch2.html#tailvipsmanualch2.html" >prev-tail</a>] [<a 
+href="vipsmanualch3.html" >front</a>] [<a 
+href="vipsmanual.html#vipsmanualch3.html" >up</a>] </p></div>
+<!--l. 86--><p class="indent" >  <a 
+ id="tailvipsmanualch3.html"></a>  
+</body></html> 

@@ -1,0 +1,252 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html > 
+<head><title>The VMask class</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (http://www.cse.ohio-state.edu/~gurari/TeX4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.cse.ohio-state.edu/~gurari/TeX4ht/)"> 
+<!-- 3,html --> 
+<meta name="src" content="vipsmanual.tex"> 
+<meta name="date" content="2010-06-09 21:39:00"> 
+<link rel="stylesheet" type="text/css" href="vipsmanual.css"> 
+</head><body 
+>
+  <!--l. 1--><div class="crosslinks"><p class="noindent">[<a 
+href="vipsmanualse5.html" >next</a>] [<a 
+href="vipsmanualse3.html" >prev</a>] [<a 
+href="vipsmanualse3.html#tailvipsmanualse3.html" >prev-tail</a>] [<a 
+href="#tailvipsmanualse4.html">tail</a>] [<a 
+href="vipsmanualch1.html#vipsmanualse4.html" >up</a>] </p></div>
+  <h3 class="sectionHead"><span class="titlemark">1.4    </span> <a 
+ id="x9-190001.4"></a>The <span 
+class="pcrr7t-">VMask </span>class</h3>
+<!--l. 3--><p class="noindent" >The <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VMask</span></span></span> class is an abstraction over the VIPS
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">DOUBLEMASK</span></span></span> and <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">INTMASK</span></span></span> types which gives convenient
+and safe representation of matrices.
+<!--l. 7--><p class="indent" >  <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VMask</span></span></span> has two sub-classes, <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VIMask</span></span></span> and <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VDMask</span></span></span>.
+These represent matrices of integers and doubles
+respectively.
+<!--l. 10--><p class="noindent" >
+  <h4 class="subsectionHead"><span class="titlemark">1.4.1    </span> <a 
+ id="x9-200001.4.1"></a>Constructors</h4>
+<!--l. 12--><p class="noindent" >There are four constructors for <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VIMask</span></span></span> and <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VDMask</span></span></span>:
+                                                 <div class="verbatim" id="verbatim-27">
+  VIMask(&#x00A0;int&#x00A0;xsize,&#x00A0;int&#x00A0;ysize&#x00A0;);
+ &#x00A0;<br />VIMask(&#x00A0;int&#x00A0;xsize,&#x00A0;int&#x00A0;ysize,
+ &#x00A0;<br />&#x00A0;&#x00A0;int&#x00A0;scale,&#x00A0;int&#x00A0;offset,&#x00A0;...&#x00A0;);
+ &#x00A0;<br />VIMask(&#x00A0;int&#x00A0;xsize,&#x00A0;int&#x00A0;ysize,
+ &#x00A0;<br />&#x00A0;&#x00A0;int&#x00A0;scale,&#x00A0;int&#x00A0;offset,
+ &#x00A0;<br />&#x00A0;&#x00A0;std::vector&#x003C;int&#x003E;&#x00A0;coeff&#x00A0;);
+ &#x00A0;<br />VIMask(&#x00A0;const&#x00A0;char&#x00A0;&#x22C6;name&#x00A0;);
+ &#x00A0;<br />VIMask();
+ &#x00A0;<br />VDMask(&#x00A0;int&#x00A0;xsize,&#x00A0;int&#x00A0;ysize&#x00A0;);
+ &#x00A0;<br />VDMask(&#x00A0;int&#x00A0;xsize,&#x00A0;int&#x00A0;ysize,
+ &#x00A0;<br />&#x00A0;&#x00A0;double&#x00A0;scale,&#x00A0;double&#x00A0;offset,&#x00A0;...&#x00A0;);
+ &#x00A0;<br />VDMask(&#x00A0;int&#x00A0;xsize,&#x00A0;int&#x00A0;ysize,
+ &#x00A0;<br />&#x00A0;&#x00A0;double&#x00A0;scale,&#x00A0;double&#x00A0;offset,
+ &#x00A0;<br />&#x00A0;&#x00A0;std::vector&#x003C;double&#x003E;&#x00A0;coeff&#x00A0;);
+ &#x00A0;<br />VDMask(&#x00A0;const&#x00A0;char&#x00A0;&#x22C6;name&#x00A0;);
+ &#x00A0;<br />VDMask(); 
+</div>
+<!--l. 31--><p class="nopar" >
+<!--l. 33--><p class="indent" >  The first form creates an empty matrix, with the specified
+dimensions; the second form initialises a matrix from
+a varargs list; the third form sets the matrix from a
+vector of coefficients; the fourth from the named file.
+The final form makes a mask object with no contents
+yet.
+<!--l. 38--><p class="indent" >    The varargs constructors are not wrapped in Python &#8212;
+use the vector constructor instead. For example:
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-28">
+m&#x00A0;=&#x00A0;VMask.VIMask&#x00A0;(3,&#x00A0;3,&#x00A0;1,&#x00A0;0,
+&#x00A0;<br />&#x00A0;&#x00A0;[-1,&#x00A0;-1,&#x00A0;-1,
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;-1,&#x00A0;&#x00A0;8,&#x00A0;-1,
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;-1,&#x00A0;-1,&#x00A0;-1])
+</div>
+<!--l. 46--><p class="nopar" >
+<!--l. 48--><p class="noindent" >
+  <h4 class="subsectionHead"><span class="titlemark">1.4.2    </span> <a 
+ id="x9-210001.4.2"></a>Projection functions</h4>
+<!--l. 50--><p class="noindent" >A set of member functions of <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VIMask</span></span></span> provide access to the
+fields in the matrix:
+                                                 <div class="verbatim" id="verbatim-29">
+  int&#x00A0;xsize()&#x00A0;const;
+ &#x00A0;<br />int&#x00A0;ysize()&#x00A0;const;
+ &#x00A0;<br />int&#x00A0;scale()&#x00A0;const;
+ &#x00A0;<br />int&#x00A0;offset()&#x00A0;const;
+ &#x00A0;<br />const&#x00A0;char&#x00A0;&#x22C6;filename()&#x00A0;const; 
+</div>
+<!--l. 59--><p class="nopar" >
+<!--l. 61--><p class="indent" >  <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VDMask</span></span></span> is the same, except that the <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">scale()</span></span></span> and
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">offset()</span></span></span> members return <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">double</span></span></span>. <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VMask</span></span></span> allows all
+operations that are common to <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VIMask</span></span></span> and <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VDMask</span></span></span>.
+<!--l. 65--><p class="noindent" >
+    <h4 class="subsectionHead"><span class="titlemark">1.4.3    </span> <a 
+ id="x9-220001.4.3"></a>Assignment</h4>
+<!--l. 67--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VMask</span></span></span> defines copy and assignment with pointer-style
+semantics. You can write stuff like:
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-30">
+VIMask&#x00A0;fred(&#x00A0;"mask"&#x00A0;);
+&#x00A0;<br />VMask&#x00A0;jim;
+&#x00A0;<br />
+&#x00A0;<br />jim&#x00A0;=&#x00A0;fred;
+</div>
+<!--l. 75--><p class="nopar" >
+<!--l. 77--><p class="indent" >  This reads the file <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">mask</span></span></span>, noting a pointer to the
+mask in <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">fred</span></span></span>. It then makes <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">jim</span></span></span> also point to it, so
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">jim</span></span></span> and <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">fred</span></span></span> are sharing the same underlying matrix
+values.
+<!--l. 81--><p class="indent" >  Internally, a <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VMask</span></span></span> object is just a pointer to a
+reference-counting block, which in turn holds a pointer to
+the underlying VIPS <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">MASK</span></span></span> type. You can therefore
+efficiently pass <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VMask</span></span></span> objects to functions by value, and
+return <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VMask</span></span></span> objects as function results.
+<!--l. 86--><p class="noindent" >
+  <h4 class="subsectionHead"><span class="titlemark">1.4.4    </span> <a 
+ id="x9-230001.4.4"></a>Computing with <span 
+class="pcrr7t-">VMask</span></h4>
+<!--l. 88--><p class="noindent" >You can use <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">[]</span></span></span> to get at matrix elements, numbered
+left-to-right, top-to-bottom. Alternatively, use <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">()</span></span></span> to address
+elements by <span 
+class="cmmi-10">x,y </span>position. For example:
+                                                 <div class="verbatim" id="verbatim-31">
+  VIMask&#x00A0;fred(&#x00A0;"mask"&#x00A0;);
+ &#x00A0;<br />
+ &#x00A0;<br />for(&#x00A0;int&#x00A0;i&#x00A0;=&#x00A0;0;&#x00A0;i&#x00A0;&#x003C;&#x00A0;fred.xsize();&#x00A0;i++&#x00A0;)
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;fred[i]&#x00A0;=&#x00A0;12; 
+</div>
+<!--l. 97--><p class="nopar" >
+<!--l. 99--><p class="noindent" >will set the first line of the matrix to 12, and:
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-32">
+VDMask&#x00A0;fred(&#x00A0;"mask"&#x00A0;);
+&#x00A0;<br />
+&#x00A0;<br />for(&#x00A0;int&#x00A0;x&#x00A0;=&#x00A0;0;&#x00A0;x&#x00A0;&#x003C;&#x00A0;fred.xsize();&#x00A0;x++&#x00A0;)
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;fred(x,&#x00A0;x)&#x00A0;=&#x00A0;12.0;
+</div>
+<!--l. 107--><p class="nopar" >
+<!--l. 109--><p class="noindent" >will set the leading diagonal to 12.
+<!--l. 112--><p class="indent" >  These don&#8217;t work well in Python, so there&#8217;s an extra
+member, <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">get()</span></span></span>, which will get an element by <span 
+class="cmmi-10">x,y</span>
+position.
+                                                 <div class="verbatim" id="verbatim-33">
+  x&#x00A0;=&#x00A0;mat.get&#x00A0;(2,&#x00A0;4) 
+</div>
+<!--l. 117--><p class="nopar" >
+<!--l. 119--><p class="indent" >  See the member functions below for other operations on
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VMask</span></span></span>.
+<!--l. 121--><p class="noindent" >
+    <h4 class="subsectionHead"><span class="titlemark">1.4.5    </span> <a 
+ id="x9-240001.4.5"></a><span 
+class="pcrr7t-">VIMask </span>operations</h4>
+<!--l. 123--><p class="noindent" >The following operations are defined for <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VIMask</span></span></span>:
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-34">
+//&#x00A0;Cast&#x00A0;to&#x00A0;VDMask&#x00A0;and&#x00A0;VImage
+&#x00A0;<br />operator&#x00A0;VDMask();
+&#x00A0;<br />operator&#x00A0;VImage();
+&#x00A0;<br />
+&#x00A0;<br />//&#x00A0;Build&#x00A0;gaussian&#x00A0;and&#x00A0;log&#x00A0;masks
+&#x00A0;<br />static&#x00A0;VIMask&#x00A0;gauss(&#x00A0;double,&#x00A0;double&#x00A0;);
+&#x00A0;<br />static&#x00A0;VIMask&#x00A0;gauss_sep(&#x00A0;double,&#x00A0;double&#x00A0;);
+&#x00A0;<br />static&#x00A0;VIMask&#x00A0;log(&#x00A0;double,&#x00A0;double&#x00A0;);
+&#x00A0;<br />
+&#x00A0;<br />//&#x00A0;Rotate
+&#x00A0;<br />VIMask&#x00A0;rotate45();
+&#x00A0;<br />VIMask&#x00A0;rotate90();
+&#x00A0;<br />
+&#x00A0;<br />//&#x00A0;Transpose,&#x00A0;invert,&#x00A0;join&#x00A0;and&#x00A0;multiply
+&#x00A0;<br />VDMask&#x00A0;trn()&#x00A0;;
+&#x00A0;<br />VDMask&#x00A0;inv();
+&#x00A0;<br />VDMask&#x00A0;cat(&#x00A0;VDMask&#x00A0;);
+&#x00A0;<br />VDMask&#x00A0;mul(&#x00A0;VDMask&#x00A0;);
+</div>
+<!--l. 144--><p class="nopar" >
+<!--l. 146--><p class="noindent" >
+  <h4 class="subsectionHead"><span class="titlemark">1.4.6    </span> <a 
+ id="x9-250001.4.6"></a><span 
+class="pcrr7t-">VDMask </span>operations</h4>
+<!--l. 148--><p class="noindent" >The following operations are defined for <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VDMask</span></span></span>:
+                                                 <div class="verbatim" id="verbatim-35">
+  //&#x00A0;Cast&#x00A0;to&#x00A0;VIMask&#x00A0;and&#x00A0;VImage
+ &#x00A0;<br />operator&#x00A0;VIMask();
+ &#x00A0;<br />operator&#x00A0;VImage();
+ &#x00A0;<br />
+ &#x00A0;<br />//&#x00A0;Build&#x00A0;gauss&#x00A0;and&#x00A0;log&#x00A0;masks
+ &#x00A0;<br />static&#x00A0;VDMask&#x00A0;gauss(&#x00A0;double,&#x00A0;double&#x00A0;);
+ &#x00A0;<br />static&#x00A0;VDMask&#x00A0;log(&#x00A0;double,&#x00A0;double&#x00A0;);
+ &#x00A0;<br />
+ &#x00A0;<br />//&#x00A0;Rotate
+ &#x00A0;<br />VDMask&#x00A0;rotate45();
+ &#x00A0;<br />VDMask&#x00A0;rotate90();
+ &#x00A0;<br />
+ &#x00A0;<br />//&#x00A0;Scale&#x00A0;to&#x00A0;intmask
+ &#x00A0;<br />VIMask&#x00A0;scalei();
+ &#x00A0;<br />
+ &#x00A0;<br />//&#x00A0;Transpose,&#x00A0;invert,&#x00A0;join&#x00A0;and&#x00A0;multiply
+ &#x00A0;<br />VDMask&#x00A0;trn();
+ &#x00A0;<br />VDMask&#x00A0;inv();
+ &#x00A0;<br />VDMask&#x00A0;cat(&#x00A0;VDMask&#x00A0;);
+ &#x00A0;<br />VDMask&#x00A0;mul(&#x00A0;VDMask&#x00A0;); 
+</div>
+<!--l. 171--><p class="nopar" >
+<!--l. 173--><p class="noindent" >
+  <h4 class="subsectionHead"><span class="titlemark">1.4.7    </span> <a 
+ id="x9-260001.4.7"></a>Output of masks</h4>
+<!--l. 175--><p class="noindent" >You can output masks with the usual <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">&#x003C;&#x003C;</span></span></span> operator.
+                                                                                       
+
+                                                                                       
+  <!--l. 1--><div class="crosslinks"><p class="noindent">[<a 
+href="vipsmanualse5.html" >next</a>] [<a 
+href="vipsmanualse3.html" >prev</a>] [<a 
+href="vipsmanualse3.html#tailvipsmanualse3.html" >prev-tail</a>] [<a 
+href="vipsmanualse4.html" >front</a>] [<a 
+href="vipsmanualch1.html#vipsmanualse4.html" >up</a>] </p></div>
+<!--l. 1--><p class="indent" >  <a 
+ id="tailvipsmanualse4.html"></a>   
+</body></html> 

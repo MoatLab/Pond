@@ -1,0 +1,94 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html > 
+<head><title>Programming in-place functions</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (http://www.cse.ohio-state.edu/~gurari/TeX4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.cse.ohio-state.edu/~gurari/TeX4ht/)"> 
+<!-- 3,html --> 
+<meta name="src" content="vipsmanual.tex"> 
+<meta name="date" content="2010-06-09 21:39:00"> 
+<link rel="stylesheet" type="text/css" href="vipsmanual.css"> 
+</head><body 
+>
+  <!--l. 1--><div class="crosslinks"><p class="noindent">[<a 
+href="vipsmanualse15.html" >prev</a>] [<a 
+href="vipsmanualse15.html#tailvipsmanualse15.html" >prev-tail</a>] [<a 
+href="#tailvipsmanualse16.html">tail</a>] [<a 
+href="vipsmanualch3.html#vipsmanualse16.html" >up</a>] </p></div>
+  <h3 class="sectionHead"><span class="titlemark">3.4    </span> <a 
+ id="x23-1030003.4"></a>Programming in-place functions</h3>
+<!--l. 3--><p class="noindent" >VIPS includes a little support for in-place functions &#8212;
+functions which operate directly on an image, both
+reading and writing from the same descriptor via the data
+pointer. This is an extremely dangerous way to handle IO,
+since any bugs in your program will trash your input
+image.
+<!--l. 8--><p class="indent" >  Operations of this type should call <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_rwcheck()</span></span></span>
+instead of <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_incheck()</span></span></span>. <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_rwcheck()</span></span></span> tries to get
+a descriptor ready for in-place writing. For example, a
+function which cleared an image to black might be written
+as:
+                                                 <div class="verbatim" id="verbatim-171">
+  #include&#x00A0;&#x003C;stdio.h&#x003E;
+ &#x00A0;<br />#include&#x00A0;&#x003C;memory.h&#x003E;
+ &#x00A0;<br />
+ &#x00A0;<br />#include&#x00A0;&#x003C;vips/vips.h&#x003E;
+ &#x00A0;<br />
+ &#x00A0;<br />int
+ &#x00A0;<br />black_inplace(&#x00A0;IMAGE&#x00A0;&#x22C6;im&#x00A0;)
+ &#x00A0;<br />{
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Check&#x00A0;that&#x00A0;we&#x00A0;can&#x00A0;RW&#x00A0;to&#x00A0;im.
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x22C6;/
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;if(&#x00A0;im_rwcheck(&#x00A0;im&#x00A0;)&#x00A0;)
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;return(&#x00A0;-1&#x00A0;);
+ &#x00A0;<br />
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Zap&#x00A0;the&#x00A0;image!
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x22C6;/
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;memset(&#x00A0;im-&#x003E;data,&#x00A0;0,
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;IM_IMAGE_SIZEOF_LINE(&#x00A0;im&#x00A0;)&#x00A0;&#x22C6;
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;im-&#x003E;Ysize&#x00A0;);
+ &#x00A0;<br />
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;return(&#x00A0;0&#x00A0;);
+ &#x00A0;<br />} 
+</div>
+<!--l. 35--><p class="nopar" >
+<!--l. 37--><p class="indent" >  This function might be called from an application
+as:
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-172">
+#include&#x00A0;&#x003C;stdio.h&#x003E;
+&#x00A0;<br />#include&#x00A0;&#x003C;stdlib.h&#x003E;
+&#x00A0;<br />
+&#x00A0;<br />#include&#x00A0;&#x003C;vips/vips.h&#x003E;
+&#x00A0;<br />
+&#x00A0;<br />void
+&#x00A0;<br />zap(&#x00A0;char&#x00A0;&#x22C6;name&#x00A0;)
+&#x00A0;<br />{
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;IMAGE&#x00A0;&#x22C6;im;
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;if(&#x00A0;!(im&#x00A0;=&#x00A0;im_open(&#x00A0;name,&#x00A0;"rw"&#x00A0;))&#x00A0;||
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;black_inplace(&#x00A0;im&#x00A0;)&#x00A0;||
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;im_updatehist(&#x00A0;im,&#x00A0;"zap&#x00A0;image"&#x00A0;)&#x00A0;||
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;im_close(&#x00A0;im&#x00A0;)&#x00A0;)
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;error_exit(&#x00A0;"failure!"&#x00A0;);
+&#x00A0;<br />}
+</div>
+<!--l. 56--><p class="nopar" >
+                                           
+                                                                                       
+
+                                                                                       
+  <!--l. 86--><div class="crosslinks"><p class="noindent">[<a 
+href="vipsmanualse15.html" >prev</a>] [<a 
+href="vipsmanualse15.html#tailvipsmanualse15.html" >prev-tail</a>] [<a 
+href="vipsmanualse16.html" >front</a>] [<a 
+href="vipsmanualch3.html#vipsmanualse16.html" >up</a>] </p></div>
+<!--l. 86--><p class="indent" >  <a 
+ id="tailvipsmanualse16.html"></a>  
+</body></html> 

@@ -1,0 +1,187 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html > 
+<head><title>Introduction</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (http://www.cse.ohio-state.edu/~gurari/TeX4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.cse.ohio-state.edu/~gurari/TeX4ht/)"> 
+<!-- 3,html --> 
+<meta name="src" content="vipsmanual.tex"> 
+<meta name="date" content="2010-06-09 21:39:00"> 
+<link rel="stylesheet" type="text/css" href="vipsmanual.css"> 
+</head><body 
+>
+  <!--l. 1--><div class="crosslinks"><p class="noindent">[<a 
+href="vipsmanualse2.html" >next</a>] [<a 
+href="#tailvipsmanualse1.html">tail</a>] [<a 
+href="vipsmanualch1.html#vipsmanualse1.html" >up</a>] </p></div>
+  <h3 class="sectionHead"><span class="titlemark">1.1    </span> <a 
+ id="x6-50001.1"></a>Introduction</h3>
+<!--l. 2--><p class="noindent" ><a name="nip_label_sec:cpp"></a>
+<!--l. 4--><p class="indent" >  This chapter describes the C++ API for the VIPS image
+processing library. The C++ API is as efficient as the C
+interface to VIPS, but is far easier to use: almost all
+creation, destruction and error handling issues are handled
+for you automatically.                             <!--l. 9--><p class="indent" >    The Python interface is a very simple wrapping of
+  this C++ API generated automatically with SWIG. It
+  adds a few utility methods noted below, but otherwise
+  the two interfaces are identical other than language
+  syntax.
+  <!--l. 14--><p class="noindent" >
+      <h4 class="subsectionHead"><span class="titlemark">1.1.1    </span> <a 
+ id="x6-60001.1.1"></a>If you&#8217;ve used the C API</h4>
+  <!--l. 16--><p class="noindent" >To show how much easier the VIPS C++ API is to use,
+  compare Figure&#x00A0;<a 
+href="vipsmanualse8.html#x14-420002.2.5">2.2.5<!--tex4ht:ref: fg:negative --></a> to Figure&#x00A0;<a 
+href="#x6-60011">1.1<!--tex4ht:ref: fg:invert-c++ --></a>. Figure&#x00A0;<a 
+href="#x6-60022">1.2<!--tex4ht:ref: fg:invert-py --></a> is the same
+  thing in Python.
+  <!--l. 19--><p class="indent" >    A typical build line for the C++ program might be:
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-1">
+g++&#x00A0;invert.cc&#x00A0;\
+&#x00A0;<br />&#x00A0;&#x00A0;&#8216;pkg-config&#x00A0;vipsCC-7.18&#x00A0;\
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;--cflags&#x00A0;--libs&#8216;
+</div>
+<!--l. 25--><p class="nopar" >
+<!--l. 27--><p class="indent" >  The key points are:
+    <ul class="itemize1">
+    <li class="itemize">You just include <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">&#x003C;vips/vips&#x003E;</span></span></span> &#8212; this then gets
+    all of the other includes you need. Everything is in
+    the <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">vips</span></span></span> namespace.
+    </li>
+    <li class="itemize">The C++ API replaces all of the VIPS C types &#8212;
+    <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">IMAGE</span></span></span> becomes <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VImage</span></span></span> and so on. The C++ API
+    also includes <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VDisplay</span></span></span>, <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VMask</span></span></span> and <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VError</span></span></span>.
+    </li>
+    <li class="itemize">Image processing operations are member functions
+    of                             the                             <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VImage</span></span></span>
+    class  &#8212;  here,  <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VImage(</span><span 
+class="pcrr7t-">&#x00A0;argv[1]</span><span 
+class="pcrr7t-">&#x00A0;)</span></span></span> creates  a
+    new  <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VImage</span></span></span> object  using  the  first  argument  to
+    initialise  it  (the  input  filename).  It  then  calls  the
+    member  function  <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">invert()</span></span></span>,  which  inverts  the
+    <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VImage</span></span></span> and  returns  a  new  <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VImage</span></span></span>.  Finally  it
+    calls the member function <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">write()</span></span></span>, which writes
+    the result image to the named file.
+    </li>
+    <li class="itemize">The   VIPS   C++   API   uses   exceptions   &#8212;   the
+    <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VError</span></span></span> class  is  covered  later.  If  you  run  this
+    program with a bad input file, for example, you get
+    the following output:
+                                                     <div class="verbatim" id="verbatim-2">
+          $&#x00A0;invert&#x00A0;jim&#x00A0;fred
+    &#x00A0;<br />invert:&#x00A0;VIPS&#x00A0;error:&#x00A0;format_for_file:
+    &#x00A0;<br />&#x00A0;&#x00A0;file&#x00A0;"jim"&#x00A0;not&#x00A0;found 
+</div>
+   <!--l. 57--><p class="nopar" >
+   </li></ul>
+                                                                                       
+
+                                                                                       
+<!--l. 62--><p class="indent" >  <a 
+ id="x6-60011"></a><hr class="float"><div class="float" 
+>
+                                           
+                                                                                       
+
+                                                                                       
+<div class="verbatim" id="verbatim-3">
+#include&#x00A0;&#x003C;iostream&#x003E;
+&#x00A0;<br />#include&#x00A0;&#x003C;vips/vips&#x003E;
+&#x00A0;<br />
+&#x00A0;<br />int
+&#x00A0;<br />main&#x00A0;(int&#x00A0;argc,&#x00A0;char&#x00A0;&#x22C6;&#x22C6;argv)
+&#x00A0;<br />{
+&#x00A0;<br />&#x00A0;&#x00A0;if&#x00A0;(argc&#x00A0;!=&#x00A0;3)
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;{
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;std::cerr&#x00A0;&#x003C;&#x003C;&#x00A0;"usage:&#x00A0;"&#x00A0;&#x003C;&#x003C;&#x00A0;argv[0]&#x00A0;&#x003C;&#x003C;&#x00A0;"&#x00A0;infile&#x00A0;outfile\n";
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;return&#x00A0;(1);
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;}
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;try
+&#x00A0;<br />&#x00A0;&#x00A0;{
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;vips::VImage&#x00A0;fred&#x00A0;(argv[1]);
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;fred.invert&#x00A0;().write&#x00A0;(argv[2]);
+&#x00A0;<br />&#x00A0;&#x00A0;}
+&#x00A0;<br />&#x00A0;&#x00A0;catch&#x00A0;(vips::VError&#x00A0;e)
+&#x00A0;<br />&#x00A0;&#x00A0;{
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;e.perror&#x00A0;(argv[0]);
+&#x00A0;<br />&#x00A0;&#x00A0;}
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;return&#x00A0;(0);
+&#x00A0;<br />}
+</div>
+<!--l. 88--><p class="nopar" >
+<br /><div class="caption" 
+><span class="id">Figure&#x00A0;1.1: </span><span  
+class="content"><span 
+class="pcrr7t-">invert </span>program in C++</span></div><!--tex4ht:label?: x6-60011 -->
+                                           
+                                                                                       
+
+                                                                                       
+  </div><hr class="endfloat" />
+                                           
+                                                                                       
+
+                                                                                       
+<!--l. 94--><p class="indent" >  <a 
+ id="x6-60022"></a><hr class="float"><div class="float" 
+>
+                                           
+                                                                                       
+
+                                                                                       
+<div class="verbatim" id="verbatim-4">
+#!/usr/bin/python
+&#x00A0;<br />
+&#x00A0;<br />import&#x00A0;sys
+&#x00A0;<br />from&#x00A0;vipsCC&#x00A0;import&#x00A0;&#x22C6;
+&#x00A0;<br />
+&#x00A0;<br />try:
+&#x00A0;<br />&#x00A0;&#x00A0;a&#x00A0;=&#x00A0;VImage.VImage&#x00A0;(sys.argv[1])
+&#x00A0;<br />&#x00A0;&#x00A0;a.invert&#x00A0;().write&#x00A0;(sys.argv[2])
+&#x00A0;<br />except&#x00A0;VError.VError,&#x00A0;e:
+&#x00A0;<br />&#x00A0;&#x00A0;e.perror&#x00A0;(sys.argv[0])
+</div>
+<!--l. 105--><p class="nopar" >
+<br /><div class="caption" 
+><span class="id">Figure&#x00A0;1.2: </span><span  
+class="content"><span 
+class="pcrr7t-">invert </span>program in Python</span></div><!--tex4ht:label?: x6-60022 -->
+                                           
+                                                                                       
+
+                                                                                       
+  </div><hr class="endfloat" />
+                                           
+                                                                                       
+
+                                                                                       
+  <!--l. 1--><div class="crosslinks"><p class="noindent">[<a 
+href="vipsmanualse2.html" >next</a>] [<a 
+href="vipsmanualse1.html" >front</a>] [<a 
+href="vipsmanualch1.html#vipsmanualse1.html" >up</a>] </p></div>
+<!--l. 1--><p class="indent" >  <a 
+ id="tailvipsmanualse1.html"></a>   
+</body></html> 

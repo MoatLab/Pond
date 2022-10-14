@@ -1,0 +1,106 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html > 
+<head><title>2 VIPS for C programmers</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (http://www.cse.ohio-state.edu/~gurari/TeX4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.cse.ohio-state.edu/~gurari/TeX4ht/)"> 
+<!-- 3,html --> 
+<meta name="src" content="vipsmanual.tex"> 
+<meta name="date" content="2010-06-09 21:39:00"> 
+<link rel="stylesheet" type="text/css" href="vipsmanual.css"> 
+</head><body 
+>
+  <!--l. 70--><div class="crosslinks"><p class="noindent">[<a 
+href="vipsmanualch3.html" >next</a>] [<a 
+href="vipsmanualch1.html" >prev</a>] [<a 
+href="vipsmanualch1.html#tailvipsmanualch1.html" >prev-tail</a>] [<a 
+href="#tailvipsmanualch2.html">tail</a>] [<a 
+href="vipsmanual.html#vipsmanualch2.html" >up</a>] </p></div>
+  <h2 class="chapterHead"><span class="titlemark">Chapter&#x00A0;2</span><br /><a 
+ id="x12-350002"></a>VIPS for C programmers</h2>
+  <div class="sectionTOCS">
+  &#x00A0;<span class="sectionToc" >2.1 <a 
+href="vipsmanualse7.html#x13-360002.1">Introduction</a></span>
+<br />  &#x00A0;<span class="sectionToc" >2.2 <a 
+href="vipsmanualse8.html#x14-370002.2">Core C API</a></span>
+<br />  &#x00A0;&#x00A0;<span class="subsectionToc" >2.2.1 <a 
+href="vipsmanualse8.html#x14-380002.2.1">Startup</a></span>
+<br />  &#x00A0;&#x00A0;<span class="subsectionToc" >2.2.2 <a 
+href="vipsmanualse8.html#x14-390002.2.2">Image descriptors</a></span>
+<br />  &#x00A0;&#x00A0;<span class="subsectionToc" >2.2.3 <a 
+href="vipsmanualse8.html#x14-400002.2.3">Header fields</a></span>
+<br />  &#x00A0;&#x00A0;<span class="subsectionToc" >2.2.4 <a 
+href="vipsmanualse8.html#x14-410002.2.4">Opening and closing</a></span>
+<br />  &#x00A0;&#x00A0;<span class="subsectionToc" >2.2.5 <a 
+href="vipsmanualse8.html#x14-420002.2.5">Examples</a></span>
+<br />  &#x00A0;&#x00A0;<span class="subsectionToc" >2.2.6 <a 
+href="vipsmanualse8.html#x14-430002.2.6">Metadata</a></span>
+<br />  &#x00A0;&#x00A0;<span class="subsectionToc" >2.2.7 <a 
+href="vipsmanualse8.html#x14-440002.2.7">History</a></span>
+<br />  &#x00A0;&#x00A0;<span class="subsectionToc" >2.2.8 <a 
+href="vipsmanualse8.html#x14-450002.2.8">Eval callbacks</a></span>
+<br />  &#x00A0;&#x00A0;<span class="subsectionToc" >2.2.9 <a 
+href="vipsmanualse8.html#x14-460002.2.9">Detailed rules for descriptors</a></span>
+<br />  &#x00A0;&#x00A0;<span class="subsectionToc" >2.2.10 <a 
+href="vipsmanualse8.html#x14-470002.2.10">Automatic resource deallocation</a></span>
+<br />  &#x00A0;&#x00A0;<span class="subsectionToc" >2.2.11 <a 
+href="vipsmanualse8.html#x14-510002.2.11">Error handling</a></span>
+<br />  &#x00A0;&#x00A0;<span class="subsectionToc" >2.2.12 <a 
+href="vipsmanualse8.html#x14-520002.2.12">Joining operations together</a></span>
+<br />  &#x00A0;<span class="sectionToc" >2.3 <a 
+href="vipsmanualse9.html#x15-590002.3">Function dispatch and plug-ins</a></span>
+<br />  &#x00A0;&#x00A0;<span class="subsectionToc" >2.3.1 <a 
+href="vipsmanualse9.html#x15-600002.3.1">Simple plugin example</a></span>
+<br />  &#x00A0;&#x00A0;<span class="subsectionToc" >2.3.2 <a 
+href="vipsmanualse9.html#x15-610002.3.2">A more complicated example</a></span>
+<br />  &#x00A0;&#x00A0;<span class="subsectionToc" >2.3.3 <a 
+href="vipsmanualse9.html#x15-620002.3.3">Adding new types</a></span>
+<br />  &#x00A0;&#x00A0;<span class="subsectionToc" >2.3.4 <a 
+href="vipsmanualse9.html#x15-630002.3.4">Using function dispatch in your application</a></span>
+<br />  &#x00A0;<span class="sectionToc" >2.4 <a 
+href="vipsmanualse10.html#x16-670002.4">The VIPS base class: <span 
+class="pcrr7t-">VipsObject</span></a></span>
+<br />  &#x00A0;&#x00A0;<span class="subsectionToc" >2.4.1 <a 
+href="vipsmanualse10.html#x16-680002.4.1">Properties</a></span>
+<br />  &#x00A0;&#x00A0;<span class="subsectionToc" >2.4.2 <a 
+href="vipsmanualse10.html#x16-730002.4.2">Convenience functions</a></span>
+<br />  &#x00A0;<span class="sectionToc" >2.5 <a 
+href="vipsmanualse11.html#x17-740002.5">Image formats</a></span>
+<br />  &#x00A0;&#x00A0;<span class="subsectionToc" >2.5.1 <a 
+href="vipsmanualse11.html#x17-750002.5.1">How a format is represented</a></span>
+<br />  &#x00A0;&#x00A0;<span class="subsectionToc" >2.5.2 <a 
+href="vipsmanualse11.html#x17-760002.5.2">The format class</a></span>
+<br />  &#x00A0;&#x00A0;<span class="subsectionToc" >2.5.3 <a 
+href="vipsmanualse11.html#x17-770002.5.3">Finding a format</a></span>
+<br />  &#x00A0;&#x00A0;<span class="subsectionToc" >2.5.4 <a 
+href="vipsmanualse11.html#x17-780002.5.4">Convenience functions</a></span>
+<br />  &#x00A0;<span class="sectionToc" >2.6 <a 
+href="vipsmanualse12.html#x18-790002.6">Interpolators</a></span>
+<br />  &#x00A0;&#x00A0;<span class="subsectionToc" >2.6.1 <a 
+href="vipsmanualse12.html#x18-800002.6.1">How an interpolator is represented</a></span>
+<br />  &#x00A0;&#x00A0;<span class="subsectionToc" >2.6.2 <a 
+href="vipsmanualse12.html#x18-810002.6.2">A sample interpolator</a></span>
+<br />  &#x00A0;&#x00A0;<span class="subsectionToc" >2.6.3 <a 
+href="vipsmanualse12.html#x18-820002.6.3">Writing a VIPS operation that takes an interpolator as an argument</a></span>
+<br />  &#x00A0;&#x00A0;<span class="subsectionToc" >2.6.4 <a 
+href="vipsmanualse12.html#x18-830002.6.4">Passing an interpolator to a VIPS operation</a></span>
+  </div>
+
+
+
+
+
+                                           
+                                                                                       
+
+                                                                                       
+  <!--l. 79--><div class="crosslinks"><p class="noindent">[<a 
+href="vipsmanualch3.html" >next</a>] [<a 
+href="vipsmanualch1.html" >prev</a>] [<a 
+href="vipsmanualch1.html#tailvipsmanualch1.html" >prev-tail</a>] [<a 
+href="vipsmanualch2.html" >front</a>] [<a 
+href="vipsmanual.html#vipsmanualch2.html" >up</a>] </p></div>
+<!--l. 79--><p class="indent" >  <a 
+ id="tailvipsmanualch2.html"></a>  
+</body></html> 

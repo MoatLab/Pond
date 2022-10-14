@@ -1,0 +1,13 @@
+
+cactuBSSN_s_base.mytest-m64
+control
+gxx.xl
+gxy.xl
+speccmds.cmd
+speccmds.err
+speccmds.out
+speccmds.stdout
+spec_ref.err
+spec_ref.out
+spec_ref.par
+OLD

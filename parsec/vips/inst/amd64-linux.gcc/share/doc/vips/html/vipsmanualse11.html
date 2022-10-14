@@ -1,0 +1,202 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html > 
+<head><title>Image formats</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (http://www.cse.ohio-state.edu/~gurari/TeX4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.cse.ohio-state.edu/~gurari/TeX4ht/)"> 
+<!-- 3,html --> 
+<meta name="src" content="vipsmanual.tex"> 
+<meta name="date" content="2010-06-09 21:39:00"> 
+<link rel="stylesheet" type="text/css" href="vipsmanual.css"> 
+</head><body 
+>
+  <!--l. 1--><div class="crosslinks"><p class="noindent">[<a 
+href="vipsmanualse12.html" >next</a>] [<a 
+href="vipsmanualse10.html" >prev</a>] [<a 
+href="vipsmanualse10.html#tailvipsmanualse10.html" >prev-tail</a>] [<a 
+href="#tailvipsmanualse11.html">tail</a>] [<a 
+href="vipsmanualch2.html#vipsmanualse11.html" >up</a>] </p></div>
+  <h3 class="sectionHead"><span class="titlemark">2.5    </span> <a 
+ id="x17-740002.5"></a>Image formats</h3>
+<!--l. 4--><p class="noindent" >VIPS has a simple system for adding support for new
+image file formats. You can ask VIPS to find a format to
+load a file with or to select a image file writer based on
+a filename. Convenience functions copy a file to an
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">IMAGE</span></span></span>, or an <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">IMAGE</span></span></span> to a file. New formats may be
+added to VIPS by simply defining a new subclass of
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VipsFormat</span></span></span>.
+<!--l. 10--><p class="indent" >  This is a parallel API to <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_open()</span></span></span>, see <span 
+class="cmsy-10">§</span><a 
+href="vipsmanualse8.html#x14-410002.2.4">2.2.4<!--tex4ht:ref: sec:open --></a>. The
+format system is useful for images which are large or
+slow to open, because you pass a descriptor to write
+to and so control how and where the decompressed
+image is held. <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_open()</span></span></span> is useful for images in
+formats which can be directly read from disc, since you
+will avoid a copy operation and can directly control
+the disc file. The inplace operations (see <span 
+class="cmsy-10">§</span><a 
+href="vipsmanualse18.html#x26-1140004.2.8">4.2.8<!--tex4ht:ref: sec:inplace --></a>), for
+example, will only work directly on disc images if you use
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_open()</span></span></span>.
+<!--l. 19--><p class="noindent" >
+  <h4 class="subsectionHead"><span class="titlemark">2.5.1    </span> <a 
+ id="x17-750002.5.1"></a>How a format is represented</h4>
+<!--l. 21--><p class="noindent" >See the man page for <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VipsFormat</span></span></span> for full details,
+but briefly, an image format consists of the following
+items:
+    <ul class="itemize1">
+    <li class="itemize">A  name,  a  name  that  can  be  shows  to  the  user,
+    and a list of possible filename suffixes (<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">.tif</span></span></span>, for
+    example)
+    </li>
+    <li class="itemize">A  function  which  tests  for  a  file  being  in  that
+    format, a function which loads just the header of
+    the file (that is, it reads properties like width and
+    height  and  does  not  read  any  pixel  data)  and  a
+    function which loads the pixel data
+    </li>
+    <li class="itemize">A function which will write an <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">IMAGE</span></span></span> to a file in
+    the format                                          </li>
+          <li class="itemize">And  finally  a  function  which  examines  a  file  in
+          the format and returns flags indicating how VIPS
+          should  deal  with  the  file.  The  only  flag  in  the
+          current version is one indicating that the file can be
+          opened lazily
+          </li></ul>
+  <!--l. 45--><p class="noindent" >
+      <h4 class="subsectionHead"><span class="titlemark">2.5.2    </span> <a 
+ id="x17-760002.5.2"></a>The format class</h4>
+  <!--l. 47--><p class="noindent" >The interface to the format system is defined by the abstract
+  base class <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VipsFormat</span></span></span>. Formats subclass this and
+  implement some or all of the methods. Any of the functions
+  may be left NULL and VIPS will try to make do with what
+  you do supply. Of course a format with all functions as
+  NULL will not be very useful.
+  <!--l. 53--><p class="indent" >    As an example, Figure&#x00A0;<a 
+href="#x17-760019">2.9<!--tex4ht:ref: fg:newformat --></a> shows how to register a new
+  format in a plugin.
+                                                                                       
+
+                                                                                       
+<!--l. 57--><p class="indent" >  <a 
+ id="x17-760019"></a><hr class="float"><div class="float" 
+>
+                                           
+                                                                                       
+
+                                                                                       
+<div class="verbatim" id="verbatim-118">
+static&#x00A0;const&#x00A0;char&#x00A0;&#x22C6;my_suffs[]&#x00A0;=&#x00A0;{&#x00A0;".me",&#x00A0;NULL&#x00A0;};
+&#x00A0;<br />
+&#x00A0;<br />static&#x00A0;int
+&#x00A0;<br />is_myformat(&#x00A0;const&#x00A0;char&#x00A0;&#x22C6;filename&#x00A0;)
+&#x00A0;<br />{
+&#x00A0;<br />&#x00A0;&#x00A0;unsigned&#x00A0;char&#x00A0;buf[2];
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;if(&#x00A0;im__get_bytes(&#x00A0;filename,&#x00A0;buf,&#x00A0;2&#x00A0;)&#x00A0;&amp;&amp;
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;(int)&#x00A0;buf[0]&#x00A0;==&#x00A0;0xff&#x00A0;&amp;&amp;
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;(int)&#x00A0;buf[1]&#x00A0;==&#x00A0;0xd8&#x00A0;)
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;return(&#x00A0;1&#x00A0;);
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;return(&#x00A0;0&#x00A0;);
+&#x00A0;<br />}
+&#x00A0;<br />
+&#x00A0;<br />//&#x00A0;This&#x00A0;format&#x00A0;adds&#x00A0;no&#x00A0;new&#x00A0;members.
+&#x00A0;<br />typedef&#x00A0;VipsFormat&#x00A0;VipsFormatMyformat;
+&#x00A0;<br />typedef&#x00A0;VipsFormatClass&#x00A0;VipsFormatMyformatClass;
+&#x00A0;<br />
+&#x00A0;<br />static&#x00A0;void
+&#x00A0;<br />vips_format_myformat_class_init(&#x00A0;VipsFormatMyformatClass&#x00A0;&#x22C6;class&#x00A0;)
+&#x00A0;<br />{
+&#x00A0;<br />&#x00A0;&#x00A0;VipsObjectClass&#x00A0;&#x22C6;object_class&#x00A0;=&#x00A0;(VipsObjectClass&#x00A0;&#x22C6;)&#x00A0;class;
+&#x00A0;<br />&#x00A0;&#x00A0;VipsFormatClass&#x00A0;&#x22C6;format_class&#x00A0;=&#x00A0;(VipsFormatClass&#x00A0;&#x22C6;)&#x00A0;class;
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;object_class-&#x003E;nickname&#x00A0;=&#x00A0;"myformat";
+&#x00A0;<br />&#x00A0;&#x00A0;object_class-&#x003E;description&#x00A0;=&#x00A0;_(&#x00A0;"My&#x00A0;format"&#x00A0;);
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;format_class-&#x003E;is_a&#x00A0;=&#x00A0;is_myformat;
+&#x00A0;<br />&#x00A0;&#x00A0;format_class-&#x003E;header&#x00A0;=&#x00A0;my_header;
+&#x00A0;<br />&#x00A0;&#x00A0;format_class-&#x003E;load&#x00A0;=&#x00A0;my_read;
+&#x00A0;<br />&#x00A0;&#x00A0;format_class-&#x003E;save&#x00A0;=&#x00A0;my_write;
+&#x00A0;<br />&#x00A0;&#x00A0;format_class-&#x003E;get_flags&#x00A0;=&#x00A0;my_get_flags;
+&#x00A0;<br />&#x00A0;&#x00A0;format_class-&#x003E;priority&#x00A0;=&#x00A0;100;
+&#x00A0;<br />&#x00A0;&#x00A0;format_class-&#x003E;suffs&#x00A0;=&#x00A0;my_suffs;
+&#x00A0;<br />}
+&#x00A0;<br />
+&#x00A0;<br />static&#x00A0;void
+&#x00A0;<br />vips_format_myformat_init(&#x00A0;VipsFormatMyformat&#x00A0;&#x22C6;object&#x00A0;)
+&#x00A0;<br />{
+&#x00A0;<br />}
+&#x00A0;<br />
+&#x00A0;<br />G_DEFINE_TYPE(&#x00A0;VipsFormatMyformat,&#x00A0;vips_format_myformat,&#x00A0;VIPS_TYPE_FORMAT&#x00A0;);
+&#x00A0;<br />
+&#x00A0;<br />char&#x00A0;&#x22C6;
+&#x00A0;<br />g_module_check_init(&#x00A0;GModule&#x00A0;&#x22C6;self&#x00A0;)  &#x00A0;<br />{
+ &#x00A0;<br />&#x00A0;&#x00A0;//&#x00A0;register&#x00A0;the&#x00A0;type
+ &#x00A0;<br />&#x00A0;&#x00A0;vips_format_myformat_get_type();
+ &#x00A0;<br />} 
+</div>
+<!--l. 108--><p class="nopar" >
+<br /><div class="caption" 
+><span class="id">Figure&#x00A0;2.9: </span><span  
+class="content">Registering a format in a plugin</span></div><!--tex4ht:label?: x17-760019 -->
+                                                                                       
+
+                                                                                       
+  </div><hr class="endfloat" />
+  <h4 class="subsectionHead"><span class="titlemark">2.5.3    </span> <a 
+ id="x17-770002.5.3"></a>Finding a format</h4>
+<!--l. 115--><p class="noindent" >You can loop over the subclasses of <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VipsFormat</span></span></span> in order
+of priority with <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">vips_format_map()</span></span></span>. Like all the map
+functions in VIPS, this take a function and applies it to
+every element in the table until the function returns
+non-zero or until the table ends.
+<!--l. 120--><p class="indent" >  You find an <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VipsFormatClass</span></span></span> to use to open a file
+with <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">vips_format_for_file()</span></span></span>. This finds the first
+format whose <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">is_a()</span></span></span> function returns true or whose
+suffix list matches the suffix of the filename, setting
+an error message and returning NULL if no format is
+found.
+<!--l. 125--><p class="indent" >  You find a format to write a file with
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">vips_format_for_name()</span></span></span>. This returns the first
+format with a save function whose suffix list matches the
+suffix of the supplied filename.
+<!--l. 129--><p class="noindent" >
+  <h4 class="subsectionHead"><span class="titlemark">2.5.4    </span> <a 
+ id="x17-780002.5.4"></a>Convenience functions</h4>
+<!--l. 131--><p class="noindent" >A pair of convenience functions, <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">vips_format_write()</span></span></span>
+and <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">vips_format_read()</span></span></span>, will copy an image to and
+from disc using the appropriate format.
+                                           
+                                                                                       
+
+                                                                                       
+  <!--l. 1--><div class="crosslinks"><p class="noindent">[<a 
+href="vipsmanualse12.html" >next</a>] [<a 
+href="vipsmanualse10.html" >prev</a>] [<a 
+href="vipsmanualse10.html#tailvipsmanualse10.html" >prev-tail</a>] [<a 
+href="vipsmanualse11.html" >front</a>] [<a 
+href="vipsmanualch2.html#vipsmanualse11.html" >up</a>] </p></div>
+<!--l. 1--><p class="indent" >  <a 
+ id="tailvipsmanualse11.html"></a>   
+</body></html> 

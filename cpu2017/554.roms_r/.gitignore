@@ -1,0 +1,16 @@
+
+compare.cmd
+compare.err
+compare.out
+compare.stdout
+ocean_benchmark2.err
+ocean_benchmark2.in.x
+ocean_benchmark2.log
+ocean_benchmark2.log.cmp
+roms_r_base.mytest-m64
+speccmds.cmd
+speccmds.err
+speccmds.out
+speccmds.stdout
+varinfo.dat
+OLD

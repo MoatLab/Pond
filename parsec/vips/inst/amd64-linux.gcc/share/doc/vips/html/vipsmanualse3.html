@@ -1,0 +1,526 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html > 
+<head><title>The VImage class</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (http://www.cse.ohio-state.edu/~gurari/TeX4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.cse.ohio-state.edu/~gurari/TeX4ht/)"> 
+<!-- 3,html --> 
+<meta name="src" content="vipsmanual.tex"> 
+<meta name="date" content="2010-06-09 21:39:00"> 
+<link rel="stylesheet" type="text/css" href="vipsmanual.css"> 
+</head><body 
+>
+  <!--l. 1--><div class="crosslinks"><p class="noindent">[<a 
+href="vipsmanualse4.html" >next</a>] [<a 
+href="vipsmanualse2.html" >prev</a>] [<a 
+href="vipsmanualse2.html#tailvipsmanualse2.html" >prev-tail</a>] [<a 
+href="#tailvipsmanualse3.html">tail</a>] [<a 
+href="vipsmanualch1.html#vipsmanualse3.html" >up</a>] </p></div>
+  <h3 class="sectionHead"><span class="titlemark">1.3    </span> <a 
+ id="x8-110001.3"></a>The <span 
+class="pcrr7t-">VImage </span>class</h3>
+<!--l. 3--><p class="noindent" >The <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VImage</span></span></span> class is a layer over the VIPS <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">IMAGE</span></span></span>
+type. It automates almost all of the image creation and
+destruction issues that complicate the C API, it automates
+error handling, and it provides a convenient system for
+composing operations.
+<!--l. 8--><p class="noindent" >
+  <h4 class="subsectionHead"><span class="titlemark">1.3.1    </span> <a 
+ id="x8-120001.3.1"></a>Constructors</h4>
+<!--l. 10--><p class="noindent" >There are two principal constructors for <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VImage</span></span></span>:
+                                                 <div class="verbatim" id="verbatim-5">
+  VImage::VImage(&#x00A0;const&#x00A0;char&#x00A0;&#x22C6;name,
+ &#x00A0;<br />&#x00A0;&#x00A0;const&#x00A0;char&#x00A0;&#x22C6;mode&#x00A0;=&#x00A0;"r"&#x00A0;);
+ &#x00A0;<br />VImage::VImage(); 
+</div>
+<!--l. 16--><p class="nopar" >
+<!--l. 18--><p class="indent" >  The first form creates a new <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VImage</span></span></span>, linking it to the
+named file. <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">mode</span></span></span> sets the mode for the file: it can take the
+following values:
+        <dl class="description"><dt class="description">
+<span 
+class="pcrb7t-">"r"</span> </dt><dd 
+class="description">The named image file is opened read-only. This is
+        the default mode.
+        </dd><dt class="description">
+<span 
+class="pcrb7t-">"w"</span> </dt><dd 
+class="description">A  <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VImage</span></span></span> is  created  which,  when  written  to,
+        will write pixels to disc in the specified file. Any
+        existing file of this name is deleted.
+        </dd><dt class="description">
+<span 
+class="pcrb7t-">"t"</span> </dt><dd 
+class="description">As  the  <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">"w"</span></span></span> mode,  but  pixels  written  to  the
+        <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VImage</span></span></span> will  be  saved  in  a  temporary  memory
+        buffer.
+        </dd><dt class="description">
+<span 
+class="pcrb7t-">"p"</span> </dt><dd 
+class="description">This  creates  a  special  &#8216;partial&#8217;  image.  Partial
+        images represent intermediate results, and are used
+        to join VIPS operations together, see&#x00A0;<span 
+class="cmsy-10">§</span><a 
+href="#x8-160001.3.5">1.3.5<!--tex4ht:ref: sec:compute --></a>.
+        </dd><dt class="description">
+<span 
+class="pcrb7t-">"rw"</span> </dt><dd 
+class="description">As  the  <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">"r"</span></span></span> mode,  but  the  image  is  mapped
+        into your address space read-write. This mode is
+        useful for paintbox-style applications which need
+        to directly modify an image. See <span 
+class="cmsy-10">§</span><a 
+href="vipsmanualse18.html#x26-1140004.2.8">4.2.8<!--tex4ht:ref: sec:inplace --></a>.
+        </dd></dl>
+<!--l. 46--><p class="indent" >    The second form of constructor is shorthand for:
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-6">
+VImage(&#x00A0;"VImage:1",&#x00A0;"p"&#x00A0;)
+</div>
+<!--l. 50--><p class="nopar" >
+<!--l. 52--><p class="noindent" >It is used for representing intermediate results of
+computations.
+<!--l. 55--><p class="indent" >  Two further constructors are handy for wrapping
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VImage</span></span></span> around existing images.
+                                                 <div class="verbatim" id="verbatim-7">
+  VImage(&#x00A0;void&#x00A0;&#x22C6;buffer,
+ &#x00A0;<br />&#x00A0;&#x00A0;int&#x00A0;width,&#x00A0;int&#x00A0;height,&#x00A0;int&#x00A0;bands,
+ &#x00A0;<br />&#x00A0;&#x00A0;TBandFmt&#x00A0;format&#x00A0;);
+ &#x00A0;<br />VImage(&#x00A0;void&#x00A0;&#x22C6;image&#x00A0;); 
+</div>
+<!--l. 63--><p class="nopar" >
+<!--l. 65--><p class="noindent" >The first constructor makes a <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VImage</span></span></span> from an area
+of memory (perhaps from another image processing
+system), and the second makes a <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VImage</span></span></span> from an
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">IMAGE</span></span></span>.
+<!--l. 70--><p class="indent" >    In both these two cases, the VIPS C++ API does not
+assume responsibility for the resources: it&#8217;s up to you to
+make sure the buffer is freed.
+<!--l. 73--><p class="indent" >    The Python interface adds the usual <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">frombuffer</span></span></span> and
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">fromstring</span></span></span> methods.
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-8">
+VImage.fromstring&#x00A0;(string,
+&#x00A0;<br />&#x00A0;&#x00A0;width,&#x00A0;height,&#x00A0;bands,&#x00A0;format)&#x00A0;-&#x003E;
+&#x00A0;<br />&#x00A0;&#x00A0;VImage
+</div>
+<!--l. 80--><p class="nopar" >
+                                              <div class="verbatim" id="verbatim-9">
+ VImage.frombuffer&#x00A0;(buffer,
+ &#x00A0;<br />&#x00A0;&#x00A0;width,&#x00A0;height,&#x00A0;bands,&#x00A0;format)&#x00A0;-&#x003E;
+ &#x00A0;<br />&#x00A0;&#x00A0;VImage 
+</div>
+<!--l. 86--><p class="nopar" >
+<!--l. 88--><p class="noindent" >Use <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">fromstring</span></span></span> to avoid worries about object lifetime,
+but you&#8217;ll see a lot of copies and high memory use. Use
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">frombuffer</span></span></span> for speed, but you have to manage object
+lifetime yourself.
+<!--l. 93--><p class="indent" >    They are useful for moving images into VIPS from other
+image processing libraries. There&#8217;s also a utility function,
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">vips_from_PIL_mode</span></span></span>, which turns a PIL mode into a
+VIPS band, format, type triple.
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-10">
+VImage.vips_from_PIL_mode&#x00A0;(mode)&#x00A0;-&#x003E;
+&#x00A0;<br />&#x00A0;&#x00A0;(bands,&#x00A0;format,&#x00A0;type)
+</div>
+<!--l. 100--><p class="nopar" >
+<!--l. 102--><p class="indent" >  See also <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">tobuffer</span></span></span> and <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">tostring</span></span></span> below.
+<!--l. 104--><p class="noindent" >
+  <h4 class="subsectionHead"><span class="titlemark">1.3.2    </span> <a 
+ id="x8-130001.3.2"></a>File conversion</h4>
+<!--l. 106--><p class="noindent" >VIPS can read and write a number of different file formats.
+Information about file format conversion is taken from the
+filename. For example:
+                                                 <div class="verbatim" id="verbatim-11">
+  VImage&#x00A0;jim(&#x00A0;"fred.jpg"&#x00A0;); 
+</div>
+<!--l. 111--><p class="nopar" >
+<!--l. 113--><p class="noindent" >This will decompress the file <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">fred.jpg</span></span></span> to a memory
+buffer, wrap a VIPS image around the buffer and build a
+reference to it called <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">jim</span></span></span>.
+<!--l. 117--><p class="indent" >    Options are passed to the file format converters embedded
+in the filename. For example:
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-12">
+VImage&#x00A0;out(&#x00A0;"jen.tif:deflate",&#x00A0;"w"&#x00A0;);
+</div>
+<!--l. 122--><p class="nopar" >
+<!--l. 124--><p class="noindent" >Writing to the descriptor <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">out</span></span></span> will cause a TIFF image to be
+written to disc with deflate compression.
+<!--l. 128--><p class="indent" >  See the manual page for <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_open(3)</span></span></span> for details of all
+the file formats and conversions available. See the man page
+for <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VipsFormat(3)</span></span></span> for a lower-level API which lets you
+control more of the detail of reading and writing data and is
+more suitable for large files.
+<!--l. 133--><p class="noindent" >
+  <h4 class="subsectionHead"><span class="titlemark">1.3.3    </span> <a 
+ id="x8-140001.3.3"></a>Projection functions</h4>
+<!--l. 135--><p class="noindent" >A set of member functions of <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VImage</span></span></span> provide access to the
+fields in the header:
+                                                 <div class="verbatim" id="verbatim-13">
+  int&#x00A0;Xsize();
+ &#x00A0;<br />int&#x00A0;Ysize();
+ &#x00A0;<br />int&#x00A0;Bands();
+ &#x00A0;<br />TBandFmt&#x00A0;BandFmt();
+ &#x00A0;<br />TCoding&#x00A0;Coding();
+ &#x00A0;<br />TType&#x00A0;Type();
+ &#x00A0;<br />float&#x00A0;Xres();
+ &#x00A0;<br />float&#x00A0;Yres();
+ &#x00A0;<br />int&#x00A0;Length();
+ &#x00A0;<br />TCompression&#x00A0;Compression();
+ &#x00A0;<br />short&#x00A0;Level();
+ &#x00A0;<br />int&#x00A0;Xoffset();
+ &#x00A0;<br />int&#x00A0;Yoffset(); 
+</div>
+<!--l. 152--><p class="nopar" >
+<!--l. 154--><p class="noindent" >Where <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">TBandFmt</span></span></span>, <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">TCoding</span></span></span>, <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">TType</span></span></span> and <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">TCompression</span></span></span>
+are <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">enum</span></span></span>s for the types in the VIPS file header. See
+section&#x00A0;<span 
+class="cmsy-10">§</span><a 
+href="vipsmanualse2.html#x7-80001.2.1">1.2.1<!--tex4ht:ref: sec:header --></a> for an explanation of all of these fields.
+<!--l. 159--><p class="indent" >    Two functions give access to the filename and history
+fields maintained by the VIPS IO system.
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-14">
+char&#x00A0;&#x22C6;filename();
+&#x00A0;<br />char&#x00A0;&#x22C6;Hist();
+</div>
+<!--l. 165--><p class="nopar" >
+<!--l. 167--><p class="indent" >  You can get and set extra metadata fields with
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">meta_get()</span></span></span> and <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">meta_set()</span></span></span>. They read and write
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">GValue</span></span></span> objects, see <span 
+class="cmsy-10">§</span><a 
+href="vipsmanualse8.html#x14-430002.2.6">2.2.6<!--tex4ht:ref: sec:meta --></a>.
+                                                 <div class="verbatim" id="verbatim-15">
+  void&#x00A0;meta_set(&#x00A0;const&#x00A0;char&#x00A0;&#x22C6;field,&#x00A0;GValue&#x00A0;&#x22C6;value&#x00A0;);
+ &#x00A0;<br />void&#x00A0;meta_get(&#x00A0;const&#x00A0;char&#x00A0;&#x22C6;field,&#x00A0;GValue&#x00A0;&#x22C6;value_copy&#x00A0;);
+ &#x00A0;<br />GType&#x00A0;meta_get_type(&#x00A0;const&#x00A0;char&#x00A0;&#x22C6;field&#x00A0;); 
+</div>
+<!--l. 175--><p class="nopar" >
+<!--l. 177--><p class="indent" >  A set of convenience functions build on these two to
+provide accessors for common types.
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-16">
+int&#x00A0;meta_get_int(&#x00A0;const&#x00A0;char&#x00A0;&#x22C6;field&#x00A0;)
+&#x00A0;<br />double&#x00A0;meta_get_double(&#x00A0;const&#x00A0;char&#x00A0;&#x22C6;field&#x00A0;)
+&#x00A0;<br />const&#x00A0;char&#x00A0;&#x22C6;meta_get_string(&#x00A0;const&#x00A0;char&#x00A0;&#x22C6;field&#x00A0;)
+&#x00A0;<br />void&#x00A0;&#x22C6;meta_get_area(&#x00A0;const&#x00A0;char&#x00A0;&#x22C6;field&#x00A0;)
+&#x00A0;<br />void&#x00A0;&#x22C6;meta_get_blob(&#x00A0;const&#x00A0;char&#x00A0;&#x22C6;field,&#x00A0;size_t&#x00A0;&#x22C6;length&#x00A0;)
+&#x00A0;<br />
+&#x00A0;<br />void&#x00A0;meta_set(&#x00A0;const&#x00A0;char&#x00A0;&#x22C6;field,&#x00A0;int&#x00A0;value&#x00A0;)
+&#x00A0;<br />void&#x00A0;meta_set(&#x00A0;const&#x00A0;char&#x00A0;&#x22C6;field,&#x00A0;double&#x00A0;value&#x00A0;)
+&#x00A0;<br />void&#x00A0;meta_set(&#x00A0;const&#x00A0;char&#x00A0;&#x22C6;field,&#x00A0;const&#x00A0;char&#x00A0;&#x22C6;value&#x00A0;)
+&#x00A0;<br />void&#x00A0;meta_set(&#x00A0;const&#x00A0;char&#x00A0;&#x22C6;field,
+&#x00A0;<br />VCallback&#x00A0;free_fn,&#x00A0;void&#x00A0;&#x22C6;value&#x00A0;)
+&#x00A0;<br />void&#x00A0;meta_set(&#x00A0;const&#x00A0;char&#x00A0;&#x22C6;field,
+&#x00A0;<br />VCallback&#x00A0;free_fn,&#x00A0;void&#x00A0;&#x22C6;value,&#x00A0;size_t&#x00A0;length&#x00A0;)
+</div>
+<!--l. 194--><p class="nopar" >
+<!--l. 196--><p class="indent" >  The <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">image()</span></span></span> member function provides access to the
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">IMAGE</span></span></span> descriptor underlying the C++ API. See the <span 
+class="cmsy-10">§</span><a 
+href="vipsmanualse7.html#x13-360002.1">2.1<!--tex4ht:ref: sec:appl --></a> for
+details.
+                                                 <div class="verbatim" id="verbatim-17">
+  void&#x00A0;&#x22C6;image(); 
+</div>
+<!--l. 201--><p class="nopar" >
+<!--l. 203--><p class="indent" >  The <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">data()</span></span></span> member function returns a pointer to an
+array of pixel data for the image.
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-18">
+void&#x00A0;&#x22C6;data()&#x00A0;const;
+</div>
+<!--l. 208--><p class="nopar" >
+<!--l. 210--><p class="noindent" >This can be very slow and use huge amounts of RAM.
+<!--l. 213--><p class="indent" >  The Python interface adds <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">tobuffer</span></span></span> and <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">tostring</span></span></span>.
+These operations call <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">data()</span></span></span> to generate the image pixels
+and then either copy it and return the copy as a string, or
+wrap the pixels up as a Python buffer object.
+<!--l. 218--><p class="indent" >  Use <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">tostring</span></span></span> to avoid worries about object lifetime,
+but you&#8217;ll see a lot of copies and high memory use. Use
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">tobuffer</span></span></span> for speed, but you have to manage object
+lifetime yourself.
+<!--l. 222--><p class="indent" >  They are useful for moving images from VIPS into other
+image processing libraries. There&#8217;s also a utility function,
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">PIL_mode_from_vips</span></span></span>, which makes a PIL mode from
+a VIPS image.
+                                                 <div class="verbatim" id="verbatim-19">
+  VImage.PIL_mode_from_vips&#x00A0;(vips-image)&#x00A0;-&#x003E;
+ &#x00A0;<br />&#x00A0;&#x00A0;mode 
+</div>
+<!--l. 229--><p class="nopar" >
+<!--l. 231--><p class="indent" >  See also <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">frombuffer</span></span></span> and <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">fromstring</span></span></span> above.
+<!--l. 233--><p class="noindent" >
+    <h4 class="subsectionHead"><span class="titlemark">1.3.4    </span> <a 
+ id="x8-150001.3.4"></a>Assignment</h4>
+<!--l. 235--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VImage</span></span></span> defines copy and assignment, with reference-counted,
+pointer-style semantics. For example, if you write:
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-20">
+VImage&#x00A0;fred(&#x00A0;"fred.v"&#x00A0;);
+&#x00A0;<br />VImage&#x00A0;jim(&#x00A0;"jim.v"&#x00A0;);
+&#x00A0;<br />
+&#x00A0;<br />fred&#x00A0;=&#x00A0;jim;
+</div>
+<!--l. 243--><p class="nopar" >
+<!--l. 245--><p class="indent" >  This will automatically close the file <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">fred.v</span></span></span>, and make
+the variable <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">fred</span></span></span> point to the image <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">jim.v</span></span></span> instead. Both
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">jim</span></span></span> and <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">fred</span></span></span> now point to the same underlying image
+object.
+<!--l. 249--><p class="indent" >  Internally, a <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VImage</span></span></span> object is just a pointer to a
+reference-counting block, which in turn holds a pointer to
+the underlying VIPS <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">IMAGE</span></span></span> type. You can therefore
+efficiently pass <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VImage</span></span></span> objects to functions by value, and
+return <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VImage</span></span></span> objects as function results.
+<!--l. 254--><p class="noindent" >
+  <h4 class="subsectionHead"><span class="titlemark">1.3.5    </span> <a 
+ id="x8-160001.3.5"></a>Computing with <span 
+class="pcrr7t-">VImage</span>s</h4>
+<!--l. 257--><p class="noindent" >All VIPS image processing operations are member
+functions of the <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VImage</span></span></span> class. For example:
+                                                 <div class="verbatim" id="verbatim-21">
+  VImage&#x00A0;fred(&#x00A0;"fred.v"&#x00A0;);
+ &#x00A0;<br />VImage&#x00A0;jim(&#x00A0;"jim.v"&#x00A0;);
+ &#x00A0;<br />
+ &#x00A0;<br />VImage&#x00A0;result&#x00A0;=&#x00A0;fred.cos()&#x00A0;+&#x00A0;jim; 
+</div>
+<!--l. 265--><p class="nopar" >
+<!--l. 267--><p class="indent" >  Will apply <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_costra()</span></span></span> to <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">fred.v</span></span></span>, making an
+image where each pixel is the cosine of the corresponding
+pixel in <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">fred.v</span></span></span>; then add that image to <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">jim.v</span></span></span>. Finally,
+the result will be held in <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">result</span></span></span>.
+<!--l. 271--><p class="indent" >    VIPS is a demand-driven image processing system:
+when it computes expressions like this, no actual pixels
+are calculated (although you can use the projection
+functions on images &#8212; <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">result.BandFmt()</span></span></span> for
+example). When you finally write the result to a file (or
+use some operation that needs pixel values, such as
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">min()</span></span></span>, find minimum value), VIPS evaluates all of the
+operations you have called to that point in parallel. If you
+have more than one CPU in your machine, the load
+is spread over the available processors. This means
+that there is no limit to the size of the images you can
+process.
+<!--l. 280--><p class="indent" >    <span 
+class="cmsy-10">§</span><a 
+href="vipsmanualse18.html#x26-1060004.2">4.2<!--tex4ht:ref: sec:packages --></a> lists all of the VIPS packages. These general rules
+apply:
+        <ul class="itemize1">
+        <li class="itemize">VIPS   operation   names   become   C++   member
+        function  names  by  dropping  the  <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_</span></span></span> prefix,  and
+        if present, the <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">tra</span></span></span> postfix, the <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">const</span></span></span> postfix and
+        the <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">_vec</span></span></span> postfix. For example, the VIPS operation
+        <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_extract()</span></span></span> becomes   <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">extract()</span></span></span>,   and
+        <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_costra()</span></span></span> becomes <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">cos()</span></span></span>.
+        </li>
+        <li class="itemize">The   <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VImage</span></span></span> object   to   which   you   apply   the
+        member  function  is  the  first  input  image,  the
+        member function returns the first output. If there is
+        no image input, the member is declared <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">static</span></span></span>.
+        <!--l. 297--><p class="noindent" >For   example,   <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_project(3)</span></span></span> returns   two
+        images. You can call it from Python like this:
+                                                                                       
+
+                                                                                       
+    <div class="verbatim" id="verbatim-22">
+    hout&#x00A0;=&#x00A0;VImage.VImage&#x00A0;()
+    &#x00A0;<br />vout&#x00A0;=&#x00A0;im.project&#x00A0;(hout)
+</div>
+    <!--l. 303--><p class="nopar" >
+    <!--l. 305--><p class="noindent" >In other words, <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">.project()</span></span></span> writes the second result
+    to the <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VImage</span></span></span> you pass as an argument.
+    </li>
+    <li class="itemize"><span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">INTMASK</span></span></span> and <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">DOUBLEMASK</span></span></span> types become <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VMask</span></span></span>
+    objects, <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_col_display</span></span></span> types become <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VDisplay</span></span></span>
+    objects.
+    </li>
+    <li class="itemize">Several C API functions can map to the same
+    C++ API member. For example, <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_andimage</span></span></span>,
+    <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_andimage_vec</span></span></span> and <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_andimageconst</span></span></span> all
+    map to the member <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">andimage</span></span></span>. The API relies on
+    overloading to discriminate between these functions.
+    </li></ul>
+<!--l. 321--><p class="indent" >  This part of the C++ API is generated automatically
+from the VIPS function database, so it should all be
+up-to-date.
+<!--l. 324--><p class="indent" >  There are a set of arithmetic operators defined for your
+convenience. You can generally write any arithmetic
+expression and include <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VImage</span></span></span> in there.
+                                                 <div class="verbatim" id="verbatim-23">
+  VImage&#x00A0;fred(&#x00A0;"fred.v"&#x00A0;);
+ &#x00A0;<br />VImage&#x00A0;jim(&#x00A0;"jim.v"&#x00A0;);
+ &#x00A0;<br />
+ &#x00A0;<br />Vimage&#x00A0;v&#x00A0;=&#x00A0;int((fred&#x00A0;+&#x00A0;jim)&#x00A0;/&#x00A0;2); 
+</div>
+<!--l. 332--><p class="nopar" >
+<!--l. 334--><p class="noindent" >
+  <h4 class="subsectionHead"><span class="titlemark">1.3.6    </span> <a 
+ id="x8-170001.3.6"></a>Writing results</h4>
+<!--l. 336--><p class="noindent" >Once you have computed some result, you can write it to a
+file with the member <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">write()</span></span></span>. It takes the following
+forms:
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-24">
+VImage&#x00A0;write(&#x00A0;const&#x00A0;char&#x00A0;&#x22C6;name&#x00A0;);
+&#x00A0;<br />VImage&#x00A0;write(&#x00A0;VImage&#x00A0;out&#x00A0;);
+&#x00A0;<br />VImage&#x00A0;write();
+</div>
+<!--l. 343--><p class="nopar" >
+<!--l. 345--><p class="indent" >  The first form simply writes the image to the named file.
+The second form writes the image to the specified <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VImage</span></span></span>
+object, for example:
+                                                 <div class="verbatim" id="verbatim-25">
+  VImage&#x00A0;fred(&#x00A0;"fred.v"&#x00A0;);
+ &#x00A0;<br />VImage&#x00A0;jim(&#x00A0;"jim&#x00A0;buffer",&#x00A0;"t"&#x00A0;);
+ &#x00A0;<br />
+ &#x00A0;<br />Vimage&#x00A0;v&#x00A0;=&#x00A0;(fred&#x00A0;+&#x00A0;42).write(&#x00A0;jim&#x00A0;); 
+</div>
+<!--l. 353--><p class="nopar" >
+<!--l. 355--><p class="noindent" >This creates a temporary memory buffer called <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">jim</span></span></span>, and
+fills it with the result of adding 42 to every pixel in
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">fred.v</span></span></span>.
+<!--l. 359--><p class="indent" >    The final form of <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">write()</span></span></span> writes the image to a
+memory buffer, and returns that.
+<!--l. 362--><p class="noindent" >
+    <h4 class="subsectionHead"><span class="titlemark">1.3.7    </span> <a 
+ id="x8-180001.3.7"></a>Type conversions</h4>
+<!--l. 364--><p class="noindent" >Two type conversions are defined: you can cast <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VImage</span></span></span> to
+a <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VDMask</span></span></span> and to a <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VIMask</span></span></span>.
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-26">
+operator&#x00A0;VDMask();
+&#x00A0;<br />operator&#x00A0;VIMask();
+</div>
+<!--l. 370--><p class="nopar" >
+<!--l. 372--><p class="indent" >  These operations are slow and need a lot of memory!
+Emergencies only.
+                                           
+                                                                                       
+
+                                                                                       
+  <!--l. 1--><div class="crosslinks"><p class="noindent">[<a 
+href="vipsmanualse4.html" >next</a>] [<a 
+href="vipsmanualse2.html" >prev</a>] [<a 
+href="vipsmanualse2.html#tailvipsmanualse2.html" >prev-tail</a>] [<a 
+href="vipsmanualse3.html" >front</a>] [<a 
+href="vipsmanualch1.html#vipsmanualse3.html" >up</a>] </p></div>
+<!--l. 1--><p class="indent" >  <a 
+ id="tailvipsmanualse3.html"></a>   
+</body></html> 

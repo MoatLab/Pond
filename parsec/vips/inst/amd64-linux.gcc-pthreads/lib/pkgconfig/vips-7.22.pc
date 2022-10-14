@@ -1,0 +1,11 @@
+prefix=/home/huaicheng/proj/run/parsec-benchmark/pkgs/apps/vips/inst/amd64-linux.gcc-pthreads
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: vips-7.22
+Description: Image processing library
+Version: 7.22.1
+Requires:  glib-2.0 gmodule-2.0 libxml-2.0 gobject-2.0 gthread-2.0
+Libs: -L${libdir} -lvips      -L/home/huaicheng/proj/run/parsec-benchmark/pkgs/libs/glib/inst/amd64-linux.gcc-pthreads/lib -lgthread-2.0 -pthread -lglib-2.0 -L/home/huaicheng/proj/run/parsec-benchmark/pkgs/libs/glib/inst/amd64-linux.gcc-pthreads/lib -L/home/huaicheng/proj/run/parsec-benchmark/pkgs/libs/libxml2/inst/amd64-linux.gcc-pthreads/lib -Wl,--export-dynamic -lgmodule-2.0 -pthread -lxml2 -lgobject-2.0 -lgthread-2.0 -pthread -lglib-2.0         -lm
+Cflags: -I${includedir} 

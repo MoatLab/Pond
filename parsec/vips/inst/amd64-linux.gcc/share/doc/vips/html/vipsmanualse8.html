@@ -1,0 +1,1164 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html > 
+<head><title>Core C API</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (http://www.cse.ohio-state.edu/~gurari/TeX4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.cse.ohio-state.edu/~gurari/TeX4ht/)"> 
+<!-- 3,html --> 
+<meta name="src" content="vipsmanual.tex"> 
+<meta name="date" content="2010-06-09 21:39:00"> 
+<link rel="stylesheet" type="text/css" href="vipsmanual.css"> 
+</head><body 
+>
+  <!--l. 1--><div class="crosslinks"><p class="noindent">[<a 
+href="vipsmanualse9.html" >next</a>] [<a 
+href="vipsmanualse7.html" >prev</a>] [<a 
+href="vipsmanualse7.html#tailvipsmanualse7.html" >prev-tail</a>] [<a 
+href="#tailvipsmanualse8.html">tail</a>] [<a 
+href="vipsmanualch2.html#vipsmanualse8.html" >up</a>] </p></div>
+  <h3 class="sectionHead"><span class="titlemark">2.2    </span> <a 
+ id="x14-370002.2"></a>Core C API</h3>
+<!--l. 3--><p class="noindent" >VIPS is built on top of several other libraries, two of which,
+glib and gobject, are exposed at various points in the C
+API.
+<!--l. 6--><p class="indent" >  You can read up on glib at the GTK+ website:
+                                                 <div class="verbatim" id="verbatim-51">
+  http://www.gtk.org 
+</div>
+<!--l. 10--><p class="nopar" >
+<!--l. 12--><p class="indent" >  There&#8217;s also an excellent book by Matthias Warkus, <span 
+class="ptmri7t-">The</span>
+<span 
+class="ptmri7t-">Official GNOME 2 Developer&#8217;s Guide</span>, which covers the
+same material in a tutorial manner.
+<!--l. 16--><p class="noindent" >
+    <h4 class="subsectionHead"><span class="titlemark">2.2.1    </span> <a 
+ id="x14-380002.2.1"></a>Startup</h4>
+<!--l. 18--><p class="noindent" >Before calling any VIPS function, you need to start VIPS
+up:
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-52">
+int&#x00A0;im_init_world(&#x00A0;const&#x00A0;char&#x00A0;&#x22C6;argv0&#x00A0;);
+</div>
+<!--l. 22--><p class="nopar" >
+<!--l. 24--><p class="indent" >  The <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">argv0</span></span></span> argument is the value of <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">argv[0]</span></span></span> your
+program was passed by the host operating system.
+VIPS uses this with <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_guess_prefix()</span></span></span> and
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_guess_libdir()</span></span></span> to try to find various VIPS data
+files.
+<!--l. 29--><p class="indent" >  If you don&#8217;t call this function, VIPS will call it for you
+the first time you use a VIPS function. But it won&#8217;t be able
+to get the <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">argv0</span></span></span> value for you, so it may not be able to find
+it&#8217;s data files.
+<!--l. 33--><p class="indent" >  VIPS also offers the optional:
+                                                 <div class="verbatim" id="verbatim-53">
+  GOptionGroup&#x00A0;&#x22C6;im_get_option_group(&#x00A0;void&#x00A0;); 
+</div>
+<!--l. 37--><p class="nopar" >
+<!--l. 39--><p class="indent" >  You can use this with GOption to parse your program&#8217;s
+command-line arguments. It adds several useful VIPS flags,
+including <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">--vips-concurrency</span></span></span>.
+<!--l. 42--><p class="indent" >    Figure&#x00A0;<a 
+href="#x14-380012">2.2<!--tex4ht:ref: fg:hello --></a> shows both these functions in use. Again, the
+GOption stuff is optional and just lets VIPS add some flags
+to your program. You do need the <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_init_world()</span></span></span>
+though.
+                                                                                       
+
+                                                                                       
+<!--l. 47--><p class="indent" >  <a 
+ id="x14-380012"></a><hr class="float"><div class="float" 
+>
+                                           
+                                                                                       
+
+                                                                                       
+<div class="verbatim" id="verbatim-54">
+#include&#x00A0;&#x003C;stdio.h&#x003E;
+&#x00A0;<br />#include&#x00A0;&#x003C;vips/vips.h&#x003E;
+&#x00A0;<br />
+&#x00A0;<br />static&#x00A0;gboolean&#x00A0;print_stuff;
+&#x00A0;<br />
+&#x00A0;<br />static&#x00A0;GOptionEntry&#x00A0;options[]&#x00A0;=&#x00A0;{
+&#x00A0;<br />&#x00A0;&#x00A0;{&#x00A0;"print",&#x00A0;'p',&#x00A0;0,&#x00A0;G_OPTION_ARG_NONE,&#x00A0;&amp;print_stuff,
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;"print&#x00A0;\"hello&#x00A0;world!\"",&#x00A0;NULL&#x00A0;},
+&#x00A0;<br />&#x00A0;&#x00A0;{&#x00A0;NULL&#x00A0;}
+&#x00A0;<br />};
+&#x00A0;<br />
+&#x00A0;<br />int
+&#x00A0;<br />main(&#x00A0;int&#x00A0;argc,&#x00A0;char&#x00A0;&#x22C6;&#x22C6;argv&#x00A0;)
+&#x00A0;<br />{
+&#x00A0;<br />&#x00A0;&#x00A0;GOptionContext&#x00A0;&#x22C6;context;
+&#x00A0;<br />&#x00A0;&#x00A0;GError&#x00A0;&#x22C6;error&#x00A0;=&#x00A0;NULL;
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;if(&#x00A0;im_init_world(&#x00A0;argv[0]&#x00A0;)&#x00A0;)
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;error_exit(&#x00A0;"unable&#x00A0;to&#x00A0;start&#x00A0;VIPS"&#x00A0;);
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;context&#x00A0;=&#x00A0;g_option_context_new(&#x00A0;"-&#x00A0;my&#x00A0;program"&#x00A0;);
+&#x00A0;<br />&#x00A0;&#x00A0;g_option_context_add_main_entries(&#x00A0;context,
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;options,&#x00A0;"main"&#x00A0;);
+&#x00A0;<br />&#x00A0;&#x00A0;g_option_context_add_group(&#x00A0;context,&#x00A0;im_get_option_group()&#x00A0;);
+&#x00A0;<br />&#x00A0;&#x00A0;if(&#x00A0;!g_option_context_parse(&#x00A0;context,&#x00A0;&amp;argc,&#x00A0;&amp;argv,&#x00A0;&amp;error&#x00A0;)&#x00A0;)&#x00A0;{
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;if(&#x00A0;error&#x00A0;)&#x00A0;{
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;fprintf(&#x00A0;stderr,&#x00A0;"%s\n",&#x00A0;error-&#x003E;message&#x00A0;);
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;g_error_free(&#x00A0;error&#x00A0;);
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;}
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;error_exit(&#x00A0;"try&#x00A0;\"%s&#x00A0;--help\"",&#x00A0;g_get_prgname()&#x00A0;);
+&#x00A0;<br />&#x00A0;&#x00A0;}
+&#x00A0;<br />&#x00A0;&#x00A0;g_option_context_free(&#x00A0;context&#x00A0;);
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;if(&#x00A0;print_stuff&#x00A0;)
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;printf(&#x00A0;"hello,&#x00A0;world!\n"&#x00A0;);
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;return(&#x00A0;0&#x00A0;);
+&#x00A0;<br />}
+</div>
+<!--l. 86--><p class="nopar" >
+<br /><div class="caption" 
+><span class="id">Figure&#x00A0;2.2: </span><span  
+class="content">Hello World for VIPS</span></div><!--tex4ht:label?: x14-380012 -->
+                                           
+                                                                                       
+
+                                                                                       
+  </div><hr class="endfloat" />
+  <h4 class="subsectionHead"><span class="titlemark">2.2.2    </span> <a 
+ id="x14-390002.2.2"></a>Image descriptors</h4>
+<!--l. 93--><p class="noindent" >The base level of the VIPS I/O system provides <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">IMAGE</span></span></span>
+descriptors. An image represented by a descriptor may
+be an image file on disc, an area of memory that has
+been allocated for the image, an output file, a delayed
+computation, and so on. Programs need (usually) only know
+that they have a descriptor, they do not see many of the
+details. Figure&#x00A0;<a 
+href="#x14-390013">2.3<!--tex4ht:ref: fg:image --></a> shows the definition of the <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">IMAGE</span></span></span>
+descriptor.
+                                           
+                                                                                       
+
+                                                                                       
+<!--l. 101--><p class="indent" >  <a 
+ id="x14-390013"></a><hr class="float"><div class="float" 
+>
+                                           
+                                                                                       
+
+                                                                                       
+<div class="verbatim" id="verbatim-55">
+typedef&#x00A0;struct&#x00A0;{
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Fields&#x00A0;from&#x00A0;image&#x00A0;header.
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;int&#x00A0;Xsize;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Pels&#x00A0;per&#x00A0;line&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;int&#x00A0;Ysize;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Lines&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;int&#x00A0;Bands;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Number&#x00A0;of&#x00A0;bands&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;int&#x00A0;Bbits;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Bits&#x00A0;per&#x00A0;band&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;int&#x00A0;BandFmt;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Band&#x00A0;format&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;int&#x00A0;Coding;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Coding&#x00A0;type&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;int&#x00A0;Type;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Type&#x00A0;of&#x00A0;file&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;float&#x00A0;XRes;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Horizontal&#x00A0;res&#x00A0;in&#x00A0;pels/mm&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;float&#x00A0;YRes;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Vertical&#x00A0;res&#x00A0;in&#x00A0;pels/mm&#x00A0;&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;int&#x00A0;Length;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Obsolete&#x00A0;(unused)&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;short&#x00A0;Compression;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Obsolete&#x00A0;(unused)&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;short&#x00A0;Level;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Obsolete&#x00A0;(unused)&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;int&#x00A0;Xoffset;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Position&#x00A0;of&#x00A0;origin&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;int&#x00A0;Yoffset;
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Derived&#x00A0;fields&#x00A0;that&#x00A0;may&#x00A0;be&#x00A0;read&#x00A0;by&#x00A0;the&#x00A0;user.
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;char&#x00A0;&#x22C6;filename;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;/&#x22C6;&#x00A0;File&#x00A0;name&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;im_time_t&#x00A0;&#x22C6;time;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Timing&#x00A0;for&#x00A0;eval&#x00A0;callback&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;int&#x00A0;kill;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Set&#x00A0;to&#x00A0;non-zero&#x00A0;to&#x00A0;block&#x00A0;eval&#x00A0;&#x22C6;/
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;...&#x00A0;and&#x00A0;lots&#x00A0;of&#x00A0;other&#x00A0;private&#x00A0;fields&#x00A0;used&#x00A0;by&#x00A0;VIPS&#x00A0;for
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;...&#x00A0;housekeeping.
+&#x00A0;<br />}&#x00A0;IMAGE;
+</div>
+<!--l. 129--><p class="nopar" >
+<br /><div class="caption" 
+><span class="id">Figure&#x00A0;2.3: </span><span  
+class="content">The <span 
+class="pcrr7t-">IMAGE </span>descriptor</span></div><!--tex4ht:label?: x14-390013 -->
+                                           
+                                                                                       
+
+                                                                                       
+  </div><hr class="endfloat" />
+<!--l. 134--><p class="indent" >  The first set of fields simply come from the image file
+header: see <span 
+class="cmsy-10">§</span><a 
+href="vipsmanualse2.html#x7-80001.2.1">1.2.1<!--tex4ht:ref: sec:header --></a> for a full description of all the fields. The
+next set are maintained for you by the VIPS I/O system.
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">filename</span></span></span> is the name of the file that this image came
+from. If you have attached an eval callback to this image,
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">time</span></span></span> points to a set of timing statistics which can
+be used by user-interfaces built on VIPS to provide
+feedback about the progress of evaluation &#8212; see <span 
+class="cmsy-10">§</span><a 
+href="#x14-450002.2.8">2.2.8<!--tex4ht:ref: sec:eval --></a>.
+Finally, if you set <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">kill</span></span></span> to non-zero, VIPS will block any
+pipelines which use this descriptor as an intermediate. See
+<span 
+class="cmsy-10">§</span><a 
+href="#x14-570002.2.12">2.2.12<!--tex4ht:ref: sec:block --></a>.
+<!--l. 144--><p class="indent" >  The remaining fields are private and are used by VIPS for
+housekeeping.
+  <h4 class="subsectionHead"><span class="titlemark">2.2.3    </span> <a 
+ id="x14-400002.2.3"></a>Header fields</h4>
+<!--l. 149--><p class="noindent" >You can access header fields either directly (as <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im-&#x003E;Xsize</span></span></span>,
+for example) or programmatically with <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_header_int()</span></span></span>
+and friends. For example:
+                                                 <div class="verbatim" id="verbatim-56">
+  int&#x00A0;i;
+ &#x00A0;<br />
+ &#x00A0;<br />im_header_int(&#x00A0;im,&#x00A0;"Xsize",&#x00A0;&amp;i&#x00A0;); 
+</div>
+<!--l. 157--><p class="nopar" >
+<!--l. 159--><p class="indent" >  There&#8217;s also <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_header_map()</span></span></span> to loop over header
+fields, and <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_header_get_type</span></span></span> to test the type of
+fields. These functions work for image meta fields as well,
+see <span 
+class="cmsy-10">§</span><a 
+href="#x14-430002.2.6">2.2.6<!--tex4ht:ref: sec:meta --></a>.
+<!--l. 163--><p class="noindent" >
+    <h4 class="subsectionHead"><span class="titlemark">2.2.4    </span> <a 
+ id="x14-410002.2.4"></a>Opening and closing</h4>
+<!--l. 166--><p class="noindent" >Descriptors are created with <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_open()</span></span></span>. You can also
+read images with the format system: see <span 
+class="cmsy-10">§</span><a 
+href="vipsmanualse11.html#x17-740002.5">2.5<!--tex4ht:ref: sec:format --></a>. The two
+APIs are complimentary, though <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_open()</span></span></span> is more
+useful.
+<!--l. 170--><p class="indent" >    At the command-line, try:
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-57">
+$&#x00A0;vips&#x00A0;--list&#x00A0;classes
+</div>
+<!--l. 174--><p class="nopar" >
+<!--l. 176--><p class="indent" >  /noindent to see a list of all the supported file formats.
+<!--l. 179--><p class="indent" >  <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_open()</span></span></span> takes a file name and a string representing
+the mode with which the descriptor is to be opened:
+                                                 <div class="verbatim" id="verbatim-58">
+  IMAGE&#x00A0;&#x22C6;im_open(&#x00A0;const&#x00A0;char&#x00A0;&#x22C6;filename,
+ &#x00A0;<br />&#x00A0;&#x00A0;const&#x00A0;char&#x00A0;&#x22C6;mode&#x00A0;) 
+</div>
+<!--l. 185--><p class="nopar" >
+<!--l. 187--><p class="indent" >  The possible values for mode are:
+        <dl class="description"><dt class="description">
+<span 
+class="pcrb7t-">"r"</span> </dt><dd 
+class="description">The   file   is   opened   read-only.   If   you   open
+        a  non-VIPS  image,  or  a  VIPS  image  written
+        on   a   machine   with   a   different   byte   ordering,
+        <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_open()</span></span></span> will   automatically   convert   it   to
+        native VIPS format. If the underlying file does not
+        support  random  access  (JPEG,  for  example),  the
+        entire file will be converted in memory.
+        <!--l. 198--><p class="noindent" >VIPS can read images in many file formats. You
+        can control the details of the conversion with extra
+        characters embedded in the filename. For example:
+                                                                                       
+
+                                                                                       
+    <div class="verbatim" id="verbatim-59">
+    fred&#x00A0;=&#x00A0;im_open(&#x00A0;"fred.tif:2",
+    &#x00A0;<br />&#x00A0;&#x00A0;"r"&#x00A0;);
+</div>
+    <!--l. 204--><p class="nopar" >
+    <!--l. 206--><p class="noindent" >will read page 2 of a multi-page TIFF. See the man
+    pages for details.
+    </dd><dt class="description">
+<span 
+class="pcrb7t-">"w"</span> </dt><dd 
+class="description">An <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">IMAGE</span></span></span> descriptor is created which, when written
+    to, will write pixels to disc in the specified file. Any
+    existing file of that name is deleted.
+    <!--l. 214--><p class="noindent" >VIPS looks at the filename suffix to determine the
+    save format. If there is no suffix, or the filename
+    ends in <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">".v"</span></span></span>, the image is written in VIPS native
+    format.
+    <!--l. 218--><p class="noindent" >If you want to control the details of the conversion to
+    the disc format (such as setting the Q factor for
+    a JPEG, for example), you embed extra control
+    characters in the filename. For example:
+                                                     <div class="verbatim" id="verbatim-60">
+          fred&#x00A0;=&#x00A0;im_open(&#x00A0;"fred.jpg:95",
+    &#x00A0;<br />&#x00A0;&#x00A0;"w"&#x00A0;); 
+</div>
+   <!--l. 225--><p class="nopar" >
+   <!--l. 227--><p class="noindent" >writes to <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">fred</span></span></span> will write a JPEG with Q 95. Again,
+        see the man pages for the conversion functions for
+        details.
+        </dd><dt class="description">
+<span 
+class="pcrb7t-">"t"</span> </dt><dd 
+class="description">As the <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">"w"</span></span></span> mode, but pels written to the descriptor
+        will be saved in a temporary memory buffer.
+        </dd><dt class="description">
+<span 
+class="pcrb7t-">"p"</span> </dt><dd 
+class="description">This creates a special partial image. Partial images
+        are used to join VIPS operations together, see
+        <span 
+class="cmsy-10">§</span><a 
+href="#x14-520002.2.12">2.2.12<!--tex4ht:ref: sec:joinup --></a>.
+        </dd><dt class="description">
+<span 
+class="pcrb7t-">"rw"</span> </dt><dd 
+class="description">As the <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">"r"</span></span></span> mode, but the image is mapped into the
+        caller&#8217;s address space read-write. This mode is only
+        provided for the use of paintbox-style applications
+        which need to directly modify an image. Most
+        programs should use the <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">"w"</span></span></span> mode for image
+        output.
+        </dd></dl>
+<!--l. 247--><p class="indent" >    If an error occurs opening the image, <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_open()</span></span></span> calls
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_error()</span></span></span> with a string describing the cause of the
+error and returns <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">NULL</span></span></span>. <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_error()</span></span></span> has type
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-61">
+void&#x00A0;im_error(&#x00A0;const&#x00A0;char&#x00A0;&#x22C6;domain,
+&#x00A0;<br />&#x00A0;&#x00A0;const&#x00A0;char&#x00A0;&#x22C6;format,&#x00A0;...&#x00A0;)
+</div>
+<!--l. 254--><p class="nopar" >
+<!--l. 256--><p class="noindent" >The first argument is a string giving the name of the thing
+that raised the error (just <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">"im_open"</span></span></span>, for example).
+The format and subsequent arguments work exactly as
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">printf()</span></span></span>. It formats the message and appends the string
+formed to the error log. You can get a pointer to the error
+text with <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_error_buffer()</span></span></span>.
+                                                 <div class="verbatim" id="verbatim-62">
+  const&#x00A0;char&#x00A0;&#x22C6;im_error_buffer() 
+</div>
+<!--l. 265--><p class="nopar" >
+<!--l. 267--><p class="noindent" >Applications may display this string to give users feedback
+about the cause of the error. The VIPS exit function,
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">error_exit()</span></span></span>, prints <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_error_buffer()</span></span></span> to
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">stderr</span></span></span> and terminates the program with an error code of
+1.
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-63">
+void&#x00A0;error_exit(&#x00A0;const&#x00A0;char&#x00A0;&#x22C6;format,
+&#x00A0;<br />&#x00A0;&#x00A0;...&#x00A0;)
+</div>
+<!--l. 276--><p class="nopar" >
+<!--l. 278--><p class="noindent" >There are other functions for handling errors: see the man
+page for <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_error()</span></span></span>.
+<!--l. 282--><p class="indent" >  Descriptors are closed with <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_close()</span></span></span>. It has
+type:
+                                                 <div class="verbatim" id="verbatim-64">
+  int&#x00A0;im_close(&#x00A0;IMAGE&#x00A0;&#x22C6;im&#x00A0;) 
+</div>
+<!--l. 286--><p class="nopar" >
+<!--l. 288--><p class="indent" >  <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_close()</span></span></span> returns 0 on success and non-zero on
+error.
+<!--l. 290--><p class="noindent" >
+    <h4 class="subsectionHead"><span class="titlemark">2.2.5    </span> <a 
+ id="x14-420002.2.5"></a>Examples</h4>
+<!--l. 293--><p class="noindent" >As an example, Figure&#x00A0;<a 
+href="#x14-420002.2.5">2.2.5<!--tex4ht:ref: fg:widthheight --></a> will print the width and height
+of an image stored on disc.
+                                                                                       
+
+                                                                                       
+<!--l. 297--><p class="indent" >  <a 
+ id="x14-420014"></a><hr class="float"><div class="float" 
+>
+                                           
+                                                                                       
+
+                                                                                       
+<div class="verbatim" id="verbatim-65">
+#include&#x00A0;&#x003C;stdio.h&#x003E;
+&#x00A0;<br />#include&#x00A0;&#x003C;vips/vips.h&#x003E;
+&#x00A0;<br />
+&#x00A0;<br />int
+&#x00A0;<br />main(&#x00A0;int&#x00A0;argc,&#x00A0;char&#x00A0;&#x22C6;&#x22C6;argv&#x00A0;)
+&#x00A0;<br />{
+&#x00A0;<br />&#x00A0;&#x00A0;IMAGE&#x00A0;&#x22C6;im;
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Check&#x00A0;arguments.
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;if(&#x00A0;im_init_world(&#x00A0;argv[0]&#x00A0;)&#x00A0;)
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;error_exit(&#x00A0;"unable&#x00A0;to&#x00A0;start&#x00A0;VIPS"&#x00A0;);
+&#x00A0;<br />&#x00A0;&#x00A0;if(&#x00A0;argc&#x00A0;!=&#x00A0;2&#x00A0;)
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;error_exit(&#x00A0;"usage:&#x00A0;%s&#x00A0;filename",&#x00A0;argv[0]&#x00A0;);
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Open&#x00A0;file.
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;if(&#x00A0;!(im&#x00A0;=&#x00A0;im_open(&#x00A0;argv[1],&#x00A0;"r"&#x00A0;))&#x00A0;)
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;error_exit(&#x00A0;"unable&#x00A0;to&#x00A0;open&#x00A0;%s&#x00A0;for&#x00A0;input",&#x00A0;argv[1]&#x00A0;);
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Process.
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;printf(&#x00A0;"width&#x00A0;=&#x00A0;%d,&#x00A0;height&#x00A0;=&#x00A0;%d\n",&#x00A0;im-&#x003E;Xsize,&#x00A0;im-&#x003E;Ysize&#x00A0;);
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Close.
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;if(&#x00A0;im_close(&#x00A0;im&#x00A0;)&#x00A0;)
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;error_exit(&#x00A0;"unable&#x00A0;to&#x00A0;close&#x00A0;%s",&#x00A0;argv[1]&#x00A0;);
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;return(&#x00A0;0&#x00A0;);
+&#x00A0;<br />}
+</div>
+<!--l. 329--><p class="nopar" >
+<br /><div class="caption" 
+><span class="id">Figure&#x00A0;2.4: </span><span  
+class="content">Print width and height of an image</span></div><!--tex4ht:label?: x14-420014 -->
+                                           
+                                                                                       
+
+                                                                                       
+  </div><hr class="endfloat" />
+<!--l. 334--><p class="indent" >  To compile this example, use:
+                                                 <div class="verbatim" id="verbatim-66">
+  cc&#x00A0;&#8216;pkg-config&#x00A0;vips-7.14&#x00A0;\
+ &#x00A0;<br />&#x00A0;&#x00A0;--cflags&#x00A0;--libs&#8216;&#x00A0;myfunc.c 
+</div>
+<!--l. 339--><p class="nopar" >
+<!--l. 341--><p class="indent" >  As a slightly more complicated example, Figure&#x00A0;<a 
+href="#x14-420002.2.5">2.2.5<!--tex4ht:ref: fg:negative --></a>
+will calculate the photographic negative of an image.
+                                                                                       
+
+                                                                                       
+<!--l. 345--><p class="indent" >  <a 
+ id="x14-420025"></a><hr class="float"><div class="float" 
+>
+                                           
+                                                                                       
+
+                                                                                       
+<div class="verbatim" id="verbatim-67">
+#include&#x00A0;&#x003C;stdio.h&#x003E;
+&#x00A0;<br />#include&#x00A0;&#x003C;vips/vips.h&#x003E;
+&#x00A0;<br />
+&#x00A0;<br />int
+&#x00A0;<br />main(&#x00A0;int&#x00A0;argc,&#x00A0;char&#x00A0;&#x22C6;&#x22C6;argv&#x00A0;)
+&#x00A0;<br />{
+&#x00A0;<br />&#x00A0;&#x00A0;IMAGE&#x00A0;&#x22C6;in,&#x00A0;&#x22C6;out;
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Check&#x00A0;arguments.
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;if(&#x00A0;im_init_world(&#x00A0;argv[0]&#x00A0;)&#x00A0;)
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;error_exit(&#x00A0;"unable&#x00A0;to&#x00A0;start&#x00A0;VIPS"&#x00A0;);
+&#x00A0;<br />&#x00A0;&#x00A0;if(&#x00A0;argc&#x00A0;!=&#x00A0;3&#x00A0;)
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;error_exit(&#x00A0;"usage:&#x00A0;%s&#x00A0;infile&#x00A0;outfile",&#x00A0;argv[0]&#x00A0;);
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Open&#x00A0;images&#x00A0;for&#x00A0;read&#x00A0;and&#x00A0;write,&#x00A0;invert,&#x00A0;update&#x00A0;the&#x00A0;history&#x00A0;with&#x00A0;our
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x22C6;&#x00A0;args,&#x00A0;and&#x00A0;close.
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;if(&#x00A0;!(in&#x00A0;=&#x00A0;im_open(&#x00A0;argv[1],&#x00A0;"r"&#x00A0;))&#x00A0;||
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;!(out&#x00A0;=&#x00A0;im_open(&#x00A0;argv[2],&#x00A0;"w"&#x00A0;))&#x00A0;||
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;im_invert(&#x00A0;in,&#x00A0;out&#x00A0;)&#x00A0;||
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;im_updatehist(&#x00A0;out,&#x00A0;argc,&#x00A0;argv&#x00A0;)&#x00A0;||
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;im_close(&#x00A0;in&#x00A0;)&#x00A0;||
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;im_close(&#x00A0;out&#x00A0;)&#x00A0;)
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;error_exit(&#x00A0;argv[0]&#x00A0;);
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;return(&#x00A0;0&#x00A0;);
+&#x00A0;<br />}
+</div>
+<!--l. 374--><p class="nopar" >
+<br /><div class="caption" 
+><span class="id">Figure&#x00A0;2.5: </span><span  
+class="content">Find photographic negative</span></div><!--tex4ht:label?: x14-420025 -->
+                                           
+                                                                                       
+
+                                                                                       
+  </div><hr class="endfloat" />
+  <h4 class="subsectionHead"><span class="titlemark">2.2.6    </span> <a 
+ id="x14-430002.2.6"></a>Metadata</h4>
+<!--l. 382--><p class="noindent" >VIPS lets you attach arbitrary metadata to an IMAGE. For
+example, ICC profiles, EXIF tags, image history, whatever
+you like. VIPS will efficiently propagate metadata as images
+are processed (usually just by copying pointers) and will
+automatically save and load metadata from VIPS files (see
+<span 
+class="cmsy-10">§</span><a 
+href="vipsmanualse2.html#x7-80001.2.1">1.2.1<!--tex4ht:ref: sec:header --></a>).
+<!--l. 388--><p class="indent" >  A piece of metadata is a value and an identifying name. A
+set of convenience functions let you set and get int, double,
+string and blob. For example:
+                                                 <div class="verbatim" id="verbatim-68">
+  int&#x00A0;im_meta_set_int(&#x00A0;IMAGE&#x00A0;&#x22C6;,
+ &#x00A0;<br />&#x00A0;&#x00A0;const&#x00A0;char&#x00A0;&#x22C6;field,&#x00A0;int&#x00A0;);
+ &#x00A0;<br />int&#x00A0;im_meta_get_int(&#x00A0;IMAGE&#x00A0;&#x22C6;,
+ &#x00A0;<br />&#x00A0;&#x00A0;const&#x00A0;char&#x00A0;&#x22C6;field,&#x00A0;int&#x00A0;&#x22C6;&#x00A0;); 
+</div>
+<!--l. 397--><p class="nopar" >
+<!--l. 399--><p class="indent" >  So you can do:
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-69">
+if(&#x00A0;im_meta_set_int(&#x00A0;im,&#x00A0;"poop",&#x00A0;42&#x00A0;)&#x00A0;)
+&#x00A0;<br />&#x00A0;&#x00A0;return(&#x00A0;-1&#x00A0;);
+</div>
+<!--l. 404--><p class="nopar" >
+<!--l. 406--><p class="noindent" >to create an int called <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">"poop"</span></span></span>, then at some later point
+(possibly much, much later), in an image distantly derived
+from <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im</span></span></span>, you can use:
+                                                 <div class="verbatim" id="verbatim-70">
+  int&#x00A0;i;
+ &#x00A0;<br />
+ &#x00A0;<br />if(&#x00A0;im_meta_get_int(&#x00A0;im,&#x00A0;"poop",&#x00A0;&amp;i&#x00A0;)&#x00A0;)
+ &#x00A0;<br />&#x00A0;&#x00A0;return(&#x00A0;-1&#x00A0;); 
+</div>
+<!--l. 415--><p class="nopar" >
+<!--l. 417--><p class="noindent" >And get the value 42 back.
+<!--l. 420--><p class="indent" >    You can use <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_meta_set()</span></span></span> and <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_meta_get()</span></span></span>
+to attach arbitrary <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">GValue</span></span></span> to images. See the man page for
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_meta_set()</span></span></span> for full details.
+<!--l. 424--><p class="indent" >    You can test for a field being present with
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_meta_get_type()</span></span></span> (you&#8217;ll get <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">G_TYPE_INT</span></span></span> back
+for <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">"poop"</span></span></span>, for example, or 0 if it is not defined for this
+image).
+<!--l. 428--><p class="noindent" >
+    <h4 class="subsectionHead"><span class="titlemark">2.2.7    </span> <a 
+ id="x14-440002.2.7"></a>History</h4>
+<!--l. 431--><p class="noindent" >VIPS tracks the history of an image, that is, the sequence of
+operations which have led to the creation of an image. You
+can view a VIPS image&#8217;s history with the <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">header</span></span></span>
+command, or with <span 
+class="pcrr7t-">nip2</span>&#8217;s <span 
+class="pcrr7t-">View Header </span>menu.
+Whenever an application performs an action, it should
+append a line of shell script to the history which would
+perform the same action.
+<!--l. 437--><p class="indent" >    The call to <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_updatehist()</span></span></span> in Figure&#x00A0;<a 
+href="#x14-420002.2.5">2.2.5<!--tex4ht:ref: fg:negative --></a> adds a
+line to the image history noting the invocation of this
+program, its arguments, and the time and date at which it
+was run. You may also find <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_histlin()</span></span></span> helpful. It has
+type:
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-71">
+void&#x00A0;im_histlin(&#x00A0;IMAGE&#x00A0;&#x22C6;im,
+&#x00A0;<br />&#x00A0;&#x00A0;const&#x00A0;char&#x00A0;&#x22C6;fmt,&#x00A0;...&#x00A0;)
+</div>
+<!--l. 445--><p class="nopar" >
+<!--l. 447--><p class="noindent" >It formats its arguments as <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">printf()</span></span></span> and appends the
+string formed to the image history.
+<!--l. 451--><p class="indent" >  You read an image&#8217;s history with <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_history_get()</span></span></span>.
+It returns the entire history of an image, one action per line.
+No need to free the result.
+                                                 <div class="verbatim" id="verbatim-72">
+  const&#x00A0;char&#x00A0;&#x22C6;
+ &#x00A0;<br />&#x00A0;&#x00A0;im_history_get(&#x00A0;IMAGE&#x00A0;&#x22C6;im&#x00A0;); 
+</div>
+<!--l. 457--><p class="nopar" >
+<!--l. 459--><p class="noindent" >
+  <h4 class="subsectionHead"><span class="titlemark">2.2.8    </span> <a 
+ id="x14-450002.2.8"></a>Eval callbacks</h4>
+<!--l. 462--><p class="noindent" >VIPS lets you attach callbacks to image descriptors. These
+are functions you provide which VIPS will call when
+certain events occur. See <span 
+class="cmsy-10">§</span><a 
+href="vipsmanualse15.html#x22-980003.3.6">3.3.6<!--tex4ht:ref: sec:callback --></a> for more detail.
+<!--l. 466--><p class="indent" >    Eval callbacks are called repeatedly during evaluation
+and can be used by user-interface programs to give feedback
+about the progress of evaluation.
+<!--l. 469--><p class="noindent" >
+    <h4 class="subsectionHead"><span class="titlemark">2.2.9    </span> <a 
+ id="x14-460002.2.9"></a>Detailed rules for descriptors</h4>
+<!--l. 471--><p class="noindent" >These rules are intended to answer awkward questions.
+<!--l. 473--><p class="indent" >
+        <ol  class="enumerate1" >
+        <li 
+  class="enumerate" id="x14-46002x1">You can output to a descriptor only once.
+        </li>
+        <li 
+  class="enumerate" id="x14-46004x2">You can use a descriptor as an input many times.
+        </li>
+        <li 
+  class="enumerate" id="x14-46006x3">You can only output to a descriptor that was opened
+        with modes <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">"w"</span></span></span>, <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">"t"</span></span></span> and <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">"p"</span></span></span>.
+        </li>
+        <li 
+  class="enumerate" id="x14-46008x4">You  can  only  use  a  descriptor  as  input  if  it  was
+        opened with modes <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">"r"</span></span></span> or <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">"rw"</span></span></span>.
+        </li>
+        <li 
+  class="enumerate" id="x14-46010x5">If  you  have  output  to  a  descriptor,  you  may
+        subsequently use it as an input. <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">"w"</span></span></span> descriptors are
+        automatically changed to <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">"r"</span></span></span> descriptors.
+        <!--l. 494--><p class="noindent" >If  the  function  you  are  passing  the  descriptor  to
+        uses  WIO  (see  <span 
+class="cmsy-10">§</span><a 
+href="#x14-580002.2.12">2.2.12<!--tex4ht:ref: sec:limit --></a>),  then  <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">"p"</span></span></span> descriptors
+        become <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">"t"</span></span></span>. If the function you are passing the
+        descriptor  to  uses  PIO,  then  <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">"p"</span></span></span> descriptors  are
+        unchanged.
+        </li></ol>
+                                                                                       
+
+                                                                                       
+<!--l. 501--><p class="noindent" >
+  <h4 class="subsectionHead"><span class="titlemark">2.2.10    </span> <a 
+ id="x14-470002.2.10"></a>Automatic resource deallocation</h4>
+<!--l. 503--><p class="noindent" >VIPS lets you allocate resources local to an image descriptor,
+that is, when the descriptor is closed, all resources which
+were allocated local to that descriptor are automatically
+released for you.
+<!--l. 507--><p class="noindent" >
+  <h5 class="subsubsectionHead"><a 
+ id="x14-480002.2.10"></a>Local image descriptors</h5>
+<!--l. 509--><p class="noindent" >VIPS provides a function which will open a new image
+local to an existing image. <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_open_local()</span></span></span> has
+type:
+                                                 <div class="verbatim" id="verbatim-73">
+  IMAGE&#x00A0;&#x22C6;im_open_local(&#x00A0;IMAGE&#x00A0;&#x22C6;im,
+ &#x00A0;<br />&#x00A0;&#x00A0;const&#x00A0;char&#x00A0;&#x22C6;filename,
+ &#x00A0;<br />&#x00A0;&#x00A0;const&#x00A0;char&#x00A0;&#x22C6;mode&#x00A0;) 
+</div>
+<!--l. 516--><p class="nopar" >
+<!--l. 518--><p class="indent" >  It behaves exactly as <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_open()</span></span></span>, except that you do
+not need to close the descriptor it returns. It will be
+closed automatically when its parent descriptor <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im</span></span></span> is
+closed.
+                                                                                       
+
+                                                                                       
+<!--l. 523--><p class="indent" >  <a 
+ id="x14-480016"></a><hr class="float"><div class="float" 
+>
+                                           
+                                                                                       
+
+                                                                                       
+<div class="verbatim" id="verbatim-74">
+/&#x22C6;&#x00A0;Add&#x00A0;another&#x00A0;image&#x00A0;to&#x00A0;the&#x00A0;accumulated&#x00A0;total.
+&#x00A0;<br />&#x00A0;&#x22C6;/
+&#x00A0;<br />static&#x00A0;int
+&#x00A0;<br />sum1(&#x00A0;IMAGE&#x00A0;&#x22C6;acc,&#x00A0;IMAGE&#x00A0;&#x22C6;&#x22C6;in,&#x00A0;int&#x00A0;nin,&#x00A0;IMAGE&#x00A0;&#x22C6;out&#x00A0;)
+&#x00A0;<br />{
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;IMAGE&#x00A0;&#x22C6;t;
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;if(&#x00A0;nin&#x00A0;==&#x00A0;0&#x00A0;)
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;/&#x22C6;&#x00A0;All&#x00A0;done&#x00A0;...&#x00A0;copy&#x00A0;to&#x00A0;out.
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;return(&#x00A0;im_copy(&#x00A0;acc,&#x00A0;out&#x00A0;)&#x00A0;);
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Make&#x00A0;a&#x00A0;new&#x00A0;intermediate,&#x00A0;and&#x00A0;add&#x00A0;to&#x00A0;it..
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;return(&#x00A0;!(t&#x00A0;=&#x00A0;im_open_local(&#x00A0;out,&#x00A0;"sum1:1",&#x00A0;"p"&#x00A0;))&#x00A0;||
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;im_add(&#x00A0;acc,&#x00A0;in[0],&#x00A0;t&#x00A0;)&#x00A0;||
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;sum1(&#x00A0;t,&#x00A0;in&#x00A0;+&#x00A0;1,&#x00A0;nin&#x00A0;-&#x00A0;1,&#x00A0;out&#x00A0;)&#x00A0;);
+&#x00A0;<br />}
+&#x00A0;<br />
+&#x00A0;<br />/&#x22C6;&#x00A0;Sum&#x00A0;the&#x00A0;array&#x00A0;of&#x00A0;images&#x00A0;in[].&#x00A0;nin&#x00A0;is&#x00A0;the&#x00A0;number&#x00A0;of&#x00A0;images&#x00A0;in
+&#x00A0;<br />&#x00A0;&#x22C6;&#x00A0;in[],&#x00A0;out&#x00A0;is&#x00A0;the&#x00A0;descriptor&#x00A0;we&#x00A0;write&#x00A0;the&#x00A0;final&#x00A0;image&#x00A0;to.
+&#x00A0;<br />&#x00A0;&#x22C6;/
+&#x00A0;<br />int
+&#x00A0;<br />total(&#x00A0;IMAGE&#x00A0;&#x22C6;&#x22C6;in,&#x00A0;int&#x00A0;nin,&#x00A0;IMAGE&#x00A0;&#x22C6;out&#x00A0;)
+&#x00A0;<br />{
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Check&#x00A0;that&#x00A0;we&#x00A0;have&#x00A0;at&#x00A0;least&#x00A0;one&#x00A0;image.
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;if(&#x00A0;nin&#x00A0;&#x003C;=&#x00A0;0&#x00A0;)&#x00A0;{
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;im_error(&#x00A0;"total",&#x00A0;"nin&#x00A0;should&#x00A0;be&#x00A0;&#x003E;&#x00A0;0"&#x00A0;);
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;return(&#x00A0;-1&#x00A0;);
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;}
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;/&#x22C6;&#x00A0;More&#x00A0;than&#x00A0;1,&#x00A0;sum&#x00A0;recursively.
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;return(&#x00A0;sum1(&#x00A0;in[0],&#x00A0;in&#x00A0;+&#x00A0;1,&#x00A0;nin&#x00A0;-&#x00A0;1,&#x00A0;out&#x00A0;)&#x00A0;);
+&#x00A0;<br />}
+</div>
+<!--l. 560--><p class="nopar" >
+<br /><div class="caption" 
+><span class="id">Figure&#x00A0;2.6: </span><span  
+class="content">Sum an array of images</span></div><!--tex4ht:label?: x14-480016 -->
+                                           
+                                                                                       
+
+                                                                                       
+  </div><hr class="endfloat" />
+<!--l. 565--><p class="indent" >  Figure&#x00A0;<a 
+href="#x14-480016">2.6<!--tex4ht:ref: fg:addemup --></a> is a function which will sum an array of
+images. We need never close any of the (unknown) number
+of intermediate images which we open. They will all be
+closed for us by our caller, when our caller finally closes
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">out</span></span></span>. VIPS lets local images themselves have local images
+and automatically makes sure that all are closed in the
+correct order.
+<!--l. 571--><p class="indent" >  It is very important that these intermediate images are
+made local to <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">out</span></span></span> rather than <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">in</span></span></span>, for reasons which should
+become apparent in the section on combining operations
+below.
+<!--l. 575--><p class="indent" >  There&#8217;s also <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_open_local_array()</span></span></span> for when
+you need a lot of local descriptors, see the man page.
+  <h5 class="subsubsectionHead"><a 
+ id="x14-490002.2.10"></a>Local memory allocation</h5>
+<!--l. 581--><p class="noindent" >VIPS includes a set of functions for memory allocation
+local to an image descriptor. The base memory allocation
+function is <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_malloc()</span></span></span>. It has type:
+                                                 <div class="verbatim" id="verbatim-75">
+  void&#x00A0;&#x22C6;im_malloc(&#x00A0;IMAGE&#x00A0;&#x22C6;,&#x00A0;size_t&#x00A0;) 
+</div>
+<!--l. 587--><p class="nopar" >
+<!--l. 589--><p class="indent" >  It operates exactly as the standard <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">malloc()</span></span></span> C library
+function, except that the area of memory it allocates is local
+to an image. If <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_malloc()</span></span></span> is unable to allocate
+memory, it returns <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">NULL</span></span></span>. If you pass <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">NULL</span></span></span> instead of a
+valid image descriptor, then <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_malloc()</span></span></span> allocates
+memory globally and you must free it yourself at some
+stage.
+<!--l. 596--><p class="indent" >    To free memory explicitly, use <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_free()</span></span></span>:
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-76">
+int&#x00A0;im_free(&#x00A0;void&#x00A0;&#x22C6;&#x00A0;)
+</div>
+<!--l. 600--><p class="nopar" >
+<!--l. 602--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_free()</span></span></span> always returns 0, so you can use it as an
+argument to a callback.
+<!--l. 606--><p class="indent" >  Three macros make memory allocation even easier.
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">IM_NEW()</span></span></span> allocates a new object. You give it a descriptor
+and a type, and it returns a pointer to enough space to hold
+an object of that type. It has type:
+                                                 <div class="verbatim" id="verbatim-77">
+  type-name&#x00A0;&#x22C6;IM_NEW(&#x00A0;IMAGE&#x00A0;&#x22C6;,&#x00A0;type-name&#x00A0;) 
+</div>
+<!--l. 612--><p class="nopar" >
+<!--l. 614--><p class="indent" >  The second macro, <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">IM_ARRAY()</span></span></span>, is very similar, but
+allocates space for an array of objects. Note that, unlike the
+usual <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">calloc()</span></span></span> C library function, it does not initialise
+the array to zero. It has type:
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-78">
+type-name&#x00A0;&#x22C6;IM_ARRAY(&#x00A0;IMAGE&#x00A0;&#x22C6;,&#x00A0;int,&#x00A0;type-name&#x00A0;)
+</div>
+<!--l. 620--><p class="nopar" >
+<!--l. 622--><p class="indent" >  Finally, <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">IM_NUMBER()</span></span></span> returns the number of elements
+in an array of defined size. See the man pages for a series of
+examples, or see <span 
+class="cmsy-10">§</span><a 
+href="vipsmanualse9.html#x15-600002.3.1">2.3.1<!--tex4ht:ref: sec:number --></a>.
+<!--l. 626--><p class="noindent" >
+  <h5 class="subsubsectionHead"><a 
+ id="x14-500002.2.10"></a>Other local operations</h5>
+<!--l. 628--><p class="noindent" >The above facilities are implemented with the VIPS core
+function <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_add_close_callback()</span></span></span>. You can use
+this facility to make your own local resource allocators for
+other types of object &#8212; see the manual page for more
+help.
+<!--l. 633--><p class="noindent" >
+  <h4 class="subsectionHead"><span class="titlemark">2.2.11    </span> <a 
+ id="x14-510002.2.11"></a>Error handling</h4>
+<!--l. 635--><p class="noindent" >All VIPS operations return 0 on success and non-zero on
+error, setting <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_error()</span></span></span>. As a consequence, when a
+VIPS function fails, you do not need to generate an error
+message &#8212; you can simply propagate the error back up to
+your caller. If however you detect some error yourself (for
+example, the bad parameter in the example above), you
+must call <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_error()</span></span></span> to let your caller know what the
+problem was.
+<!--l. 642--><p class="indent" >  VIPS provides two more functions for error message
+handling: <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_warn()</span></span></span> and <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_diag()</span></span></span>. These are
+intended to be used for less serious messages, as their
+names suggest. Currently, they simply format and print their
+arguments to <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">stderr</span></span></span>, optionally suppressed by the setting
+of an environment variable. Future releases of VIPS may
+allow more sophisticated trapping of these functions to
+allow their text to be easily presented to the user by VIPS
+applications. See the manual pages.
+<!--l. 650--><p class="noindent" >
+  <h4 class="subsectionHead"><span class="titlemark">2.2.12    </span> <a 
+ id="x14-520002.2.12"></a>Joining operations together</h4>
+<!--l. 653--><p class="noindent" >VIPS lets you join image processing operations together so
+that they behave as a single unit. Figure&#x00A0;<a 
+href="#x14-520017">2.7<!--tex4ht:ref: fg:join --></a> shows the
+definition of the function <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_Lab2disp()</span></span></span> from the VIPS
+library. This function converts an image in <span 
+class="ptmri7t-">CIE</span><span 
+class="ptmri7t-">&#x00A0;</span><span 
+class="cmmi-10">L</span><span 
+class="cmsy-7">*</span><span 
+class="cmmi-10">a</span><span 
+class="cmsy-7">*</span><span 
+class="cmmi-10">b</span><span 
+class="cmsy-7">*</span>
+colour space to an RGB image for a monitor. The monitorcharacteristics (gamma, phosphor type, etc.) are described
+ by the <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_col_display</span></span></span> structure, see the man page for
+ <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_col_XYZ2rgb()</span></span></span>.
+                                                                                       
+
+                                                                                       
+<!--l. 661--><p class="indent" >  <a 
+ id="x14-520017"></a><hr class="float"><div class="float" 
+>
+                                           
+                                                                                       
+
+                                                                                       
+<div class="verbatim" id="verbatim-79">
+int
+&#x00A0;<br />im_Lab2disp(&#x00A0;IMAGE&#x00A0;&#x22C6;in,&#x00A0;IMAGE&#x00A0;&#x22C6;out,&#x00A0;struct&#x00A0;im_col_display&#x00A0;&#x22C6;disp&#x00A0;)
+&#x00A0;<br />{
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;IMAGE&#x00A0;&#x22C6;t1;
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;if(&#x00A0;!(t1&#x00A0;=&#x00A0;im_open_local(&#x00A0;out,&#x00A0;"im_Lab2disp:1",&#x00A0;"p"&#x00A0;))&#x00A0;||
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;im_Lab2XYZ(&#x00A0;in,&#x00A0;t1&#x00A0;)&#x00A0;||
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;im_XYZ2disp(&#x00A0;t1,&#x00A0;out,&#x00A0;disp&#x00A0;)&#x00A0;)
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;return(&#x00A0;-1&#x00A0;);
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;return(&#x00A0;0&#x00A0;);
+&#x00A0;<br />}
+</div>
+<!--l. 674--><p class="nopar" >
+<br /><div class="caption" 
+><span class="id">Figure&#x00A0;2.7: </span><span  
+class="content">Two image-processing operations joined together</span></div><!--tex4ht:label?: x14-520017 -->
+                                           
+                                                                                       
+
+                                                                                       
+  </div><hr class="endfloat" />
+<!--l. 679--><p class="indent" >  The special <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">"p"</span></span></span> mode (for partial) used to open
+the image descriptor used as the intermediate image
+in this function &#8216;glues&#8217; the two operations together.
+When you use <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_Lab2disp()</span></span></span>, the two operations
+inside it will execute together and no extra storage
+is necessary for the intermediate image (<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">t1</span></span></span> in this
+example). This is important if you want to process
+images larger than the amount of RAM you have on your
+machine.
+<!--l. 686--><p class="indent" >  As an added bonus, if you have more than one CPU in
+your computer, the work will be automatically spread
+across the processors for you. You can control this
+parallelization with the <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">IM_CONCURRENCY</span></span></span> environment
+variable, <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_concurrency_set()</span></span></span>, and with the
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">--vips-concurrency</span></span></span> command-line switch. See the
+man page for <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_generate()</span></span></span>.
+  <h5 class="subsubsectionHead"><a 
+ id="x14-530002.2.12"></a>How it works</h5>
+<!--l. 694--><p class="noindent" >When a VIPS function is asked to output to a <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">"p"</span></span></span> image
+descriptor, all the fields in the descriptor are set (the output
+image size and type are set, for example), but no image data
+is actually generated. Instead, the function attaches
+callbacks to the image descriptor which VIPS can use later
+to generate any piece of the output image that might be
+needed.
+<!--l. 700--><p class="indent" >  When a VIPS function is asked to output to a <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">"w"</span></span></span> or a
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">"t"</span></span></span> descriptor (a real disc file or a real memory buffer), it
+evaluates immediately and its evaluation in turn forces the
+evaluation of any earlier <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">"p"</span></span></span> images.
+<!--l. 705--><p class="indent" >  In the example in Figure&#x00A0;<a 
+href="#x14-520017">2.7<!--tex4ht:ref: fg:join --></a>, whether or not any pixels
+are really processed when <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_Lab2disp()</span></span></span> is called
+depends upon the mode in which <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">out</span></span></span> was opened.
+If <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">out</span></span></span> is also a partial image, then no pixels will be
+calculated &#8212; instead, a pipeline of VIPS operations
+will be constructed behind the scenes and attached to
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">out</span></span></span>.
+<!--l. 711--><p class="indent" >  Conversely, if <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">out</span></span></span> is a real image (that is, either <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">"w"</span></span></span> or
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">"t"</span></span></span>), then the final VIPS operation in the function
+(<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_XYZ2disp()</span></span></span>) will output the entire image to <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">out</span></span></span>,
+causing the earlier parts of <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_Lab2disp()</span></span></span> (and indeed
+possibly some earlier pieces of program, if <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">in</span></span></span> was also a
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">"p"</span></span></span> image) to run.
+<!--l. 717--><p class="indent" >  When a VIPS pipeline does finally evaluate, all of the
+functions in the pipeline execute together, sucking image
+data through the system in small pieces. As a consequence,
+no intermediate images are generated, large amounts of
+RAM are not needed, and no slow disc I/O needs to be    performed.
+  <!--l. 722--><p class="indent" >    Since VIPS partial I/O is demand-driven rather than
+  data-driven this works even if some of the operations
+  perform coordinate transformations. We could, for example,
+  include a call to <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_affine()</span></span></span>, which performs arbitrary
+  rotation and scaling, and everything would still work
+  correctly.
+  <!--l. 727--><p class="noindent" >
+      <h5 class="subsubsectionHead"><a 
+ id="x14-540002.2.12"></a>Pitfalls with partials</h5>
+  <!--l. 729--><p class="noindent" >To go with all of the benefits that partial image I/O brings,
+  there are also some problems. The most serious is that you
+  are often not quite certain when computation will happen.
+  This can cause problems if you close an input file, thinking
+  that it is finished with, when in fact that file has not been
+  processed yet. Doing this results in dangling pointers and an
+  almost certain core-dump.
+  <!--l. 736--><p class="indent" >    You can prevent this from happening with careful use of
+  <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_open_local()</span></span></span>. If you always open local to your
+  output image, you can be sure that the input will not be
+  closed before the output has been generated to a file
+  or memory buffer. You do not need to be so careful
+  with non-image arguments. VIPS functions which take
+  extra non-image arguments (a matrix, perhaps) are
+  careful to make their own copy of the object before
+  returning.
+  <!--l. 744--><p class="noindent" >
+      <h5 class="subsubsectionHead"><a 
+ id="x14-550002.2.12"></a>Non-image output</h5>
+  <!--l. 746--><p class="noindent" >Some VIPS functions consume images, but make no image
+  output. <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_stats()</span></span></span> for example, scans an image
+  calculating various statistical values. When you use
+  <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_stats()</span></span></span>, it behaves as a data sink, sucking image
+  data through any earlier pipeline stages.
+  <!--l. 751--><p class="noindent" >
+      <h5 class="subsubsectionHead"><a 
+ id="x14-560002.2.12"></a>Calculating twice</h5>
+  <!--l. 753--><p class="noindent" >In some circumstances, the same image data can be
+  generated twice. Figure&#x00A0;<a 
+href="#x14-560018">2.8<!--tex4ht:ref: fg:thrmean --></a> is a function which finds the
+  mean value of an image, and writes a new image in which
+  pixels less than the mean are set to 0 and images greater
+  than the mean are set to 255.
+                                                                                       
+
+                                                                                       
+<!--l. 759--><p class="indent" >  <a 
+ id="x14-560018"></a><hr class="float"><div class="float" 
+>
+                                           
+                                                                                       
+
+                                                                                       
+<div class="verbatim" id="verbatim-80">
+int
+&#x00A0;<br />threshold_at_mean(&#x00A0;IMAGE&#x00A0;&#x22C6;in,&#x00A0;IMAGE&#x00A0;&#x22C6;out&#x00A0;)
+&#x00A0;<br />{
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;double&#x00A0;mean;
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;if(&#x00A0;im_avg(&#x00A0;in,&#x00A0;&amp;mean&#x00A0;)&#x00A0;||
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;im_moreconst(&#x00A0;in,&#x00A0;out,&#x00A0;mean&#x00A0;)&#x00A0;)
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;return(&#x00A0;-1&#x00A0;);
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;return(&#x00A0;0&#x00A0;);
+&#x00A0;<br />}
+</div>
+<!--l. 771--><p class="nopar" >
+<br /><div class="caption" 
+><span class="id">Figure&#x00A0;2.8: </span><span  
+class="content">Threshold an image at the mean value</span></div><!--tex4ht:label?: x14-560018 -->
+                                           
+                                                                                       
+
+                                                                                       
+  </div><hr class="endfloat" />
+<!--l. 776--><p class="indent" >  This seems straightforward &#8212; but consider if image <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">in</span></span></span>
+were a <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">"p"</span></span></span>, and represented the output of a large pipeline
+of operations. The call to <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_avg()</span></span></span> would force the
+evaluation of the entire pipeline, and throw it all away,
+keeping only the average value. The subsequent call to
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_moreconst()</span></span></span> will cause the pipeline to be evaluated
+a second time.
+<!--l. 782--><p class="indent" >  When designing a program, it is sensible to pay attention
+to these issues. It might be faster, in some cases, to output to
+a file before calling <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_avg()</span></span></span>, find the average of the disc
+file, and then run <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_moreconst()</span></span></span> from that. There&#8217;s
+also <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_cache()</span></span></span> which can keep recent parts of a very
+large image.
+  <h5 class="subsubsectionHead"><a 
+ id="x14-570002.2.12"></a>Blocking computation</h5>
+<!--l. 791--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">IMAGE</span></span></span> descriptors have a flag called <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">kill</span></span></span> which can be
+used to block computation. If <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im-&#x003E;kill</span></span></span> is set to a
+non-zero value, then any VIPS pipelines which use <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im</span></span></span> as
+an intermediate will fail with an error message. This
+is useful for user-interface writers &#8212; suppose your
+interface is forced to close an image which many other
+images are using as a source of data. You can just set
+the <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">kill</span></span></span> flag in all of the deleted image&#8217;s immediate
+children and prevent any dangling pointers from being
+followed.
+<!--l. 800--><p class="noindent" >
+  <h5 class="subsubsectionHead"><a 
+ id="x14-580002.2.12"></a>Limitations</h5>
+<!--l. 803--><p class="noindent" >Not all VIPS operations are partial-aware. These non-partial
+operations use a pre-VIPS 7.0 I/O scheme in which the
+whole of the input image has to be present at the same time.
+In some cases, this is because partial I/O simply makes no
+sense &#8212; for example, a Fourier Transform can produce no
+output until it has seen all of the input. <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_fwfft()</span></span></span> is
+therefore not a partial operation. In other cases, we have
+simply not got around to rewriting the old non-partial
+operation in the newer partial style.
+<!--l. 811--><p class="indent" >  You can mix partial and non-partial VIPS operations
+freely, without worrying about which type they are. The
+only effect will be on the time your pipeline takes to
+execute, and the memory requirements of the intermediate
+images. VIPS uses the following rules when you mix the
+two styles of operation:
+<!--l. 816--><p class="indent" >
+    <ol  class="enumerate1" >                                                 <li 
+  class="enumerate" id="x14-58002x1">When a non-partial operation is asked to output to
+          a  partial  image  descriptor,  the  <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">"p"</span></span></span> descriptor  is
+          magically transformed into a <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">"t"</span></span></span> descriptor.
+          </li>
+          <li 
+  class="enumerate" id="x14-58004x2">When a non-partial operation is asked to read from
+          a <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">"p"</span></span></span> descriptor, the <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">"p"</span></span></span> descriptor is turned into
+          a <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">"t"</span></span></span> type, and any earlier stages in the pipeline
+          forced to evaluate into that memory buffer.
+          <!--l. 828--><p class="noindent" >The non-partial operation then processes from the
+          memory buffer.
+          </li></ol>
+  <!--l. 832--><p class="indent" >    These rules have the consequence that you may only
+  process very large images if you only use partial operations.
+  If you use any non-partial operations, then parts of your
+  pipelines will fall back to old whole-image I/O and you will
+  need to think carefully about where your intermediates
+  should be stored.
+                                                                                       
+
+                                                                                       
+  <!--l. 1--><div class="crosslinks"><p class="noindent">[<a 
+href="vipsmanualse9.html" >next</a>] [<a 
+href="vipsmanualse7.html" >prev</a>] [<a 
+href="vipsmanualse7.html#tailvipsmanualse7.html" >prev-tail</a>] [<a 
+href="vipsmanualse8.html" >front</a>] [<a 
+href="vipsmanualch2.html#vipsmanualse8.html" >up</a>] </p></div>
+<!--l. 1--><p class="indent" >  <a 
+ id="tailvipsmanualse8.html"></a>    
+</body></html> 

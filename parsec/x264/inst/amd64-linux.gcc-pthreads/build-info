@@ -1,0 +1,40 @@
+PARSEC Compile Information
+==========================
+Package 'parsec.x264'
+Built on Wed 28 Jul 2021 12:04:20 PM PDT
+
+Configure arguments: --enable-pthread --extra-asflags="" --extra-cflags="  -DPARSEC_VERSION=3.0-beta-20150206 -fno-pie -no-pie" --extra-ldflags=" -fno-pie -no-pie " --build= --host= --prefix=/home/huaicheng/proj/run/parsec-benchmark/pkgs/apps/x264/inst/amd64-linux.gcc-pthreads
+
+Environment modifications: PATH="/home/huaicheng/proj/run/parsec-benchmark/pkgs/tools/yasm/inst/amd64-linux.gcc-pthreads/bin:/home/huaicheng/proj/run/parsec-benchmark/bin:/home/huaicheng/..//huaicheng/bin:/share/testbed/bin:/home/huaicheng/bin:/home/huaicheng/.local/bin:/home/linuxbrew/.linuxbrew/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/home/huaicheng/proj/run/parsec-benchmark/bin"
+
+CC: /usr/bin/gcc
+Version: gcc (Ubuntu 9.3.0-17ubuntu1~20.04) 9.3.0
+Copyright (C) 2019 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+CFLAGS:   -DPARSEC_VERSION=3.0-beta-20150206
+
+CXX: /usr/bin/g++
+Version: g++ (Ubuntu 9.3.0-17ubuntu1~20.04) 9.3.0
+Copyright (C) 2019 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+CXXFLAGS:  -fpermissive -fno-exceptions -DPARSEC_VERSION=3.0-beta-20150206
+
+CCAS: 
+Version: 
+CCASFLAGS: 
+
+LD: /usr/bin/ld
+Version: GNU ld (GNU Binutils for Ubuntu) 2.34
+Copyright (C) 2020 Free Software Foundation, Inc.
+This program is free software; you may redistribute it under the terms of
+the GNU General Public License version 3 or (at your option) a later version.
+This program has absolutely no warranty.
+LDFLAGS: 
+
+JAVAC: /usr/bin/javac
+Version: javac 1.8.0_292
+JFLAGS: 
+
+[EOF]

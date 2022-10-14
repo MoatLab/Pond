@@ -1,0 +1,129 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html > 
+<head><title>The VError class</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (http://www.cse.ohio-state.edu/~gurari/TeX4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.cse.ohio-state.edu/~gurari/TeX4ht/)"> 
+<!-- 3,html --> 
+<meta name="src" content="vipsmanual.tex"> 
+<meta name="date" content="2010-06-09 21:39:00"> 
+<link rel="stylesheet" type="text/css" href="vipsmanual.css"> 
+</head><body 
+>
+  <!--l. 1--><div class="crosslinks"><p class="noindent">[<a 
+href="vipsmanualse5.html" >prev</a>] [<a 
+href="vipsmanualse5.html#tailvipsmanualse5.html" >prev-tail</a>] [<a 
+href="#tailvipsmanualse6.html">tail</a>] [<a 
+href="vipsmanualch1.html#vipsmanualse6.html" >up</a>] </p></div>
+  <h3 class="sectionHead"><span class="titlemark">1.6    </span> <a 
+ id="x11-300001.6"></a>The <span 
+class="pcrr7t-">VError </span>class</h3>
+<!--l. 3--><p class="noindent" >The <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VError</span></span></span> class is the class thrown by the VIPS
+C++ API when an error is detected. It is derived from
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">std::exception</span></span></span> in the usual way.
+<!--l. 6--><p class="noindent" >
+  <h4 class="subsectionHead"><span class="titlemark">1.6.1    </span> <a 
+ id="x11-310001.6.1"></a>Constructors</h4>
+<!--l. 8--><p class="noindent" >There are two constructors for <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VError</span></span></span>:
+                                                 <div class="verbatim" id="verbatim-41">
+  VError(&#x00A0;std::string&#x00A0;str&#x00A0;);
+ &#x00A0;<br />VError(); 
+</div>
+<!--l. 13--><p class="nopar" >
+<!--l. 15--><p class="indent" >  The first form creates an error object initialised with the
+specified string, the last form creates an empty error
+object.
+<!--l. 18--><p class="noindent" >
+    <h4 class="subsectionHead"><span class="titlemark">1.6.2    </span> <a 
+ id="x11-320001.6.2"></a>Projection functions</h4>
+<!--l. 20--><p class="noindent" >A function gives access to the string held by <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VError</span></span></span>:
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-42">
+const&#x00A0;char&#x00A0;&#x22C6;what();
+</div>
+<!--l. 24--><p class="nopar" >
+<!--l. 26--><p class="indent" >  You can also send to an <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">ostream</span></span></span>.
+                                                 <div class="verbatim" id="verbatim-43">
+  std::ostream&amp;&#x00A0;operator&#x003C;&#x003C;(
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;std::ostream&amp;,&#x00A0;const&#x00A0;error&amp;&#x00A0;); 
+</div>
+<!--l. 31--><p class="nopar" >
+<!--l. 33--><p class="noindent" >
+  <h4 class="subsectionHead"><span class="titlemark">1.6.3    </span> <a 
+ id="x11-330001.6.3"></a>Computing with <span 
+class="pcrr7t-">VError</span></h4>
+<!--l. 35--><p class="noindent" >Two member functions let you append elements to an
+error:
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-44">
+VError&#x00A0;&amp;app(&#x00A0;std::string&#x00A0;txt&#x00A0;);
+&#x00A0;<br />VError&#x00A0;&amp;app(&#x00A0;const&#x00A0;int&#x00A0;i&#x00A0;);
+</div>
+<!--l. 40--><p class="nopar" >
+<!--l. 42--><p class="indent" >  For example:
+                                                 <div class="verbatim" id="verbatim-45">
+  VError&#x00A0;wombat;
+ &#x00A0;<br />int&#x00A0;n&#x00A0;=&#x00A0;12;
+ &#x00A0;<br />
+ &#x00A0;<br />wombat.app(&#x00A0;"possum:&#x00A0;no&#x00A0;more&#x00A0;than&#x00A0;"&#x00A0;).
+ &#x00A0;<br />app(&#x00A0;n&#x00A0;).app(&#x00A0;"&#x00A0;elements\n"&#x00A0;);
+ &#x00A0;<br />throw(&#x00A0;wombat&#x00A0;); 
+</div>
+<!--l. 51--><p class="nopar" >
+<!--l. 53--><p class="noindent" >will throw a <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VError</span></span></span> with a diagnostic of:
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-46">
+possum:&#x00A0;no&#x00A0;more&#x00A0;than&#x00A0;12&#x00A0;elements
+</div>
+<!--l. 58--><p class="nopar" >
+<!--l. 60--><p class="indent" >  The member function <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">perror()</span></span></span> prints the error
+message to <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">stdout</span></span></span> and exits with a code of 1.
+                                                 <div class="verbatim" id="verbatim-47">
+  void&#x00A0;perror(&#x00A0;const&#x00A0;char&#x00A0;&#x22C6;&#x00A0;);
+ &#x00A0;<br />void&#x00A0;perror(); 
+</div>
+<!--l. 66--><p class="nopar" >
+<!--l. 68--><p class="noindent" >
+  <h4 class="subsectionHead"><span class="titlemark">1.6.4    </span> <a 
+ id="x11-340001.6.4"></a>Convenience function</h4>
+<!--l. 70--><p class="noindent" >The convenience function <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">verror</span></span></span> creates an <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VError</span></span></span>
+with the specified error string, and throws it. If you pass <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">""</span></span></span>
+for the string, verror uses the contents of the VIPS error
+buffer instead.
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-48">
+extern&#x00A0;void&#x00A0;verror(&#x00A0;std::string&#x00A0;str&#x00A0;=&#x00A0;""&#x00A0;);
+</div>
+<!--l. 76--><p class="nopar" >
+                                           
+                                                                                       
+
+                                                                                       
+  <!--l. 70--><div class="crosslinks"><p class="noindent">[<a 
+href="vipsmanualse5.html" >prev</a>] [<a 
+href="vipsmanualse5.html#tailvipsmanualse5.html" >prev-tail</a>] [<a 
+href="vipsmanualse6.html" >front</a>] [<a 
+href="vipsmanualch1.html#vipsmanualse6.html" >up</a>] </p></div>
+<!--l. 70--><p class="indent" >  <a 
+ id="tailvipsmanualse6.html"></a>   
+</body></html> 

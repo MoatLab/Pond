@@ -1,0 +1,15 @@
+
+compare.cmd
+compare.err
+compare.out
+compare.stdout
+deepsjeng_s_base.mytest-m64
+ref.err
+ref.out
+ref.out.cmp
+ref.txt
+speccmds.cmd
+speccmds.err
+speccmds.out
+speccmds.stdout
+OLD

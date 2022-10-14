@@ -1,0 +1,168 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html > 
+<head><title>Introduction</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (http://www.cse.ohio-state.edu/~gurari/TeX4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.cse.ohio-state.edu/~gurari/TeX4ht/)"> 
+<!-- 3,html --> 
+<meta name="src" content="vipsmanual.tex"> 
+<meta name="date" content="2010-06-09 21:39:00"> 
+<link rel="stylesheet" type="text/css" href="vipsmanual.css"> 
+</head><body 
+>
+  <!--l. 1--><div class="crosslinks"><p class="noindent">[<a 
+href="vipsmanualse14.html" >next</a>] [<a 
+href="#tailvipsmanualse13.html">tail</a>] [<a 
+href="vipsmanualch3.html#vipsmanualse13.html" >up</a>] </p></div>
+  <h3 class="sectionHead"><span class="titlemark">3.1    </span> <a 
+ id="x20-850003.1"></a>Introduction</h3>
+<!--l. 2--><p class="noindent" ><a name="nip_label_sec:oper"></a>
+<!--l. 4--><p class="indent" >  This chapter explains how to write image processing
+operations using the VIPS image I/O (input-output) system.
+For background, you should probably take a look at <span 
+class="cmsy-10">§</span><a 
+href="vipsmanualse7.html#x13-360002.1">2.1<!--tex4ht:ref: sec:appl --></a>.
+This is supposed to be a tutorial, if you need detailed
+information on any particular function, use the on-line
+UNIX manual pages.
+<!--l. 10--><p class="noindent" >
+  <h4 class="subsectionHead"><span class="titlemark">3.1.1    </span> <a 
+ id="x20-860003.1.1"></a>Why use VIPS?</h4>
+<!--l. 12--><p class="noindent" >If you use the VIPS image I/O system, you get a number of
+benefits:
+    <dl class="description"><dt class="description">
+<span 
+class="ptmb7t-">Threading</span> </dt><dd 
+class="description">If your computer has more than one CPU,
+    the VIPS I/O system will automatically split your
+    image  processing  operation  into  separate  threads
+    (provided you use PIO, see below). You should get
+    an approximately linear speed-up as you add more
+    CPUs.                                             </dd><dt class="description">
+  <span 
+class="ptmb7t-">Pipelining</span>  </dt><dd 
+class="description">Provided  you  use  PIO  (again,  see  below),
+          VIPS can automatically join operations together. A
+          sequence  of  image  processing  operations  will  all
+          execute together, with image data flowing through
+          the processing pipeline in small pieces. This makes
+          it possible to perform complex processing on very
+          large images with no need to worry about storage
+          management.
+          </dd><dt class="description">
+  <span 
+class="ptmb7t-">Composition</span>  </dt><dd 
+class="description">Because  VIPS  can  efficiently  compose
+          image      processing      operations,      you      can
+          implement your new operation in small, reusable,
+          easy-to-understand pieces. VIPS already has a lot
+          of these: many new operations can be implemented
+          by simply composing existing operations.
+          </dd><dt class="description">
+  <span 
+class="ptmb7t-">Large files</span>  </dt><dd 
+class="description">Provided  you  use  PIO  and  as  long  as  the
+          underlying  OS  supports  large  files  (that  is,  files
+          larger  than  2GB),  VIPS  operations  can  work  on
+          files larger than can be addressed with 32 bits on a
+          plain 32-bit machine. VIPS operations only see 32
+          bit  addresses;  the  VIPS  I/O  system  transparently
+          maps these to 64 bit operations for I/O. Large file
+          support is included on most machines after about
+          1998.
+          </dd><dt class="description">
+  <span 
+class="ptmb7t-">Abstraction</span>  </dt><dd 
+class="description">VIPS   operations   see   only   arrays   of
+          numbers in native format. Details of representation
+          (big/little  endian,  VIPS/TIFF/JPEG  file  format,
+          etc.) are hidden from you.
+          </dd><dt class="description">
+  <span 
+class="ptmb7t-">Interfaces</span>  </dt><dd 
+class="description">Once   you   have   your   image   processing
+          operation implemented, it automatically appears in
+          all of the VIPS interfaces. VIPS comes with a GUI
+          (<span 
+class="pcrr7t-">nip2</span>), a UNIX command-line interface (<span 
+class="pcrr7t-">vips</span>)
+          and a C++ and Python API.
+          </dd><dt class="description">
+  <span 
+class="ptmb7t-">Portability</span>  </dt><dd 
+class="description">VIPS operations can be compiled on most
+          unixes, Mac OS X and Windows NT, 2000 and XP
+          without modification. Mostly.
+          </dd></dl>
+                                                                                       
+
+                                                                                       
+<!--l. 59--><p class="noindent" >
+  <h4 class="subsectionHead"><span class="titlemark">3.1.2    </span> <a 
+ id="x20-870003.1.2"></a>I/O styles</h4>
+<!--l. 61--><p class="noindent" >The I/O system supports three styles of input-output.
+    <dl class="description"><dt class="description">
+<span 
+class="ptmb7t-">Whole-image I/O (WIO)</span> </dt><dd 
+class="description">This   style   is   a   largely   a
+    left-over  from  VIPS  6.x.  WIO  image-processing
+    operations  have  all  of  the  input  image  given  to
+    them  in  a  large  memory  array.  They  can  read
+    any  of  the  input  pels  at  will  with  simple  pointer
+    arithmetic.
+    </dd><dt class="description">
+<span 
+class="ptmb7t-">Partial-image I/O (PIO)</span> </dt><dd 
+class="description">In this style operations only
+    have a small part of the input image available to
+    them at any time. When PIO operations are joined
+    together into a pipeline, images flow through them
+    in small pieces, with all the operations in a pipeline
+    executing at the same time.
+    </dd><dt class="description">
+<span 
+class="ptmb7t-">In-place</span> </dt><dd 
+class="description">The  third  style  allows  pels  to  be  read  and
+    written  anywhere  in  the  image  at  any  time,  and
+    is  used  by  the  VIPS  in-place  operations,  such
+    as  <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_fastline()</span></span></span>.  You  should  only  use  it
+    for  operations  which  would  just  be  impossibly
+    inefficient  to  write  with  either  of  the  other  two
+    styles.
+    </dd></dl>
+<!--l. 85--><p class="indent" >  WIO operations are easy to program, but slow and
+inflexible when images become large. PIO operations are
+harder to program, but scale well as images become larger,
+and are automatically parallelized by the VIPS I/O
+system.
+<!--l. 89--><p class="indent" >  If you can face it, and if your algorithm can be expressed
+in this way, you should write your operations using PIO.
+Whichever you choose, applications which call your
+operation will see no difference, except in execution
+speed.
+<!--l. 93--><p class="indent" >  If your image processing operation performs no
+coordinate transformations, that is, if your output image is
+the same size as your input image or images, and if
+each output pixel depends only upon the pixel at the
+corresponding position in the input images, then you
+can use the <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_wrapone()</span></span></span> and <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_wrapmany()</span></span></span>
+operations. These take a simple buffer-processing operation
+supplied by you and wrap it up as a full-blown PIO
+operation. See&#x00A0;<span 
+class="cmsy-10">§</span><a 
+href="vipsmanualse15.html#x22-930003.3.1">3.3.1<!--tex4ht:ref: sec:wrapone --></a>.
+                                           
+                                                                                       
+
+                                                                                       
+  <!--l. 1--><div class="crosslinks"><p class="noindent">[<a 
+href="vipsmanualse14.html" >next</a>] [<a 
+href="vipsmanualse13.html" >front</a>] [<a 
+href="vipsmanualch3.html#vipsmanualse13.html" >up</a>] </p></div>
+<!--l. 1--><p class="indent" >  <a 
+ id="tailvipsmanualse13.html"></a>   
+</body></html> 

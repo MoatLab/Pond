@@ -1,0 +1,197 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html > 
+<head><title>The VIPS base class: VipsObject</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (http://www.cse.ohio-state.edu/~gurari/TeX4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.cse.ohio-state.edu/~gurari/TeX4ht/)"> 
+<!-- 3,html --> 
+<meta name="src" content="vipsmanual.tex"> 
+<meta name="date" content="2010-06-09 21:39:00"> 
+<link rel="stylesheet" type="text/css" href="vipsmanual.css"> 
+</head><body 
+>
+  <!--l. 1--><div class="crosslinks"><p class="noindent">[<a 
+href="vipsmanualse11.html" >next</a>] [<a 
+href="vipsmanualse9.html" >prev</a>] [<a 
+href="vipsmanualse9.html#tailvipsmanualse9.html" >prev-tail</a>] [<a 
+href="#tailvipsmanualse10.html">tail</a>] [<a 
+href="vipsmanualch2.html#vipsmanualse10.html" >up</a>] </p></div>
+  <h3 class="sectionHead"><span class="titlemark">2.4    </span> <a 
+ id="x16-670002.4"></a>The VIPS base class: <span 
+class="pcrr7t-">VipsObject</span></h3>
+<!--l. 4--><p class="noindent" >VIPS is in the process of moving to an object system based
+on <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">GObject</span></span></span>. You can read about the <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">GObjec</span></span></span> library at
+the GTK+ website:
+                                                 <div class="verbatim" id="verbatim-109">
+  http://www.gtk.org 
+</div>
+<!--l. 9--><p class="nopar" >
+<!--l. 11--><p class="indent" >  We&#8217;ve implemented two new subsystems (<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VipsFormat</span></span></span>
+and <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VipsInterpolate</span></span></span>) on top of <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VipsObject</span></span></span> but
+not yet moved the core VIPS types over. As a result,
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VipsObject</span></span></span> is still developing and is likely to change in
+the next release.
+<!--l. 16--><p class="indent" >    This section quickly summarises enough of the
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VipsObject</span></span></span> system to let you use the two derived APIs
+but that&#8217;s all. Full documentation will come when this
+system stabilises.
+<!--l. 20--><p class="noindent" >
+    <h4 class="subsectionHead"><span class="titlemark">2.4.1    </span> <a 
+ id="x16-680002.4.1"></a>Properties</h4>
+<!--l. 22--><p class="noindent" >Like the rest of VIPS, <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VipsObject</span></span></span> is a functional type.
+You can set properties during object construction, but not
+after that point. You may read properties at any time after
+construction, but not before.
+<!--l. 26--><p class="indent" >    To enforce these rules, VIPS extends the standard
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">GObject</span></span></span> property system and adds a new phase to
+object creation. An object has the following stages in its
+life:
+<!--l. 30--><p class="noindent" >
+    <h5 class="subsubsectionHead"><a 
+ id="x16-690002.4.1"></a>Lookup</h5>
+<!--l. 32--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">vips_type_find()</span></span></span> is a convenience function that looks
+up a type by its nickname relative to a base class. For
+example:
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-110">
+GType&#x00A0;type&#x00A0;=
+&#x00A0;<br />&#x00A0;&#x00A0;vips_type_find(&#x00A0;"VipsInterpolate",&#x00A0;"bilinear"&#x00A0;);
+</div>
+<!--l. 38--><p class="nopar" >
+<!--l. 40--><p class="noindent" >finds a subclass of <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VipsInterpolate</span></span></span> nicknamed &#8216;bilinear&#8217;.
+You can look up types by their full name of course, but these
+can be rather unwieldy (<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VipsInterpolateBilinear</span></span></span>
+in this case, for example).
+<!--l. 45--><p class="noindent" >
+  <h5 class="subsubsectionHead"><a 
+ id="x16-700002.4.1"></a>Create</h5>
+<!--l. 47--><p class="noindent" >Build an instance with <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">g_object_new()</span></span></span>. For example:
+                                                 <div class="verbatim" id="verbatim-111">
+  VipsObject&#x00A0;&#x22C6;object&#x00A0;=
+ &#x00A0;<br />&#x00A0;&#x00A0;g_object_new(&#x00A0;type,
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;"sharpness",&#x00A0;12.0,
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;NULL&#x00A0;); 
+</div>
+<!--l. 54--><p class="nopar" >
+<!--l. 56--><p class="indent" >  You can set any of the object&#8217;s properties in the constructor.
+You can continue to set, but not read, any other properties,
+for example:
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-112">
+g_object_set(&#x00A0;object,
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;"sharpness",&#x00A0;12.0,
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;NULL&#x00A0;);
+</div>
+<!--l. 63--><p class="nopar" >
+<!--l. 65--><p class="indent" >  You can loop over an object&#8217;s required and optional
+parameters with <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">vips_argument_map()</span></span></span>.
+<!--l. 68--><p class="noindent" >
+  <h5 class="subsubsectionHead"><a 
+ id="x16-710002.4.1"></a>Build</h5>
+<!--l. 70--><p class="noindent" >Once all of the required any any of the optional object
+parameters have been set, call <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">vips_object_build()</span></span></span>:
+                                                 <div class="verbatim" id="verbatim-113">
+  int&#x00A0;vips_object_build(&#x00A0;VipsObject&#x00A0;&#x22C6;object&#x00A0;); 
+</div>
+<!--l. 75--><p class="nopar" >
+<!--l. 77--><p class="indent" >  This function checks that all the parameters have been set
+correctly and starts the object working. It returns non-zero
+on error, setting <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_error_string()</span></span></span>.
+<!--l. 81--><p class="noindent" >
+    <h5 class="subsubsectionHead"><a 
+ id="x16-720002.4.1"></a>Use</h5>
+<!--l. 83--><p class="noindent" >The object is now fully working. You can read results from
+it, or pass it on other objects. When you&#8217;re finished with it,
+drop your reference to end its life.
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-114">
+g_object_unref(&#x00A0;object&#x00A0;);
+</div>
+<!--l. 89--><p class="nopar" >
+<!--l. 91--><p class="noindent" >
+  <h4 class="subsectionHead"><span class="titlemark">2.4.2    </span> <a 
+ id="x16-730002.4.2"></a>Convenience functions</h4>
+<!--l. 93--><p class="noindent" >Two functions simplify building and printing objects.
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">vips_object_new_from_string()</span></span></span> makes a new
+object which is a subclass of a named base class.
+                                                 <div class="verbatim" id="verbatim-115">
+  VipsObject&#x00A0;&#x22C6;
+ &#x00A0;<br />&#x00A0;&#x00A0;vips_object_new_from_string(
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;const&#x00A0;char&#x00A0;&#x22C6;basename,&#x00A0;const&#x00A0;char&#x00A0;&#x22C6;p&#x00A0;); 
+</div>
+<!--l. 101--><p class="nopar" >
+<!--l. 103--><p class="indent" >  This is the function used by <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">IM_INPUT_INTERPOLATE()</span></span></span>,
+for example, to parse command-line arguments. The syntax
+is:
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-116">
+nickname&#x00A0;[&#x00A0;(&#x00A0;required-arg1,
+&#x00A0;<br />&#x00A0;&#x00A0;...
+&#x00A0;<br />&#x00A0;&#x00A0;required-argn,
+&#x00A0;<br />&#x00A0;&#x00A0;optional-arg-name&#x00A0;=&#x00A0;value,
+&#x00A0;<br />&#x00A0;&#x00A0;...
+&#x00A0;<br />&#x00A0;&#x00A0;optional-argm-name&#x00A0;=&#x00A0;value&#x00A0;)&#x00A0;]
+</div>
+<!--l. 113--><p class="nopar" >
+<!--l. 115--><p class="indent" >  So values for all the required arguments, in the correct
+order, then name = value for all the optional arguments you
+want to set. Parameters may be enclosed in round or curly
+braces.
+<!--l. 119--><p class="indent" >  <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">vips_object_to_string()</span></span></span> is the exact opposite:
+it generates the construct string for any constructed
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VipsObject</span></span></span>.
+<!--l. 123--><p class="indent" >  <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">vips_object_new()</span></span></span> wraps up the business of
+creating and checking an object. It makes the object, uses
+the supplied function to attach any arguments, then builds
+the object and returns NULL on failure or the new object on
+success.
+<!--l. 128--><p class="indent" >  A switch to the <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">vips</span></span></span> command-line program is handy
+for listing subtypes of <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VipsObject</span></span></span>. Try:
+                                                 <div class="verbatim" id="verbatim-117">
+  $&#x00A0;vips&#x00A0;--list&#x00A0;classes 
+</div>
+<!--l. 133--><p class="nopar" >
+                                                                                       
+
+                                                                                       
+  <!--l. 1--><div class="crosslinks"><p class="noindent">[<a 
+href="vipsmanualse11.html" >next</a>] [<a 
+href="vipsmanualse9.html" >prev</a>] [<a 
+href="vipsmanualse9.html#tailvipsmanualse9.html" >prev-tail</a>] [<a 
+href="vipsmanualse10.html" >front</a>] [<a 
+href="vipsmanualch2.html#vipsmanualse10.html" >up</a>] </p></div>
+<!--l. 1--><p class="indent" >  <a 
+ id="tailvipsmanualse10.html"></a>   
+</body></html> 

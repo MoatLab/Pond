@@ -1,0 +1,1141 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html > 
+<head><title>Programming PIO functions</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (http://www.cse.ohio-state.edu/~gurari/TeX4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.cse.ohio-state.edu/~gurari/TeX4ht/)"> 
+<!-- 3,html --> 
+<meta name="src" content="vipsmanual.tex"> 
+<meta name="date" content="2010-06-09 21:39:00"> 
+<link rel="stylesheet" type="text/css" href="vipsmanual.css"> 
+</head><body 
+>
+  <!--l. 1--><div class="crosslinks"><p class="noindent">[<a 
+href="vipsmanualse16.html" >next</a>] [<a 
+href="vipsmanualse14.html" >prev</a>] [<a 
+href="vipsmanualse14.html#tailvipsmanualse14.html" >prev-tail</a>] [<a 
+href="#tailvipsmanualse15.html">tail</a>] [<a 
+href="vipsmanualch3.html#vipsmanualse15.html" >up</a>] </p></div>
+  <h3 class="sectionHead"><span class="titlemark">3.3    </span> <a 
+ id="x22-920003.3"></a>Programming PIO functions</h3>
+<!--l. 4--><p class="noindent" >The VIPS PIO system has a number of advantages over
+WIO, as summarised in the introduction. On the other hand,
+they are a bit more complicated.
+<!--l. 7--><p class="noindent" >
+  <h4 class="subsectionHead"><span class="titlemark">3.3.1    </span> <a 
+ id="x22-930003.3.1"></a>Easy PIO with <span 
+class="pcrr7t-">im</span><span 
+class="pcrr7t-">_wrapone() </span>and
+<span 
+class="pcrr7t-">im</span><span 
+class="pcrr7t-">_wrapmany()</span></h4>
+<!--l. 10--><p class="noindent" >PIO is a very general image IO system, and because of this
+flexibility, can be complicated to program. As a convenience,
+VIPS offers an easy-to-use layer over PIO with the funtions
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_wrapone()</span></span></span> and <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_wrapmany()</span></span></span>.
+<!--l. 14--><p class="indent" >  If your image processing function is uninterested in
+coordinates, that is, if your input and output images are the
+same size, and each output pixel depends only upon the
+value of the corresponding pixel in the input image or
+images, then these functions are for you.
+<!--l. 19--><p class="indent" >  Consider the <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">invert()</span></span></span> function of figure&#x00A0;<a 
+href="vipsmanualse14.html#x21-900012">3.2<!--tex4ht:ref: fg:invert --></a>. First, we
+have to write the core of this as a buffer-processing
+function:
+                                                 <div class="verbatim" id="verbatim-140">
+  #include&#x00A0;&#x003C;stdio.h&#x003E;
+ &#x00A0;<br />#include&#x00A0;&#x003C;stdlib.h&#x003E;
+ &#x00A0;<br />
+ &#x00A0;<br />#include&#x00A0;&#x003C;vips/vips.h&#x003E;
+ &#x00A0;<br />
+ &#x00A0;<br />/&#x22C6;&#x00A0;p&#x00A0;points&#x00A0;to&#x00A0;a&#x00A0;buffer&#x00A0;of&#x00A0;pixels&#x00A0;which
+ &#x00A0;<br />&#x00A0;&#x22C6;&#x00A0;need&#x00A0;inverting,&#x00A0;q&#x00A0;points&#x00A0;to&#x00A0;the&#x00A0;buffer
+ &#x00A0;<br />&#x00A0;&#x22C6;&#x00A0;we&#x00A0;should&#x00A0;write&#x00A0;the&#x00A0;result&#x00A0;to,&#x00A0;and&#x00A0;n
+ &#x00A0;<br />&#x00A0;&#x22C6;&#x00A0;is&#x00A0;the&#x00A0;number&#x00A0;of&#x00A0;pels&#x00A0;present.
+ &#x00A0;<br />&#x00A0;&#x22C6;/
+ &#x00A0;<br />static&#x00A0;void
+ &#x00A0;<br />invert_buffer(&#x00A0;unsigned&#x00A0;char&#x00A0;&#x22C6;p,
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;unsigned&#x00A0;char&#x00A0;&#x22C6;q,&#x00A0;int&#x00A0;n&#x00A0;)
+ &#x00A0;<br />{
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;int&#x00A0;i;
+ &#x00A0;<br />
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;for(&#x00A0;i&#x00A0;=&#x00A0;0;&#x00A0;i&#x00A0;&#x003C;&#x00A0;n;&#x00A0;i++&#x00A0;)
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;q[i]&#x00A0;=&#x00A0;255&#x00A0;-&#x00A0;p[i];
+ &#x00A0;<br />} 
+</div>
+<!--l. 42--><p class="nopar" >
+<!--l. 44--><p class="indent" >  Now we have to wrap up this very primitive expression
+of the invert operation as a PIO function. We use
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_wrapone()</span></span></span> to do this. It has type:
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-141">
+int
+&#x00A0;<br />im_wrapone(&#x00A0;IMAGE&#x00A0;&#x22C6;in,&#x00A0;IMAGE&#x00A0;&#x22C6;out,
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;im_wrapone_fn&#x00A0;fn,&#x00A0;void&#x00A0;&#x22C6;a,&#x00A0;void&#x00A0;&#x22C6;b&#x00A0;)
+</div>
+<!--l. 51--><p class="nopar" >
+<!--l. 53--><p class="noindent" >where:
+                                                 <div class="verbatim" id="verbatim-142">
+  void
+ &#x00A0;<br />(&#x22C6;im_wrapone_fn)(void&#x00A0;&#x22C6;in,&#x00A0;void&#x00A0;&#x22C6;out,
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;int&#x00A0;n,&#x00A0;void&#x00A0;&#x22C6;a,&#x00A0;void&#x00A0;&#x22C6;b&#x00A0;) 
+</div>
+<!--l. 60--><p class="nopar" >
+<!--l. 62--><p class="noindent" >almost the same type as our buffer-processing function
+above. The values <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">a</span></span></span> and <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">b</span></span></span> are carried around by VIPS for
+whatever use you fancy. <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">invert()</span></span></span> can now be written
+as:
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-143">
+int
+&#x00A0;<br />invert(&#x00A0;IMAGE&#x00A0;&#x22C6;in,&#x00A0;IMAGE&#x00A0;&#x22C6;out&#x00A0;)
+&#x00A0;<br />{
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Check&#x00A0;parameters.
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;if(&#x00A0;in-&#x003E;BandFmt&#x00A0;!=&#x00A0;IM_BANDFMT_UCHAR&#x00A0;||
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;in-&#x003E;Bands&#x00A0;!=&#x00A0;1&#x00A0;||
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;in-&#x003E;Coding&#x00A0;!=&#x00A0;IM_CODING_NONE&#x00A0;)&#x00A0;{
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;im_error(&#x00A0;"invert",&#x00A0;"bad&#x00A0;image"&#x00A0;);
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;return(&#x00A0;-1&#x00A0;);
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;}
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Set&#x00A0;fields&#x00A0;in&#x00A0;output&#x00A0;image.
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;if(&#x00A0;im_cp_desc(&#x00A0;out,&#x00A0;in&#x00A0;)&#x00A0;)
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;return(&#x00A0;-1&#x00A0;);
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Process!&#x00A0;We&#x00A0;don't&#x00A0;use&#x00A0;either&#x00A0;of&#x00A0;the
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x22C6;&#x00A0;user&#x00A0;parameters&#x00A0;in&#x00A0;this&#x00A0;function,
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x22C6;&#x00A0;so&#x00A0;leave&#x00A0;them&#x00A0;as&#x00A0;NULL.
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;if(&#x00A0;im_wrapone(&#x00A0;in,&#x00A0;out,
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;(im_wrapone_fn)&#x00A0;invert_buffer,
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;NULL,&#x00A0;NULL&#x00A0;)&#x00A0;)
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;return(&#x00A0;-1&#x00A0;);
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;return(&#x00A0;0&#x00A0;);
+&#x00A0;<br />}
+</div>
+<!--l. 96--><p class="nopar" >
+<!--l. 98--><p class="indent" >  And that&#8217;s all there is to it. This function will have all of
+the desirable properties of PIO functions, while being as
+easy to program as the WIO <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">invert()</span></span></span> earlier in this
+chapter.
+<!--l. 102--><p class="indent" >  This version of <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">invert()</span></span></span> is not very general: it will
+only accept one-band unsigned char images. It is easy to
+modify for n-band images:
+                                                 <div class="verbatim" id="verbatim-144">
+  /&#x22C6;&#x00A0;As&#x00A0;before,&#x00A0;but&#x00A0;use&#x00A0;one&#x00A0;of&#x00A0;the&#x00A0;user
+ &#x00A0;<br />&#x00A0;&#x22C6;&#x00A0;parameters&#x00A0;to&#x00A0;pass&#x00A0;in&#x00A0;the&#x00A0;number&#x00A0;of
+ &#x00A0;<br />&#x00A0;&#x22C6;&#x00A0;bands&#x00A0;in&#x00A0;the&#x00A0;image.
+ &#x00A0;<br />&#x00A0;&#x22C6;/
+ &#x00A0;<br />static&#x00A0;void
+ &#x00A0;<br />invert_buffer(&#x00A0;unsigned&#x00A0;char&#x00A0;&#x22C6;p,
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;unsigned&#x00A0;char&#x00A0;&#x22C6;q,&#x00A0;int&#x00A0;n,
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;IMAGE&#x00A0;&#x22C6;in&#x00A0;)
+ &#x00A0;<br />{
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;int&#x00A0;i;
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;int&#x00A0;sz&#x00A0;=&#x00A0;n&#x00A0;&#x22C6;&#x00A0;in-&#x003E;Bands;
+ &#x00A0;<br />
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;for(&#x00A0;i&#x00A0;=&#x00A0;0;&#x00A0;i&#x00A0;&#x003C;&#x00A0;sz;&#x00A0;i++&#x00A0;)
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;q[i]&#x00A0;=&#x00A0;255&#x00A0;-&#x00A0;p[i];
+ &#x00A0;<br />} 
+</div>
+<!--l. 121--><p class="nopar" >
+<!--l. 123--><p class="indent" >  We must also modify <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">invert()</span></span></span>:
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-145">
+int
+&#x00A0;<br />invert(&#x00A0;IMAGE&#x00A0;&#x22C6;in,&#x00A0;IMAGE&#x00A0;&#x22C6;out&#x00A0;)
+&#x00A0;<br />{
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Check&#x00A0;parameters.
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;if(&#x00A0;in-&#x003E;BandFmt&#x00A0;!=&#x00A0;IM_BANDFMT_UCHAR&#x00A0;||
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;in-&#x003E;Coding&#x00A0;!=&#x00A0;IM_CODING_NONE&#x00A0;)&#x00A0;{
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;im_error(&#x00A0;"invert",&#x00A0;"bad&#x00A0;image"&#x00A0;);
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;return(&#x00A0;-1&#x00A0;);
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;}
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Set&#x00A0;fields&#x00A0;in&#x00A0;output&#x00A0;image.
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;if(&#x00A0;im_cp_desc(&#x00A0;out,&#x00A0;in&#x00A0;)&#x00A0;)
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;return(&#x00A0;-1&#x00A0;);
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Process!&#x00A0;The&#x00A0;first&#x00A0;user-parameter
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x22C6;&#x00A0;is&#x00A0;the&#x00A0;number&#x00A0;of&#x00A0;bands&#x00A0;involved.
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;if(&#x00A0;im_wrapone(&#x00A0;in,&#x00A0;out,
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;(im_wrapone_fn)invert_buffer,
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;in,&#x00A0;NULL&#x00A0;)&#x00A0;)
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;return(&#x00A0;-1&#x00A0;);
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;return(&#x00A0;0&#x00A0;);
+&#x00A0;<br />}
+</div>
+<!--l. 152--><p class="nopar" >
+<!--l. 154--><p class="indent" >  There are two significant hidden traps here. First,
+inside the buffer processing functions, you may only
+read the contents of the user parameters <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">a</span></span></span> and <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">b</span></span></span>, you
+may not write to them. This is because on a multi-CPU
+machine, several copies of your buffer-processing functions
+will be run in parallel &#8212; if they all write to the same
+place, there will be complete confusion. If you need
+writeable parameters (for example, to count and report
+overflows), you can&#8217;t use <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_wrapone()</span></span></span>, you&#8217;ll
+have to use the PIO system in all its gory detail, see
+below.
+<!--l. 163--><p class="indent" >  Secondly, your buffer processing function may not be
+called immediately. VIPS may decide to delay evaluation of
+your operation until long after the call to <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">invert()</span></span></span> has
+returned. As a result, care is needed to ensure that you never
+read anything in your buffer-processing function that may
+have been freed. The best way to ensure this is to use the
+local resource allocators, such as <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_open_local()</span></span></span> and<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_malloc()</span></span></span>. This issue is discussed at length in the
+ sections below, and in <span 
+class="cmsy-10">§</span><a 
+href="vipsmanualse7.html#x13-360002.1">2.1<!--tex4ht:ref: sec:appl --></a>.
+ <!--l. 171--><p class="indent" >    <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_wrapone()</span></span></span> is for operations which take exactly
+ one input image. VIPS provides a second function,
+ <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_wrapmany()</span></span></span>, which works for any number of input
+ images. The type of <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_wrapmany()</span></span></span> is slightly
+ different:
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-146">
+int
+&#x00A0;<br />im_wrapmany(&#x00A0;IMAGE&#x00A0;&#x22C6;&#x22C6;in,&#x00A0;IMAGE&#x00A0;&#x22C6;out,
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;im_wrapmany_fn&#x00A0;fn,&#x00A0;void&#x00A0;&#x22C6;a,&#x00A0;void&#x00A0;&#x22C6;b&#x00A0;)
+</div>
+<!--l. 179--><p class="nopar" >
+<!--l. 181--><p class="noindent" >
+                                              <div class="verbatim" id="verbatim-147">
+ void
+ &#x00A0;<br />(&#x22C6;im_wrapmany_fn)(&#x00A0;void&#x00A0;&#x22C6;&#x22C6;in,&#x00A0;void&#x00A0;&#x22C6;out,
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;int&#x00A0;n,&#x00A0;void&#x00A0;&#x22C6;a,&#x00A0;void&#x00A0;&#x22C6;b&#x00A0;) 
+</div>
+<!--l. 187--><p class="nopar" >
+<!--l. 189--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_wrapmany()</span></span></span> takes a <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">NULL</span></span></span>-terminated array of
+input images, and creates a <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">NULL</span></span></span>-terminated array of
+buffers for the use of your buffer processing function. A
+function to add two <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">IM_BANDFMT_UCHAR</span></span></span> images to
+make a <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">IM_BANDFMT_UCHAR</span></span></span> image might be written
+as:
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-148">
+static&#x00A0;void
+&#x00A0;<br />add_buffer(&#x00A0;unsigned&#x00A0;char&#x00A0;&#x22C6;&#x22C6;in,
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;unsigned&#x00A0;short&#x00A0;&#x22C6;out,&#x00A0;int&#x00A0;n,
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;IMAGE&#x00A0;&#x22C6;in&#x00A0;)
+&#x00A0;<br />{
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;int&#x00A0;i;
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;int&#x00A0;sz&#x00A0;=&#x00A0;n&#x00A0;&#x22C6;&#x00A0;in-&#x003E;Bands;
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;unsigned&#x00A0;char&#x00A0;&#x22C6;p1&#x00A0;=&#x00A0;in[0];
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;unsigned&#x00A0;char&#x00A0;&#x22C6;p2&#x00A0;=&#x00A0;in[1];
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;for(&#x00A0;i&#x00A0;=&#x00A0;0;&#x00A0;i&#x00A0;&#x003C;&#x00A0;sz;&#x00A0;i++&#x00A0;)
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;out[i]&#x00A0;=&#x00A0;p1[i]&#x00A0;+&#x00A0;p2[i];
+&#x00A0;<br />}
+</div>
+<!--l. 209--><p class="nopar" >
+<!--l. 211--><p class="indent" >  This can be made into a PIO function with:
+                                                 <div class="verbatim" id="verbatim-149">
+  int
+ &#x00A0;<br />add_uchar(&#x00A0;IMAGE&#x00A0;&#x22C6;i1,&#x00A0;IMAGE&#x00A0;&#x22C6;i2,
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;IMAGE&#x00A0;&#x22C6;out&#x00A0;)
+ &#x00A0;<br />{
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;IMAGE&#x00A0;&#x22C6;invec[3];
+ &#x00A0;<br />
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Check&#x00A0;parameters.&#x00A0;We&#x00A0;don't&#x00A0;need&#x00A0;to
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x22C6;&#x00A0;check&#x00A0;that&#x00A0;i1&#x00A0;and&#x00A0;i2&#x00A0;are&#x00A0;the&#x00A0;same
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x22C6;&#x00A0;size,&#x00A0;im_wrapmany()&#x00A0;does&#x00A0;that&#x00A0;for
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x22C6;&#x00A0;us.
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x22C6;/
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;if(&#x00A0;i1-&#x003E;BandFmt&#x00A0;!=&#x00A0;IM_BANDFMT_UCHAR&#x00A0;||
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;i1-&#x003E;Coding&#x00A0;!=&#x00A0;IM_CODING_NONE&#x00A0;||
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;i2-&#x003E;BandFmt&#x00A0;!=&#x00A0;IM_BANDFMT_UCHAR&#x00A0;||
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;i2-&#x003E;Coding&#x00A0;!=&#x00A0;IM_CODING_NONE&#x00A0;||
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;i1-&#x003E;Bands&#x00A0;!=&#x00A0;i2-&#x003E;Bands&#x00A0;)&#x00A0;{
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;im_error(&#x00A0;"add_uchar",&#x00A0;"bad&#x00A0;in"&#x00A0;);
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;return(&#x00A0;-1&#x00A0;);
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;}
+ &#x00A0;<br />
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Set&#x00A0;fields&#x00A0;in&#x00A0;output&#x00A0;image.&#x00A0;As
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x22C6;&#x00A0;input&#x00A0;image,&#x00A0;but&#x00A0;we&#x00A0;want&#x00A0;a&#x00A0;USHORT.
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x22C6;/
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;if(&#x00A0;im_cp_desc(&#x00A0;out,&#x00A0;i1&#x00A0;)&#x00A0;)
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;return(&#x00A0;-1&#x00A0;);
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;out-&#x003E;BandFmt&#x00A0;=&#x00A0;IM_BANDFMT_USHORT;
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;out-&#x003E;Bbits&#x00A0;=&#x00A0;IM_BBITS_SHORT;
+ &#x00A0;<br />
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Process!&#x00A0;The&#x00A0;first&#x00A0;user-parameter
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x22C6;&#x00A0;is&#x00A0;the&#x00A0;number&#x00A0;of&#x00A0;bands&#x00A0;involved.
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x22C6;&#x00A0;invec&#x00A0;is&#x00A0;a&#x00A0;NULL-terminated&#x00A0;array&#x00A0;of
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x22C6;&#x00A0;input&#x00A0;images.
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x22C6;/
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;invec[0]&#x00A0;=&#x00A0;i1;&#x00A0;invec[1]&#x00A0;=&#x00A0;i2;
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;invec[2]&#x00A0;=&#x00A0;NULL;
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;if(&#x00A0;im_wrapmany(&#x00A0;invec,&#x00A0;out,
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;(im_wrapone_fn)add_buffer,
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;i1,&#x00A0;NULL&#x00A0;)&#x00A0;)
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;return(&#x00A0;-1&#x00A0;);
+ &#x00A0;<br />
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;return(&#x00A0;0&#x00A0;);
+ &#x00A0;<br />} 
+</div>
+<!--l. 256--><p class="nopar" >
+                                                                                       
+
+                                                                                       
+<!--l. 258--><p class="noindent" >
+  <h4 class="subsectionHead"><span class="titlemark">3.3.2    </span> <a 
+ id="x22-940003.3.2"></a>Region descriptors</h4>
+<!--l. 260--><p class="noindent" >Regions are the next layer of abstraction above image
+descriptors. A region is a small part of an image, held
+in memory ready for processing. A region is defined
+as:
+                                                 <div class="verbatim" id="verbatim-150">
+  typedef&#x00A0;struct&#x00A0;{
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;Rect&#x00A0;valid;
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;IMAGE&#x00A0;&#x22C6;im;
+ &#x00A0;<br />
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;...&#x00A0;and&#x00A0;some&#x00A0;other&#x00A0;private&#x00A0;fields,
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;...&#x00A0;used&#x00A0;by&#x00A0;VIPS&#x00A0;for&#x00A0;housekeeping
+ &#x00A0;<br />}&#x00A0;REGION; 
+</div>
+<!--l. 272--><p class="nopar" >
+<!--l. 274--><p class="noindent" >where <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">valid</span></span></span> holds the sub-area of image <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im</span></span></span> that this
+region represents, and <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">Rect</span></span></span> is defined as:
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-151">
+typedef&#x00A0;struct&#x00A0;{
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;int&#x00A0;left,&#x00A0;top;
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;int&#x00A0;width,&#x00A0;height;
+&#x00A0;<br />}&#x00A0;Rect;
+</div>
+<!--l. 283--><p class="nopar" >
+<!--l. 285--><p class="noindent" >two macros are available for <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">Rect</span></span></span> calculations:
+                                                 <div class="verbatim" id="verbatim-152">
+  int&#x00A0;IM_RECT_RIGHT(&#x00A0;Rect&#x00A0;&#x22C6;r&#x00A0;)
+ &#x00A0;<br />int&#x00A0;IM_RECT_BOTTOM(&#x00A0;Rect&#x00A0;&#x22C6;r&#x00A0;) 
+</div>
+<!--l. 291--><p class="nopar" >
+<!--l. 293--><p class="noindent" >where <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">IM_RECT_RIGHT()</span></span></span> returns <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">left</span></span></span> + <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">width</span></span></span>, and
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">IM_RECT_BOTTOM()</span></span></span> returns <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">top</span></span></span> + <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">height</span></span></span>. A small
+library of C functions are also available for <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">Rect</span></span></span> algebra, see
+the manual pages for <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_rect_intersectrect()</span></span></span>.
+<!--l. 299--><p class="indent" >    Regions are created with <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_region_create()</span></span></span>.
+This has type:
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-153">
+REGION&#x00A0;&#x22C6;im_region_create(&#x00A0;IMAGE&#x00A0;&#x22C6;im&#x00A0;)
+</div>
+<!--l. 303--><p class="nopar" >
+<!--l. 305--><p class="noindent" ><span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_region_create()</span></span></span> returns a pointer to a new
+region structure, or <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">NULL</span></span></span> on error. Regions returned by
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_region_create()</span></span></span> are blank &#8212; they contain no
+image data and cannot be read from or written to. See the
+next couple of sections for calls to fill regions with
+data.
+<!--l. 311--><p class="indent" >  Regions are destroyed with <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_region_free()</span></span></span>. It
+has type:
+                                                 <div class="verbatim" id="verbatim-154">
+  int&#x00A0;im_region_free(&#x00A0;REGION&#x00A0;&#x22C6;reg&#x00A0;) 
+</div>
+<!--l. 315--><p class="nopar" >
+<!--l. 317--><p class="noindent" >And, as usual, returns 0 on success and non-zero on
+error, setting <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_error()</span></span></span>. You must free all regions
+you create. If you close an image without freeing all
+the regions defined on that image, the image is just
+marked for future closure &#8212; it is not actually closed
+until the final region is freed. This behaviour helps
+to prevent dangling pointers, and it is not difficult to
+make sure you free all regions &#8212; see the examples
+below.
+<!--l. 325--><p class="noindent" >
+    <h4 class="subsectionHead"><span class="titlemark">3.3.3    </span> <a 
+ id="x22-950003.3.3"></a>Image input with regions</h4>
+<!--l. 327--><p class="noindent" >Before you can read from a region, you need to call
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_prepare()</span></span></span> to fill the region with image data. It has
+type:
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-155">
+int&#x00A0;im_prepare(&#x00A0;REGION&#x00A0;&#x22C6;reg,&#x00A0;Rect&#x00A0;&#x22C6;r&#x00A0;)
+</div>
+<!--l. 332--><p class="nopar" >
+<!--l. 334--><p class="indent" >  Area <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">r</span></span></span> of the image on which <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">reg</span></span></span> has been created is
+prepared and attached to the region.
+<!--l. 337--><p class="indent" >  Exactly what this preparation involves depends upon
+the image &#8212; it can vary from simply adjusting some
+pointers, to triggering the evaluation of a series of other
+functions. If it returns successfully, <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_prepare()</span></span></span>
+guarantees that all pixels within <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">reg-&#x003E;valid</span></span></span> may be
+accessed. Note that this may be smaller or larger than <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">r</span></span></span>,
+since <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_prepare()</span></span></span> clips <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">r</span></span></span> against the size of the
+image.
+<!--l. 344--><p class="indent" >  Programs can access image data in the region by calling
+the macro <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">IM_REGION_ADDR()</span></span></span>. It has type
+                                                 <div class="verbatim" id="verbatim-156">
+  char&#x00A0;&#x22C6;IM_REGION_ADDR(&#x00A0;REGION&#x00A0;&#x22C6;reg,
+ &#x00A0;<br />&#x00A0;&#x00A0;int&#x00A0;x,&#x00A0;int&#x00A0;y&#x00A0;) 
+</div>
+<!--l. 350--><p class="nopar" >
+<!--l. 352--><p class="indent" >  Provided that point (x,y) lies inside <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">reg-&#x003E;valid</span></span></span>,
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">IM_REGION_ADDR()</span></span></span> returns a pointer to pel <span 
+class="cmr-10">(</span><span 
+class="cmmi-10">x,y</span><span 
+class="cmr-10">)</span>.
+Adding to the result of <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">IM_REGION_ADDR()</span></span></span> moves to
+the right along the line of pels, provided you stay strictly
+within <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">reg-&#x003E;valid</span></span></span>. Add <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">IM_REGION_LSKIP()</span></span></span> to
+move down a line, see below. <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">IM_REGION_ADDR()</span></span></span> has
+some other useful features &#8212; see the manual page.
+<!--l. 359--><p class="indent" >    Other macros are available to ease address calculation:
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-157">
+int&#x00A0;IM_REGION_LSKIP(&#x00A0;REGION&#x00A0;&#x22C6;reg&#x00A0;)
+&#x00A0;<br />int&#x00A0;IM_REGION_N_ELEMENTS(&#x00A0;REGION&#x00A0;&#x22C6;reg&#x00A0;)
+&#x00A0;<br />int&#x00A0;IM_REGION_SIZEOF_LINE(&#x00A0;REGION&#x00A0;&#x22C6;reg&#x00A0;)
+</div>
+<!--l. 365--><p class="nopar" >
+<!--l. 367--><p class="noindent" >These find the number of bytes to add to the result of
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">IM_REGION_ADDR()</span></span></span> to move down a line, the number of
+band elements across the region and the number of bytes
+across the region.
+<!--l. 372--><p class="indent" >  Figure&#x00A0;<a 
+href="#x22-950015">3.5<!--tex4ht:ref: fg:paverage --></a> is a version of <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">average()</span></span></span> which uses
+regions rather than WIO input. Two things: first, we
+should really be using <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">vips_sink()</span></span></span>, see <span 
+class="cmsy-10">§</span><a 
+href="#x22-960003.3.4">3.3.4<!--tex4ht:ref: sec:sequence --></a>, to do
+the rectangle algebra for us. Secondly, note that we
+call <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_pincheck()</span></span></span> rather than <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_incheck()</span></span></span>.
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_pincheck()</span></span></span> signals to the IO system that you are a
+PIO-aware function, giving <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_prepare()</span></span></span> much more
+flexibility in the sorts of preparation it can do. Also
+see the manual pages for <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_poutcheck()</span></span></span> and
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_piocheck()</span></span></span>.
+                                           
+                                                                                       
+
+                                                                                       
+<!--l. 382--><p class="indent" >  <a 
+ id="x22-950015"></a><hr class="float"><div class="float" 
+>
+                                           
+                                                                                       
+
+                                                                                       
+<div class="verbatim" id="verbatim-158">
+#include&#x00A0;&#x003C;stdio.h&#x003E;
+&#x00A0;<br />#include&#x00A0;&#x003C;stdlib.h&#x003E;
+&#x00A0;<br />#include&#x00A0;&#x003C;vips/vips.h&#x003E;
+&#x00A0;<br />#include&#x00A0;&#x003C;vips/region.h&#x003E;
+&#x00A0;<br />
+&#x00A0;<br />int
+&#x00A0;<br />average(&#x00A0;IMAGE&#x00A0;&#x22C6;im,&#x00A0;double&#x00A0;&#x22C6;out&#x00A0;)
+&#x00A0;<br />{
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;int&#x00A0;total,&#x00A0;i,&#x00A0;y;
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;REGION&#x00A0;&#x22C6;reg;
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;Rect&#x00A0;area,&#x00A0;&#x22C6;r;
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Check&#x00A0;im.
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;if(&#x00A0;im_pincheck(&#x00A0;im&#x00A0;)&#x00A0;)
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;return(&#x00A0;-1&#x00A0;);
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;if(&#x00A0;im-&#x003E;BandFmt&#x00A0;!=&#x00A0;IM_BANDFMT_UCHAR&#x00A0;||&#x00A0;im-&#x003E;Coding&#x00A0;!=&#x00A0;IM_CODING_NONE&#x00A0;)&#x00A0;{
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;im_error(&#x00A0;"average",&#x00A0;"uncoded&#x00A0;uchar&#x00A0;images&#x00A0;only"&#x00A0;);
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;return(&#x00A0;-1&#x00A0;);
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;}
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Make&#x00A0;a&#x00A0;region&#x00A0;on&#x00A0;im&#x00A0;which&#x00A0;we&#x00A0;can&#x00A0;use&#x00A0;for&#x00A0;reading.
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;if(&#x00A0;!(reg&#x00A0;=&#x00A0;im_region_create(&#x00A0;im&#x00A0;))&#x00A0;)
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;return(&#x00A0;-1&#x00A0;);
+</div>
+<!--l. 408--><p class="nopar" >
+<br /><div class="caption" 
+><span class="id">Figure&#x00A0;3.5: </span><span  
+class="content">First PIO average of image</span></div><!--tex4ht:label?: x22-950015 -->
+                                           
+                                                                                       
+
+                                                                                       
+  </div><hr class="endfloat" />
+                                           
+                                                                                       
+
+                                                                                       
+<!--l. 414--><p class="indent" >  <a 
+ id="x22-950026"></a><hr class="float"><div class="float" 
+>
+                                           
+                                                                                       
+
+                                                                                       
+<div class="verbatim" id="verbatim-159">
+&#x00A0;&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Move&#x00A0;area&#x00A0;over&#x00A0;the&#x00A0;image&#x00A0;in&#x00A0;100x100&#x00A0;pel&#x00A0;chunks.
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x22C6;&#x00A0;im_prepare()&#x00A0;will&#x00A0;clip&#x00A0;against&#x00A0;the&#x00A0;edges&#x00A0;of&#x00A0;the&#x00A0;image
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x22C6;&#x00A0;for&#x00A0;us.
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;total&#x00A0;=&#x00A0;0;
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;r&#x00A0;=&#x00A0;&amp;reg-&#x003E;valid;
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;area.width&#x00A0;=&#x00A0;100;&#x00A0;area.height&#x00A0;=&#x00A0;100;
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;for(&#x00A0;area.top&#x00A0;=&#x00A0;0;&#x00A0;area.top&#x00A0;&#x003C;&#x00A0;im-&#x003E;Ysize;&#x00A0;area.top&#x00A0;+=&#x00A0;100&#x00A0;)
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;for(&#x00A0;area.left&#x00A0;=&#x00A0;0;&#x00A0;area.left&#x00A0;&#x003C;&#x00A0;im-&#x003E;Xsize;
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;area.left&#x00A0;+=&#x00A0;100&#x00A0;)&#x00A0;{
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Fill&#x00A0;reg&#x00A0;with&#x00A0;pels.
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;if(&#x00A0;im_prepare(&#x00A0;reg,&#x00A0;&amp;area&#x00A0;)&#x00A0;)&#x00A0;{
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;/&#x22C6;&#x00A0;We&#x00A0;must&#x00A0;free&#x00A0;the&#x00A0;region!
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;im_region_free(&#x00A0;reg&#x00A0;);
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;return(&#x00A0;-1&#x00A0;);
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;}
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Loop&#x00A0;over&#x00A0;reg,&#x00A0;adding&#x00A0;to&#x00A0;our&#x00A0;total.
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;for(&#x00A0;y&#x00A0;=&#x00A0;r-&#x003E;top;&#x00A0;y&#x00A0;&#x003C;&#x00A0;IM_RECT_BOTTOM(&#x00A0;r&#x00A0;);&#x00A0;y++&#x00A0;)&#x00A0;{
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;unsigned&#x00A0;char&#x00A0;&#x22C6;p&#x00A0;=&#x00A0;IM_REGION_ADDR(&#x00A0;reg,&#x00A0;r-&#x003E;left,&#x00A0;y&#x00A0;);
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;for(&#x00A0;i&#x00A0;=&#x00A0;0;&#x00A0;i&#x00A0;&#x003C;&#x00A0;IM_REGION_N_ELEMENTS(&#x00A0;reg&#x00A0;);&#x00A0;i++&#x00A0;)
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;total&#x00A0;+=&#x00A0;p[i];
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;}
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;}
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Make&#x00A0;sure&#x00A0;we&#x00A0;free&#x00A0;the&#x00A0;region.
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;im_region_free(&#x00A0;reg&#x00A0;);
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Find&#x00A0;average.
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x22C6;out&#x00A0;=&#x00A0;(double)&#x00A0;total&#x00A0;/&#x00A0;(IM_IMAGE_N_ELEMENTS(&#x00A0;im&#x00A0;)&#x00A0;&#x22C6;&#x00A0;im-&#x003E;Ysize);
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;return(&#x00A0;0&#x00A0;);
+&#x00A0;<br />}
+</div>
+<!--l. 454--><p class="nopar" >
+<br /><div class="caption" 
+><span class="id">Figure&#x00A0;3.6: </span><span  
+class="content">First PIO average of image (cont.)</span></div><!--tex4ht:label?: x22-950026 -->
+                                           
+                                                                                       
+
+                                                                                       
+  </div><hr class="endfloat" />
+<!--l. 458--><p class="indent" >  This version of <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">average()</span></span></span> can be called in exactly the
+same way as the previous one, but this version has the great
+advantage of not needing to have the whole of the input
+image available at once.
+<!--l. 462--><p class="indent" >  We can do one better than this &#8212; if the image is being
+split into small pieces, we can assign each piece to a
+separate thread of execution and get parallelism. To
+support this splitting of tasks, VIPS has the notion of a
+sequence.
+  <h4 class="subsectionHead"><span class="titlemark">3.3.4    </span> <a 
+ id="x22-960003.3.4"></a>Splitting into sequences</h4>
+<!--l. 470--><p class="noindent" >A sequence comes in three parts: a start function, a
+processing function, and a stop function. When VIPS
+starts up a new sequence, it runs the start function.
+Start functions return sequence values: a void pointer
+representing data local to this sequence. VIPS then
+repeatedly calls the processing function, passing in
+the sequence value and a new piece of image data for
+processing. Finally, when processing is complete, VIPS
+cleans up by calling the stop function, passing in the
+sequence value as an argument. The types look like
+this:
+                                                 <div class="verbatim" id="verbatim-160">
+  void&#x00A0;&#x22C6;
+ &#x00A0;<br />(&#x22C6;start_fn)(&#x00A0;IMAGE&#x00A0;&#x22C6;out,
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;void&#x00A0;&#x22C6;a,&#x00A0;void&#x00A0;&#x22C6;b&#x00A0;)
+ &#x00A0;<br />int
+ &#x00A0;<br />(&#x22C6;process_fn)(&#x00A0;REGION&#x00A0;&#x22C6;reg,
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;void&#x00A0;&#x22C6;seq,&#x00A0;void&#x00A0;&#x22C6;a,&#x00A0;void&#x00A0;&#x22C6;b&#x00A0;)
+ &#x00A0;<br />int
+ &#x00A0;<br />(&#x22C6;stop_fn)(&#x00A0;void&#x00A0;&#x22C6;seq,&#x00A0;void&#x00A0;&#x22C6;a,&#x00A0;void&#x00A0;&#x22C6;b&#x00A0;) 
+</div>
+<!--l. 488--><p class="nopar" >
+<!--l. 490--><p class="noindent" >The values <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">a</span></span></span> and <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">b</span></span></span> are carried around by VIPS for your
+use.
+<!--l. 493--><p class="indent" >    For functions like <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">average()</span></span></span> which consume
+images but produce no image output, VIPS provides
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">vips_sink()</span></span></span>. This has type:
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-161">
+int&#x00A0;vips_sink(&#x00A0;VipsImage&#x00A0;&#x22C6;in,
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;VipsStart&#x00A0;start,
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;VipsGenerate&#x00A0;generate,
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;VipsStop&#x00A0;stop,
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;void&#x00A0;&#x22C6;a,&#x00A0;void&#x00A0;&#x22C6;b&#x00A0;)
+</div>
+<!--l. 502--><p class="nopar" >
+<!--l. 504--><p class="indent" >  VIPS starts one or more sequences, runs one or more
+processing functions over image <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">in</span></span></span> until all of <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">in</span></span></span> has
+been consumed, and then closes all of the sequences
+down and returns. VIPS guarantees that the regions the
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">process_fn()</span></span></span> is given will be complete and disjoint,
+that is, every pixel in the image will be passed through
+exactly one sequence. To make it possible for the sequences
+to each contribute to the result of the function in an orderly
+manner, VIPS also guarantees that all start and stop
+functions are mutually exclusive.
+<!--l. 513--><p class="indent" >  An example should make this clearer. This version of
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">average()</span></span></span> is very similar to the average function in the
+VIPS library &#8212; it is only missing polymorphism.
+                                           
+                                                                                       
+
+                                                                                       
+<!--l. 518--><p class="indent" >  <a 
+ id="x22-960017"></a><hr class="float"><div class="float" 
+>
+                                           
+                                                                                       
+
+                                                                                       
+<div class="verbatim" id="verbatim-162">
+#include&#x00A0;&#x003C;stdio.h&#x003E;
+&#x00A0;<br />#include&#x00A0;&#x003C;stdlib.h&#x003E;
+&#x00A0;<br />#include&#x00A0;&#x003C;vips/vips.h&#x003E;
+&#x00A0;<br />#include&#x00A0;&#x003C;vips/region.h&#x003E;
+&#x00A0;<br />
+&#x00A0;<br />/&#x22C6;&#x00A0;Start&#x00A0;function&#x00A0;for&#x00A0;average().&#x00A0;We&#x00A0;allocate&#x00A0;a&#x00A0;small&#x00A0;piece&#x00A0;of
+&#x00A0;<br />&#x00A0;&#x22C6;&#x00A0;storage&#x00A0;which&#x00A0;this&#x00A0;sequence&#x00A0;will&#x00A0;accumulate&#x00A0;its&#x00A0;total&#x00A0;in.&#x00A0;Our
+&#x00A0;<br />&#x00A0;&#x22C6;&#x00A0;sequence&#x00A0;value&#x00A0;is&#x00A0;just&#x00A0;a&#x00A0;pointer&#x00A0;to&#x00A0;this&#x00A0;storage&#x00A0;area.
+&#x00A0;<br />&#x00A0;&#x22C6;
+&#x00A0;<br />&#x00A0;&#x22C6;&#x00A0;The&#x00A0;first&#x00A0;of&#x00A0;the&#x00A0;two&#x00A0;pointers&#x00A0;VIPS&#x00A0;carries&#x00A0;around&#x00A0;for&#x00A0;us&#x00A0;is&#x00A0;a
+&#x00A0;<br />&#x00A0;&#x22C6;&#x00A0;pointer&#x00A0;to&#x00A0;the&#x00A0;space&#x00A0;where&#x00A0;we&#x00A0;store&#x00A0;the&#x00A0;grand&#x00A0;total.
+&#x00A0;<br />&#x00A0;&#x22C6;/
+&#x00A0;<br />static&#x00A0;int&#x00A0;&#x22C6;
+&#x00A0;<br />average_start(&#x00A0;IMAGE&#x00A0;&#x22C6;out&#x00A0;)
+&#x00A0;<br />{
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;int&#x00A0;&#x22C6;seq&#x00A0;=&#x00A0;IM_NEW(&#x00A0;out,&#x00A0;int&#x00A0;);
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;if(&#x00A0;!seq&#x00A0;)
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;return(&#x00A0;NULL&#x00A0;);
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x22C6;seq&#x00A0;=&#x00A0;0;
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;return(&#x00A0;seq&#x00A0;);
+&#x00A0;<br />}
+&#x00A0;<br />
+&#x00A0;<br />/&#x22C6;&#x00A0;Stop&#x00A0;function&#x00A0;for&#x00A0;average().&#x00A0;Add&#x00A0;the&#x00A0;total&#x00A0;which&#x00A0;has
+&#x00A0;<br />&#x00A0;&#x22C6;&#x00A0;accumulated&#x00A0;in&#x00A0;our&#x00A0;sequence&#x00A0;value&#x00A0;to&#x00A0;the&#x00A0;grand&#x00A0;total&#x00A0;for
+&#x00A0;<br />&#x00A0;&#x22C6;&#x00A0;the&#x00A0;program.
+&#x00A0;<br />&#x00A0;&#x22C6;/
+&#x00A0;<br />static&#x00A0;int
+&#x00A0;<br />average_stop(&#x00A0;int&#x00A0;&#x22C6;seq,&#x00A0;int&#x00A0;&#x22C6;gtotal&#x00A0;)
+&#x00A0;<br />{
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Stop&#x00A0;functions&#x00A0;are&#x00A0;mutually&#x00A0;exclusive,&#x00A0;so&#x00A0;we&#x00A0;can&#x00A0;write
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x22C6;&#x00A0;to&#x00A0;gtotal&#x00A0;without&#x00A0;clashing&#x00A0;with&#x00A0;any&#x00A0;other&#x00A0;stop&#x00A0;functions.
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x22C6;gtotal&#x00A0;+=&#x00A0;&#x22C6;seq;
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;return(&#x00A0;0&#x00A0;);
+&#x00A0;<br />}
+</div>
+<!--l. 557--><p class="nopar" >
+<br /><div class="caption" 
+><span class="id">Figure&#x00A0;3.7: </span><span  
+class="content">Final PIO average of image</span></div><!--tex4ht:label?: x22-960017 -->
+                                           
+                                                                                       
+
+                                                                                       
+  </div><hr class="endfloat" />
+                                           
+                                                                                       
+
+                                                                                       
+<!--l. 563--><p class="indent" >  <a 
+ id="x22-960028"></a><hr class="float"><div class="float" 
+>
+                                           
+                                                                                       
+
+                                                                                       
+<div class="verbatim" id="verbatim-163">
+/&#x22C6;&#x00A0;Process&#x00A0;function&#x00A0;for&#x00A0;average().&#x00A0;Total&#x00A0;this&#x00A0;region,&#x00A0;and
+&#x00A0;<br />&#x00A0;&#x22C6;&#x00A0;add&#x00A0;that&#x00A0;total&#x00A0;to&#x00A0;the&#x00A0;sequence&#x00A0;value.
+&#x00A0;<br />&#x00A0;&#x22C6;/
+&#x00A0;<br />static&#x00A0;int
+&#x00A0;<br />average_process(&#x00A0;REGION&#x00A0;&#x22C6;reg,&#x00A0;int&#x00A0;&#x22C6;seq&#x00A0;)
+&#x00A0;<br />{
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;int&#x00A0;total,&#x00A0;i,&#x00A0;y;
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;Rect&#x00A0;&#x22C6;r&#x00A0;=&#x00A0;&amp;reg-&#x003E;valid;
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Get&#x00A0;the&#x00A0;appropriate&#x00A0;part&#x00A0;of&#x00A0;the&#x00A0;input&#x00A0;image&#x00A0;ready.
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;if(&#x00A0;im_prepare(&#x00A0;reg,&#x00A0;r&#x00A0;)&#x00A0;)
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;return(&#x00A0;-1&#x00A0;);
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Loop&#x00A0;over&#x00A0;the&#x00A0;region.
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;total&#x00A0;=&#x00A0;0;
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;for(&#x00A0;y&#x00A0;=&#x00A0;r-&#x003E;top;&#x00A0;y&#x00A0;&#x003C;&#x00A0;IM_RECT_BOTTOM(&#x00A0;r&#x00A0;);&#x00A0;y++&#x00A0;)&#x00A0;{
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;unsigned&#x00A0;char&#x00A0;&#x22C6;p&#x00A0;=&#x00A0;IM_REGION_ADDR(&#x00A0;reg,&#x00A0;r-&#x003E;left,&#x00A0;y&#x00A0;);
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;for(&#x00A0;i&#x00A0;=&#x00A0;0;&#x00A0;i&#x00A0;&#x003C;&#x00A0;IM_REGION_N_ELEMENTS(&#x00A0;reg&#x00A0;);&#x00A0;i++&#x00A0;)
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;total&#x00A0;+=&#x00A0;p[i];
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;}
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Add&#x00A0;to&#x00A0;the&#x00A0;total&#x00A0;for&#x00A0;this&#x00A0;sequence.
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x22C6;seq&#x00A0;+=&#x00A0;total;
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;return(&#x00A0;0&#x00A0;);
+&#x00A0;<br />}
+</div>
+<!--l. 594--><p class="nopar" >
+<br /><div class="caption" 
+><span class="id">Figure&#x00A0;3.8: </span><span  
+class="content">Final PIO average of image (cont.)</span></div><!--tex4ht:label?: x22-960028 -->
+                                           
+                                                                                       
+
+                                                                                       
+  </div><hr class="endfloat" />
+                                           
+                                                                                       
+
+                                                                                       
+<!--l. 599--><p class="indent" >  <a 
+ id="x22-960039"></a><hr class="float"><div class="float" 
+>
+                                           
+                                                                                       
+
+                                                                                       
+<div class="verbatim" id="verbatim-164">
+/&#x22C6;&#x00A0;Find&#x00A0;average&#x00A0;of&#x00A0;image.
+&#x00A0;<br />&#x00A0;&#x22C6;/
+&#x00A0;<br />int
+&#x00A0;<br />average(&#x00A0;IMAGE&#x00A0;&#x22C6;im,&#x00A0;double&#x00A0;&#x22C6;out&#x00A0;)
+&#x00A0;<br />{
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Accumulate&#x00A0;grand&#x00A0;total&#x00A0;here.
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;int&#x00A0;gtotal&#x00A0;=&#x00A0;0;
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Prepare&#x00A0;im&#x00A0;for&#x00A0;PIO&#x00A0;reading.
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;if(&#x00A0;im_pincheck(&#x00A0;im&#x00A0;)&#x00A0;)
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;return(&#x00A0;-1&#x00A0;);
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Check&#x00A0;it&#x00A0;is&#x00A0;the&#x00A0;sort&#x00A0;of&#x00A0;thing&#x00A0;we&#x00A0;can&#x00A0;process.
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;if(&#x00A0;im-&#x003E;BandFmt&#x00A0;!=&#x00A0;IM_BANDFMT_UCHAR&#x00A0;||
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;im-&#x003E;Coding&#x00A0;!=&#x00A0;IM_CODING_NONE&#x00A0;)&#x00A0;{
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;im_error(&#x00A0;"average",&#x00A0;"uncoded&#x00A0;uchar&#x00A0;images&#x00A0;only"&#x00A0;);
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;return(&#x00A0;-1&#x00A0;);
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;}
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Loop&#x00A0;over&#x00A0;the&#x00A0;image&#x00A0;in&#x00A0;pieces,&#x00A0;and&#x00A0;possibly&#x00A0;in&#x00A0;parallel.
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;if(&#x00A0;vips_sink(&#x00A0;im,
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;average_start,&#x00A0;average_process,&#x00A0;average_stop,
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&amp;gtotal,&#x00A0;NULL&#x00A0;)&#x00A0;)
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;return(&#x00A0;-1&#x00A0;);
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Calculate&#x00A0;average.
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x22C6;out&#x00A0;=&#x00A0;(double)&#x00A0;gtotal&#x00A0;/&#x00A0;(IM_IMAGE_N_ELEMENTS(&#x00A0;im&#x00A0;)&#x00A0;&#x22C6;&#x00A0;im-&#x003E;Ysize);
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;return(&#x00A0;0&#x00A0;);
+&#x00A0;<br />}
+</div>
+<!--l. 635--><p class="nopar" >
+<br /><div class="caption" 
+><span class="id">Figure&#x00A0;3.9: </span><span  
+class="content">Final PIO average of image (cont.)</span></div><!--tex4ht:label?: x22-960039 -->
+                                           
+                                                                                       
+
+                                                                                       
+  </div><hr class="endfloat" />
+<!--l. 639--><p class="indent" >  There are a couple of variations on <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_prepare()</span></span></span>:
+you can use <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_prepare_to()</span></span></span> to force writing to a
+particular place, and <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_prepare_thread()</span></span></span> to use
+threaded evaluation. See the man pages.
+  <h4 class="subsectionHead"><span class="titlemark">3.3.5    </span> <a 
+ id="x22-970003.3.5"></a>Output to regions</h4>
+<!--l. 646--><p class="noindent" >Regions are written to in just the same way they are
+read from &#8212; by writing to a pointer found with the
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">IM_REGION_ADDR()</span></span></span> macro.
+<!--l. 649--><p class="indent" >  <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">vips_sink()</span></span></span> does input &#8212; <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_generate()</span></span></span> does
+output. It has the same type as <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">vips_sink()</span></span></span>:
+                                                 <div class="verbatim" id="verbatim-165">
+  int
+ &#x00A0;<br />im_generate(&#x00A0;IMAGE&#x00A0;&#x22C6;out,
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;void&#x00A0;&#x22C6;(&#x22C6;start_fn)(),
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;int&#x00A0;(&#x22C6;process_fn)(),
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;int&#x00A0;(&#x22C6;stop_fn)(),
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;void&#x00A0;&#x22C6;a,&#x00A0;void&#x00A0;&#x22C6;b&#x00A0;) 
+</div>
+<!--l. 659--><p class="nopar" >
+<!--l. 661--><p class="indent" >  The region given to the process function is ready for
+output. Each time the process function is called, it should
+fill in the pels in the region it was given. Note that, unlike
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">vips_sink()</span></span></span>, the areas the process function is asked to
+produce are not guaranteed to be either disjoint or complete.
+Again, VIPS may start up many process functions if it sees
+fit.
+<!--l. 667--><p class="indent" >    Here is <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">invert()</span></span></span>, rewritten to use PIO. This piece of
+code makes use of a pair of standard start and stop functions
+provided by the VIPS library: <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_start_one()</span></span></span> and
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_stop_one()</span></span></span>. They assume that the first of the two
+user arguments to <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_generate()</span></span></span> is the input image.
+They are defined as:
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-166">
+REGION&#x00A0;&#x22C6;
+&#x00A0;<br />im_start_one(&#x00A0;IMAGE&#x00A0;&#x22C6;out,&#x00A0;IMAGE&#x00A0;&#x22C6;in&#x00A0;)
+&#x00A0;<br />{
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;return(&#x00A0;im_region_create(&#x00A0;in&#x00A0;)&#x00A0;);
+&#x00A0;<br />}
+</div>
+<!--l. 679--><p class="nopar" >
+<!--l. 681--><p class="noindent" >and:
+                                                 <div class="verbatim" id="verbatim-167">
+  int
+ &#x00A0;<br />im_stop_one(&#x00A0;REGION&#x00A0;&#x22C6;seq&#x00A0;)
+ &#x00A0;<br />{
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;return(&#x00A0;im_region_free(&#x00A0;seq&#x00A0;)&#x00A0;);
+ &#x00A0;<br />} 
+</div>
+<!--l. 690--><p class="nopar" >
+<!--l. 692--><p class="indent" >  They are useful for simple functions which expect only one
+input image. See the manual page for <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_start_many()</span></span></span>
+for many-input functions.
+                                                                                       
+
+                                                                                       
+<!--l. 697--><p class="indent" >  <a 
+ id="x22-9700110"></a><hr class="float"><div class="float" 
+>
+                                           
+                                                                                       
+
+                                                                                       
+<div class="verbatim" id="verbatim-168">
+#include&#x00A0;&#x003C;stdio.h&#x003E;
+&#x00A0;<br />#include&#x00A0;&#x003C;stdlib.h&#x003E;
+&#x00A0;<br />#include&#x00A0;&#x003C;vips/vips.h&#x003E;
+&#x00A0;<br />#include&#x00A0;&#x003C;vips/region.h&#x003E;
+&#x00A0;<br />
+&#x00A0;<br />/&#x22C6;&#x00A0;Process&#x00A0;function&#x00A0;for&#x00A0;invert().&#x00A0;Build&#x00A0;the&#x00A0;pixels&#x00A0;in&#x00A0;or
+&#x00A0;<br />&#x00A0;&#x22C6;&#x00A0;from&#x00A0;the&#x00A0;appropriate&#x00A0;pixels&#x00A0;in&#x00A0;ir.
+&#x00A0;<br />&#x00A0;&#x22C6;/
+&#x00A0;<br />static&#x00A0;int
+&#x00A0;<br />invert_process(&#x00A0;REGION&#x00A0;&#x22C6;or,&#x00A0;REGION&#x00A0;&#x22C6;ir&#x00A0;)
+&#x00A0;<br />{
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;Rect&#x00A0;&#x22C6;r&#x00A0;=&#x00A0;&amp;or-&#x003E;valid;
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;int&#x00A0;i,&#x00A0;y;
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Ask&#x00A0;for&#x00A0;the&#x00A0;part&#x00A0;of&#x00A0;ir&#x00A0;we&#x00A0;need&#x00A0;to&#x00A0;make&#x00A0;or.&#x00A0;In&#x00A0;this
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x22C6;&#x00A0;case,&#x00A0;the&#x00A0;two&#x00A0;areas&#x00A0;will&#x00A0;be&#x00A0;the&#x00A0;same.
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;if(&#x00A0;im_prepare(&#x00A0;ir,&#x00A0;r&#x00A0;)&#x00A0;)
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;return(&#x00A0;-1&#x00A0;);
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Loop&#x00A0;over&#x00A0;or&#x00A0;writing&#x00A0;pels&#x00A0;calculated&#x00A0;from&#x00A0;ir.
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;for(&#x00A0;y&#x00A0;=&#x00A0;r-&#x003E;top;&#x00A0;y&#x00A0;&#x003C;&#x00A0;IM_RECT_BOTTOM(&#x00A0;r&#x00A0;);&#x00A0;y++&#x00A0;)&#x00A0;{
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;unsigned&#x00A0;char&#x00A0;&#x22C6;p&#x00A0;=&#x00A0;IM_REGION_ADDR(&#x00A0;ir,&#x00A0;r-&#x003E;left,&#x00A0;y&#x00A0;);
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;unsigned&#x00A0;char&#x00A0;&#x22C6;q&#x00A0;=&#x00A0;IM_REGION_ADDR(&#x00A0;or,&#x00A0;r-&#x003E;left,&#x00A0;y&#x00A0;);
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;for(&#x00A0;i&#x00A0;=&#x00A0;0;&#x00A0;i&#x00A0;&#x003C;&#x00A0;IM_REGION_N_ELEMENTS(&#x00A0;or&#x00A0;);&#x00A0;i++&#x00A0;)
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;q[i]&#x00A0;=&#x00A0;255&#x00A0;-&#x00A0;p[i];
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;}
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Success!
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;return(&#x00A0;0&#x00A0;);
+&#x00A0;<br />}
+</div>
+<!--l. 732--><p class="nopar" >
+<br /><div class="caption" 
+><span class="id">Figure&#x00A0;3.10: </span><span  
+class="content">PIO invert</span></div><!--tex4ht:label?: x22-9700110 -->
+                                           
+                                                                                       
+
+                                                                                       
+  </div><hr class="endfloat" />
+                                           
+                                                                                       
+
+                                                                                       
+<!--l. 738--><p class="indent" >  <a 
+ id="x22-9700211"></a><hr class="float"><div class="float" 
+>
+                                           
+                                                                                       
+
+                                                                                       
+<div class="verbatim" id="verbatim-169">
+/&#x22C6;&#x00A0;Invert&#x00A0;an&#x00A0;image.
+&#x00A0;<br />&#x00A0;&#x22C6;/
+&#x00A0;<br />int
+&#x00A0;<br />invert(&#x00A0;IMAGE&#x00A0;&#x22C6;in,&#x00A0;IMAGE&#x00A0;&#x22C6;out&#x00A0;)
+&#x00A0;<br />{
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Check&#x00A0;descriptors&#x00A0;for&#x00A0;PIO&#x00A0;compatibility.
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;if(&#x00A0;im_piocheck(&#x00A0;in,&#x00A0;out&#x00A0;)&#x00A0;)
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;return(&#x00A0;-1&#x00A0;);
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Check&#x00A0;input&#x00A0;image&#x00A0;for&#x00A0;compatibility&#x00A0;with&#x00A0;us.
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;if(&#x00A0;in-&#x003E;BandFmt&#x00A0;!=&#x00A0;IM_BANDFMT_UCHAR&#x00A0;||&#x00A0;in-&#x003E;Coding&#x00A0;!=&#x00A0;IM_CODING_NONE&#x00A0;)&#x00A0;{
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;im_error(&#x00A0;"invert",&#x00A0;"uncoded&#x00A0;uchar&#x00A0;images&#x00A0;only"&#x00A0;);
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;return(&#x00A0;-1&#x00A0;);
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;}
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;/&#x22C6;&#x00A0;out&#x00A0;inherits&#x00A0;from&#x00A0;in,&#x00A0;as&#x00A0;before.
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;if(&#x00A0;im_cp_desc(&#x00A0;out,&#x00A0;in&#x00A0;)&#x00A0;)
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;return(&#x00A0;-1&#x00A0;);
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Set&#x00A0;demand&#x00A0;hints&#x00A0;for&#x00A0;out.
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;if(&#x00A0;im_demand_hint(&#x00A0;out,&#x00A0;IM_THINSTRIP,&#x00A0;in,&#x00A0;NULL&#x00A0;)&#x00A0;)
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;return(&#x00A0;-1&#x00A0;);
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Build&#x00A0;out&#x00A0;in&#x00A0;pieces,&#x00A0;and&#x00A0;possibly&#x00A0;in&#x00A0;parallel!
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;if(&#x00A0;im_generate(&#x00A0;out,
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;im_start_one,&#x00A0;invert_process,&#x00A0;im_stop_one,
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;in,&#x00A0;NULL&#x00A0;)&#x00A0;)
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;return(&#x00A0;-1&#x00A0;);
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;return(&#x00A0;0&#x00A0;);
+&#x00A0;<br />}
+</div>
+<!--l. 775--><p class="nopar" >
+<br /><div class="caption" 
+><span class="id">Figure&#x00A0;3.11: </span><span  
+class="content">PIO invert (cont.)</span></div><!--tex4ht:label?: x22-9700211 -->
+                                           
+                                                                                       
+
+                                                                                       
+  </div><hr class="endfloat" />
+<!--l. 779--><p class="indent" >  Functions have some choice about the way they write
+their output. Usually, they should just write to the region
+they were given by <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_generate()</span></span></span>. They can, if they
+wish, set up the region for output to some other place. See
+the manual page for <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_region_region()</span></span></span>. See also
+the source for <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_copy()</span></span></span> and <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_extract()</span></span></span> for
+examples of these tricks.
+<!--l. 785--><p class="indent" >  Note also the call to <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_demand_hint()</span></span></span>. This
+function hints to the IO system, suggesting the sorts of
+shapes of region this function is happiest with. VIPS
+supports four basic shapes &#8212; choosing the correct shape
+can have a dramatic effect on the speed of your function.
+See the man page for full details.
+  <h4 class="subsectionHead"><span class="titlemark">3.3.6    </span> <a 
+ id="x22-980003.3.6"></a>Callbacks</h4>
+<!--l. 794--><p class="noindent" >VIPS lets you attach callbacks to image descriptors. These
+are functions you provide that VIPS will call when certain
+events occur. There are more callbacks than are listed here:
+see the man page for full details.
+<!--l. 798--><p class="noindent" >
+  <h5 class="subsubsectionHead"><a 
+ id="x22-990003.3.6"></a>Close callbacks</h5>
+<!--l. 800--><p class="noindent" >These callbacks are invoked just before an image is
+closed. They are useful for freeing objects which are
+associated with the image. All callbacks are triggered
+in the reverse order to the order in which they were
+attached. This is sometimes important when freeing objects
+which contain pointers to other objects. Close callbacks
+are guaranteed to be called, and to be called exactly
+once.
+<!--l. 807--><p class="indent" >  Use <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_add_close_callback()</span></span></span> to add a close
+callback:
+                                                 <div class="verbatim" id="verbatim-170">
+  typedef&#x00A0;int&#x00A0;(&#x22C6;im_callback)(&#x00A0;void&#x00A0;&#x22C6;,&#x00A0;void&#x00A0;&#x22C6;&#x00A0;)
+ &#x00A0;<br />int&#x00A0;im_add_close_callback(&#x00A0;IMAGE&#x00A0;&#x22C6;,
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;im_callback_fn,
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;void&#x00A0;&#x22C6;,&#x00A0;void&#x00A0;&#x22C6;&#x00A0;) 
+</div>
+<!--l. 814--><p class="nopar" >
+<!--l. 816--><p class="indent" >  As with <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_generate()</span></span></span>, the two <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">void</span><span 
+class="pcrr7t-">&#x00A0;&#x22C6;</span></span></span> pointers
+are carried around for you by VIPS and may be used as your
+function sees fit.
+<!--l. 820--><p class="noindent" >
+    <h5 class="subsubsectionHead"><a 
+ id="x22-1000003.3.6"></a>Preclose callbacks</h5>
+<!--l. 822--><p class="noindent" >Preclose callbacks are called before any shutdown has
+occured. Everything is still alive and your callback can do
+anything to the image. Preclose callbacks are guaranteed to
+be called, and to be called exactly once. See the manual
+page for <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_add_preclose_callback()</span></span></span> for full
+details.
+<!--l. 827--><p class="noindent" >
+    <h5 class="subsubsectionHead"><a 
+ id="x22-1010003.3.6"></a>Eval callbacks</h5>
+<!--l. 829--><p class="noindent" >These are callbacks which are invoked periodically by VIPS
+during evaluation. The callback has access to a struct
+containing information about the progress of evaluation,
+useful for user-interfaces built on top of VIPS. See the
+manual page for <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_add_eval_callback()</span></span></span> for full
+details.
+<!--l. 834--><p class="noindent" >
+    <h4 class="subsectionHead"><span class="titlemark">3.3.7    </span> <a 
+ id="x22-1020003.3.7"></a>Memory allocation revisited</h4>
+<!--l. 836--><p class="noindent" >When you are using PIO, memory allocation becomes
+rather more complicated than it was before. There are
+essentially two types of memory which your function might
+want to use for working space: memory which is associated
+with each instance of your function (remember that two
+copies of you function may be joined together in a
+pipeline and be running at the same time &#8212; you can&#8217;t just
+use global variables), and memory which is local to
+each sequence which VIPS starts on your argument
+image.
+<!--l. 844--><p class="indent" >    The first type, memory local to this function instance,
+typically holds copies of any parameters passed to your
+                                                                                       
+
+                                                                                       
+image processing function, and links to any read-only tables
+used by sequences which you run over the image. This
+should be allocated in your main function.
+<!--l. 849--><p class="indent" >  The second type of memory, memory local to a sequence,
+should be allocated in a start function. Because this space is
+private to a sequence, it may be written to. Start and
+stop functions are guaranteed to be single-threaded, so
+you may write to the function-local memory within
+them.
+                                           
+                                                                                       
+
+                                                                                       
+  <!--l. 1--><div class="crosslinks"><p class="noindent">[<a 
+href="vipsmanualse16.html" >next</a>] [<a 
+href="vipsmanualse14.html" >prev</a>] [<a 
+href="vipsmanualse14.html#tailvipsmanualse14.html" >prev-tail</a>] [<a 
+href="vipsmanualse15.html" >front</a>] [<a 
+href="vipsmanualch3.html#vipsmanualse15.html" >up</a>] </p></div>
+<!--l. 1--><p class="indent" >  <a 
+ id="tailvipsmanualse15.html"></a>   
+</body></html> 

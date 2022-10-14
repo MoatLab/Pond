@@ -1,0 +1,236 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html > 
+<head><title>Interpolators</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (http://www.cse.ohio-state.edu/~gurari/TeX4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.cse.ohio-state.edu/~gurari/TeX4ht/)"> 
+<!-- 3,html --> 
+<meta name="src" content="vipsmanual.tex"> 
+<meta name="date" content="2010-06-09 21:39:00"> 
+<link rel="stylesheet" type="text/css" href="vipsmanual.css"> 
+</head><body 
+>
+  <!--l. 1--><div class="crosslinks"><p class="noindent">[<a 
+href="vipsmanualse11.html" >prev</a>] [<a 
+href="vipsmanualse11.html#tailvipsmanualse11.html" >prev-tail</a>] [<a 
+href="#tailvipsmanualse12.html">tail</a>] [<a 
+href="vipsmanualch2.html#vipsmanualse12.html" >up</a>] </p></div>
+  <h3 class="sectionHead"><span class="titlemark">2.6    </span> <a 
+ id="x18-790002.6"></a>Interpolators</h3>
+<!--l. 4--><p class="noindent" >VIPS has a general system for representing pixel interpolators.
+You can select an interpolator to pass to other VIPS
+operations, such as <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_affinei()</span></span></span>, you can add new
+interpolators, and you can write operations which take a
+general interpolator as a parameter.
+<!--l. 9--><p class="indent" >  An interpolator is a function of the form:
+                                                 <div class="verbatim" id="verbatim-119">
+  typedef&#x00A0;void&#x00A0;(&#x22C6;VipsInterpolateMethod)(&#x00A0;VipsInterpolate&#x00A0;&#x22C6;,
+ &#x00A0;<br />&#x00A0;&#x00A0;PEL&#x00A0;&#x22C6;out,&#x00A0;REGION&#x00A0;&#x22C6;in,&#x00A0;double&#x00A0;x,&#x00A0;double&#x00A0;y&#x00A0;); 
+</div>
+<!--l. 14--><p class="nopar" >
+<!--l. 16--><p class="noindent" >given the set of input pixels <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">in</span></span></span>, it has to calculate a value
+for the fractional position <span 
+class="cmr-10">(</span><span 
+class="cmmi-10">x,y</span><span 
+class="cmr-10">) </span>and write this value to the
+memory pointed to by <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">out</span></span></span>.
+<!--l. 21--><p class="indent" >    VIPS uses corner convention, so the value of pixel <span 
+class="cmr-10">(0</span><span 
+class="cmmi-10">,</span><span 
+class="cmr-10">0)</span>
+is the value of the surface the interpolator fits at the
+fractional position <span 
+class="cmr-10">(0</span><span 
+class="cmmi-10">.</span><span 
+class="cmr-10">0</span><span 
+class="cmmi-10">,</span><span 
+class="cmr-10">0</span><span 
+class="cmmi-10">.</span><span 
+class="cmr-10">0)</span>.
+<!--l. 24--><p class="noindent" >
+    <h4 class="subsectionHead"><span class="titlemark">2.6.1    </span> <a 
+ id="x18-800002.6.1"></a>How an interpolator is represented</h4>
+<!--l. 26--><p class="noindent" >See the man page for <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VipsInterpolate</span></span></span> for full
+details, but briefly, an interpolator is a subclass of
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VipsInterpolate</span></span></span> implementing the following
+items:
+        <ul class="itemize1">
+        <li class="itemize">An interpolation method, with the type signature
+        above.
+        </li>
+        <li class="itemize">A            function            <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">get_window_size()</span></span></span>
+   which  returns  the  size  of  the  area  of  pixels  that
+        the interpolator needs in order to calculate a value.
+        For example, a bilinear interpolator needs the four
+        pixels surrounding the point to be calculated, or a
+        2 by 2 window, so window size should be 2.
+        </li>
+        <li class="itemize">Or if the window size is constant, you can leave
+        <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">get_window_size()</span></span></span> NULL  and  just  set  the
+        int value <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">window_size</span></span></span>.
+        </li></ul>
+<!--l. 46--><p class="noindent" >
+    <h4 class="subsectionHead"><span class="titlemark">2.6.2    </span> <a 
+ id="x18-810002.6.2"></a>A sample interpolator</h4>
+<!--l. 48--><p class="noindent" >As an example, Figure&#x00A0;<a 
+href="#x18-8100110">2.10<!--tex4ht:ref: fg:newinterpolator --></a> shows how to register a new
+interpolator in a plugin.
+                                                                                       
+
+                                                                                       
+<!--l. 52--><p class="indent" >  <a 
+ id="x18-8100110"></a><hr class="float"><div class="float" 
+>
+                                           
+                                                                                       
+
+                                                                                       
+<div class="verbatim" id="verbatim-120">
+//&#x00A0;This&#x00A0;interpolator&#x00A0;adds&#x00A0;no&#x00A0;new&#x00A0;members.
+&#x00A0;<br />typedef&#x00A0;VipsInterpolate&#x00A0;Myinterpolator;
+&#x00A0;<br />typedef&#x00A0;VipsInterpolateClass&#x00A0;MyinterpolatorClass;
+&#x00A0;<br />
+&#x00A0;<br />G_DEFINE_TYPE(&#x00A0;Myinterpolator,&#x00A0;myinterpolator,&#x00A0;VIPS_TYPE_INTERPOLATE&#x00A0;);
+&#x00A0;<br />
+&#x00A0;<br />static&#x00A0;void
+&#x00A0;<br />myinterpolator_interpolate(&#x00A0;VipsInterpolate&#x00A0;&#x22C6;interpolate,
+&#x00A0;<br />PEL&#x00A0;&#x22C6;out,&#x00A0;REGION&#x00A0;&#x22C6;in,&#x00A0;double&#x00A0;x,&#x00A0;double&#x00A0;y&#x00A0;)
+&#x00A0;<br />{
+&#x00A0;<br />&#x00A0;&#x00A0;MyinterpolatorClass&#x00A0;&#x22C6;class&#x00A0;=
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;MYINTERPOLATOR_GET_CLASS(&#x00A0;interpolate&#x00A0;);
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Nearest-neighbor.
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;memcpy(&#x00A0;out,
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;IM_REGION_ADDR(&#x00A0;in,&#x00A0;floor(&#x00A0;x&#x00A0;),&#x00A0;floor(&#x00A0;y&#x00A0;)&#x00A0;),
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;IM_IMAGE_SIZEOF_PEL(&#x00A0;in-&#x003E;im&#x00A0;)&#x00A0;);
+&#x00A0;<br />}
+&#x00A0;<br />
+&#x00A0;<br />static&#x00A0;void
+&#x00A0;<br />myinterpolator_class_init(&#x00A0;MyinterpolatorClass&#x00A0;&#x22C6;class&#x00A0;)
+&#x00A0;<br />{
+&#x00A0;<br />&#x00A0;&#x00A0;VipsObjectClass&#x00A0;&#x22C6;object_class&#x00A0;=&#x00A0;(VipsObjectClass&#x00A0;&#x22C6;)&#x00A0;class;
+&#x00A0;<br />&#x00A0;&#x00A0;VipsInterpolateClass&#x00A0;&#x22C6;interpolate_class&#x00A0;=&#x00A0;(VipsInterpolateClass&#x00A0;&#x22C6;)&#x00A0;class;
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;object_class-&#x003E;nickname&#x00A0;=&#x00A0;"myinterpolator";
+&#x00A0;<br />&#x00A0;&#x00A0;object_class-&#x003E;description&#x00A0;=&#x00A0;_(&#x00A0;"My&#x00A0;interpolator"&#x00A0;);
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;interpolate_class-&#x003E;interpolate&#x00A0;=&#x00A0;myinterpolator_interpolate;
+&#x00A0;<br />}
+&#x00A0;<br />
+&#x00A0;<br />static&#x00A0;void
+&#x00A0;<br />myinterpolate_init(&#x00A0;Myinterpolate&#x00A0;&#x22C6;object&#x00A0;)
+&#x00A0;<br />{
+&#x00A0;<br />}
+&#x00A0;<br />
+&#x00A0;<br />char&#x00A0;&#x22C6;
+&#x00A0;<br />g_module_check_init(&#x00A0;GModule&#x00A0;&#x22C6;self&#x00A0;)
+&#x00A0;<br />{
+&#x00A0;<br />&#x00A0;&#x00A0;//&#x00A0;register&#x00A0;the&#x00A0;type
+&#x00A0;<br />&#x00A0;&#x00A0;myinterpolator_get_type();
+&#x00A0;<br />}
+</div>
+<!--l. 96--><p class="nopar" >
+<br /><div class="caption" 
+><span class="id">Figure&#x00A0;2.10: </span><span  
+class="content">Registering an interpolator in a plugin</span></div><!--tex4ht:label?: x18-8100110 -->    
+                                                                                       
+
+                                                                                       
+  </div><hr class="endfloat" />
+  <h4 class="subsectionHead"><span class="titlemark">2.6.3    </span> <a 
+ id="x18-820002.6.3"></a>Writing a VIPS operation that takes an interpolator
+as an argument</h4>
+<!--l. 103--><p class="noindent" >Operations just take a <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VipsInterpolate</span></span></span> as an
+argument, for example:
+                                                 <div class="verbatim" id="verbatim-121">
+  int&#x00A0;im_affinei_all(&#x00A0;IMAGE&#x00A0;&#x22C6;in,&#x00A0;IMAGE&#x00A0;&#x22C6;out,
+ &#x00A0;<br />&#x00A0;&#x00A0;VipsInterpolate&#x00A0;&#x22C6;interpolate,
+ &#x00A0;<br />&#x00A0;&#x00A0;double&#x00A0;a,&#x00A0;double&#x00A0;b,&#x00A0;double&#x00A0;c,&#x00A0;double&#x00A0;d,
+ &#x00A0;<br />&#x00A0;&#x00A0;double&#x00A0;dx,&#x00A0;double&#x00A0;dy&#x00A0;); 
+</div>
+<!--l. 110--><p class="nopar" >
+<!--l. 112--><p class="indent" >  To use the interpolator, use <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">vips_interpolate()</span></span></span>:
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-122">
+void&#x00A0;vips_interpolate(&#x00A0;VipsInterpolate&#x00A0;&#x22C6;interpolate,
+&#x00A0;<br />&#x00A0;&#x00A0;PEL&#x00A0;&#x22C6;out,&#x00A0;REGION&#x00A0;&#x22C6;in,&#x00A0;double&#x00A0;x,&#x00A0;double&#x00A0;y&#x00A0;);
+</div>
+<!--l. 117--><p class="nopar" >
+<!--l. 119--><p class="noindent" >This looks up the interpolate method for the object and calls
+it for you.
+<!--l. 122--><p class="indent" >  You can save the cost of the lookup in an inner loop with
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">vips_interpolate_get_method()</span></span></span>:
+                                                 <div class="verbatim" id="verbatim-123">
+  VipsInterpolateMethod
+ &#x00A0;<br />&#x00A0;&#x00A0;vips_interpolate_get_method(
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;VipsInterpolate&#x00A0;&#x22C6;interpolate&#x00A0;); 
+</div>
+<!--l. 129--><p class="nopar" >
+<!--l. 131--><p class="noindent" >
+  <h4 class="subsectionHead"><span class="titlemark">2.6.4    </span> <a 
+ id="x18-830002.6.4"></a>Passing an interpolator to a VIPS operation</h4>
+<!--l. 133--><p class="noindent" >You can build an instance of a <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VipsInterpolator</span></span></span>
+with the <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">vips_object_&#x22C6;()</span></span></span> family of functions, see
+<span 
+class="cmsy-10">§</span><a 
+href="vipsmanualse10.html#x16-670002.4">2.4<!--tex4ht:ref: sec:object --></a>.
+<!--l. 136--><p class="indent" >    Convenience functions return a static instance of one of
+the standard interpolators:
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-124">
+VipsInterpolate&#x00A0;&#x22C6;vips_interpolate_nearest_static(&#x00A0;void&#x00A0;);
+&#x00A0;<br />VipsInterpolate&#x00A0;&#x22C6;vips_interpolate_bilinear_static(&#x00A0;void&#x00A0;);
+&#x00A0;<br />VipsInterpolate&#x00A0;&#x22C6;vips_interpolate_bicubic_static(&#x00A0;void&#x00A0;);
+</div>
+<!--l. 143--><p class="nopar" >
+<!--l. 145--><p class="noindent" >Don&#8217;t free the result.
+<!--l. 148--><p class="indent" >  Finally, <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">vips_interpolate_new()</span></span></span> makes a
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">VipsInterpolate</span></span></span> from a nickname:
+                                                 <div class="verbatim" id="verbatim-125">
+  VipsInterpolate&#x00A0;&#x22C6;vips_interpolate_new(&#x00A0;const&#x00A0;char&#x00A0;&#x22C6;nickname&#x00A0;); 
+</div>
+<!--l. 153--><p class="nopar" >
+<!--l. 155--><p class="indent" >  For example:
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-126">
+VipsInterpolate&#x00A0;&#x22C6;interpolate&#x00A0;=&#x00A0;vips_interpolate_new(&#x00A0;"nohalo"&#x00A0;);
+</div>
+<!--l. 159--><p class="nopar" >
+<!--l. 161--><p class="noindent" >You must drop your ref after you&#8217;re done with the object
+with <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">g_object_unref()</span></span></span>.
+                                           
+                                                                                       
+
+                                                                                       
+  <!--l. 79--><div class="crosslinks"><p class="noindent">[<a 
+href="vipsmanualse11.html" >prev</a>] [<a 
+href="vipsmanualse11.html#tailvipsmanualse11.html" >prev-tail</a>] [<a 
+href="vipsmanualse12.html" >front</a>] [<a 
+href="vipsmanualch2.html#vipsmanualse12.html" >up</a>] </p></div>
+<!--l. 79--><p class="indent" >  <a 
+ id="tailvipsmanualse12.html"></a>   
+</body></html> 

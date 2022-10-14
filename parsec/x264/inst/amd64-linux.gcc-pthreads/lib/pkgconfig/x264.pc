@@ -1,0 +1,10 @@
+prefix=/home/huaicheng/proj/run/parsec-benchmark/pkgs/apps/x264/inst/amd64-linux.gcc-pthreads
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: x264
+Description: H.264 (MPEG4 AVC) encoder library
+Version: 0.65.1047M f773bf0
+Libs: -L${exec_prefix}/lib -lx264 -lpthread
+Cflags: -I${prefix}/include

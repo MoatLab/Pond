@@ -1,0 +1,1035 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html > 
+<head><title>Function dispatch and plug-ins</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (http://www.cse.ohio-state.edu/~gurari/TeX4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.cse.ohio-state.edu/~gurari/TeX4ht/)"> 
+<!-- 3,html --> 
+<meta name="src" content="vipsmanual.tex"> 
+<meta name="date" content="2010-06-09 21:39:00"> 
+<link rel="stylesheet" type="text/css" href="vipsmanual.css"> 
+</head><body 
+>
+  <!--l. 1--><div class="crosslinks"><p class="noindent">[<a 
+href="vipsmanualse10.html" >next</a>] [<a 
+href="vipsmanualse8.html" >prev</a>] [<a 
+href="vipsmanualse8.html#tailvipsmanualse8.html" >prev-tail</a>] [<a 
+href="#tailvipsmanualse9.html">tail</a>] [<a 
+href="vipsmanualch2.html#vipsmanualse9.html" >up</a>] </p></div>
+  <h3 class="sectionHead"><span class="titlemark">2.3    </span> <a 
+ id="x15-590002.3"></a>Function dispatch and plug-ins</h3>
+<!--l. 3--><p class="noindent" >(This chapter is on the verge of being deprecated. We have
+started building a replacement based on <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">GObject</span></span></span>, see
+<span 
+class="cmsy-10">§</span><a 
+href="vipsmanualse10.html#x16-670002.4">2.4<!--tex4ht:ref: sec:object --></a>.)
+<!--l. 6--><p class="indent" >  As image processing libraries increase in size it becomes
+progressively more difficult to build applications which
+present the operations the library offers to the user. Every
+time a new operation is added, every user interface
+needs to be adapted &#8212; a job which can rapidly become
+unmanageable.
+<!--l. 11--><p class="indent" >  To address this problem VIPS includes a simple database
+which stores an abstract description of every image
+processing operation. User interfaces, rather than having
+special code wired into them for each operation, can simply
+interrogate the database and present what they find to the
+user.
+<!--l. 16--><p class="indent" >  The operation database is extensible. You can define new
+operations, and even new types, and add them to VIPS.
+These new operations will then automatically appear in
+all VIPS user interfaces with no extra programming
+effort. Plugins can extend the database at runtime: when
+VIPS starts, it loads all the plugins in the VIPS library
+area.
+<!--l. 22--><p class="noindent" >
+  <h4 class="subsectionHead"><span class="titlemark">2.3.1    </span> <a 
+ id="x15-600002.3.1"></a>Simple plugin example</h4>
+<!--l. 24--><p class="noindent" >As an example, consider this function:
+                                                 <div class="verbatim" id="verbatim-81">
+  #include&#x00A0;&#x003C;stdio.h&#x003E;
+ &#x00A0;<br />
+ &#x00A0;<br />#include&#x00A0;&#x003C;vips/vips.h&#x003E;
+ &#x00A0;<br />
+ &#x00A0;<br />/&#x22C6;&#x00A0;The&#x00A0;function&#x00A0;we&#x00A0;define.&#x00A0;Call&#x00A0;this
+ &#x00A0;<br />&#x00A0;&#x22C6;&#x00A0;from&#x00A0;other&#x00A0;parts&#x00A0;of&#x00A0;your&#x00A0;C
+ &#x00A0;<br />&#x00A0;&#x22C6;&#x00A0;application.
+ &#x00A0;<br />&#x00A0;&#x22C6;/
+ &#x00A0;<br />int
+ &#x00A0;<br />double_integer(&#x00A0;int&#x00A0;in&#x00A0;)
+ &#x00A0;<br />{
+ &#x00A0;<br />&#x00A0;&#x00A0;return(&#x00A0;in&#x00A0;&#x22C6;&#x00A0;2&#x00A0;);
+ &#x00A0;<br />} 
+</div>
+<!--l. 40--><p class="nopar" >
+<!--l. 42--><p class="noindent" >The source for all the example code in this section is in the
+vips-examples package.
+<!--l. 46--><p class="indent" >    The first step is to make a layer over this function which
+will make it look like a standard VIPS function. VIPS
+insists on the following pattern:
+        <ul class="itemize1">
+        <li class="itemize">The  function  should  be  int-valued,  and  return  0
+        for  success  and  non-zero  for  error.  It  should  set
+        <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_error()</span></span></span>.
+        </li>
+        <li class="itemize">The       function       should       take       a       single
+        argument: a pointer to a <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">NULL</span></span></span>-terminated array of
+        <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_objects</span></span></span>.
+        </li>
+        <li class="itemize">Each  <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_object</span></span></span> represents  one  argument  to
+        the   function   (either   output   or   input)   in   the
+        form  specified  by  the  corresponding  entry  in  the
+        function&#8217;s argument descriptor.
+        </li></ul>
+<!--l. 66--><p class="indent" >    The argument descriptor is an array of structures,
+each describing one argument. For this example, it
+is:
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-82">
+/&#x22C6;&#x00A0;Describe&#x00A0;the&#x00A0;type&#x00A0;of&#x00A0;our&#x00A0;function.
+&#x00A0;<br />&#x00A0;&#x22C6;&#x00A0;One&#x00A0;input&#x00A0;int,&#x00A0;and&#x00A0;one&#x00A0;output&#x00A0;int.
+&#x00A0;<br />&#x00A0;&#x22C6;/
+&#x00A0;<br />static&#x00A0;im_arg_desc&#x00A0;arg_types[]&#x00A0;=&#x00A0;{
+&#x00A0;<br />&#x00A0;&#x00A0;IM_INPUT_INT(&#x00A0;"in"&#x00A0;),
+&#x00A0;<br />&#x00A0;&#x00A0;IM_OUTPUT_INT(&#x00A0;"out"&#x00A0;)
+&#x00A0;<br />};
+</div>
+<!--l. 77--><p class="nopar" >
+<!--l. 79--><p class="indent" >  <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">IM_INPUT_INT()</span></span></span> and <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">IM_OUTPUT_INT()</span></span></span> are
+macros defined in <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">&#x003C;vips/dispatch.h&#x003E;</span></span></span> which make
+argument types easy to define. Other macros available are
+listed in table&#x00A0;<a 
+href="#x15-600011">2.1<!--tex4ht:ref: tab:type --></a>.
+                                           
+                                                                                       
+
+                                                                                       
+<!--l. 84--><p class="indent" >  <a 
+ id="x15-600011"></a><hr class="float"><div class="float" 
+>
+                                           
+                                                                                       
+
+                                                                                       
+<div class="center" 
+>
+<!--l. 84--><p class="noindent" >
+<div class="tabular"> <table id="TBL-5" class="tabular" 
+cellspacing="0" cellpadding="0" rules="groups" 
+><colgroup id="TBL-5-1g"><col 
+id="TBL-5-1"></colgroup><colgroup id="TBL-5-2g"><col 
+id="TBL-5-2"></colgroup><colgroup id="TBL-5-3g"><col 
+id="TBL-5-3"></colgroup><tr 
+class="hline"><td><hr></td><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-5-1-"><td  style="white-space:nowrap; text-align:left;" id="TBL-5-1-1"  
+class="td11">Macro                                       </td><td  style="white-space:nowrap; text-align:left;" id="TBL-5-1-2"  
+class="td11">Meaning                                 </td><td  style="white-space:nowrap; text-align:left;" id="TBL-5-1-3"  
+class="td11"><span 
+class="pcrr7t-">im</span><span 
+class="pcrr7t-">_object </span>has type          </td>
+</tr><tr 
+class="hline"><td><hr></td><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-5-2-"><td  style="white-space:nowrap; text-align:left;" id="TBL-5-2-1"  
+class="td11"><span 
+class="pcrr7t-">IM</span><span 
+class="pcrr7t-">_INPUT</span><span 
+class="pcrr7t-">_INT         </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-5-2-2"  
+class="td11">Input int                                  </td><td  style="white-space:nowrap; text-align:left;" id="TBL-5-2-3"  
+class="td11"><span 
+class="pcrr7t-">int &#x22C6;              </span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-5-3-"><td  style="white-space:nowrap; text-align:left;" id="TBL-5-3-1"  
+class="td11"><span 
+class="pcrr7t-">IM</span><span 
+class="pcrr7t-">_INPUT</span><span 
+class="pcrr7t-">_INTVEC      </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-5-3-2"  
+class="td11">Input vector of int                   </td><td  style="white-space:nowrap; text-align:left;" id="TBL-5-3-3"  
+class="td11"><span 
+class="pcrr7t-">im</span><span 
+class="pcrr7t-">_intvec</span><span 
+class="pcrr7t-">_object &#x22C6; </span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-5-4-"><td  style="white-space:nowrap; text-align:left;" id="TBL-5-4-1"  
+class="td11"><span 
+class="pcrr7t-">IM</span><span 
+class="pcrr7t-">_INPUT</span><span 
+class="pcrr7t-">_IMASK       </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-5-4-2"  
+class="td11">Input int array                         </td><td  style="white-space:nowrap; text-align:left;" id="TBL-5-4-3"  
+class="td11"><span 
+class="pcrr7t-">im</span><span 
+class="pcrr7t-">_mask</span><span 
+class="pcrr7t-">_object &#x22C6;   </span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-5-5-"><td  style="white-space:nowrap; text-align:left;" id="TBL-5-5-1"  
+class="td11"><span 
+class="pcrr7t-">IM</span><span 
+class="pcrr7t-">_OUTPUT</span><span 
+class="pcrr7t-">_INT        </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-5-5-2"  
+class="td11">Output int                               </td><td  style="white-space:nowrap; text-align:left;" id="TBL-5-5-3"  
+class="td11"><span 
+class="pcrr7t-">int &#x22C6;              </span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-5-6-"><td  style="white-space:nowrap; text-align:left;" id="TBL-5-6-1"  
+class="td11"><span 
+class="pcrr7t-">IM</span><span 
+class="pcrr7t-">_INPUT</span><span 
+class="pcrr7t-">_INTVEC      </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-5-6-2"  
+class="td11">Output vector of int                </td><td  style="white-space:nowrap; text-align:left;" id="TBL-5-6-3"  
+class="td11"><span 
+class="pcrr7t-">im</span><span 
+class="pcrr7t-">_intvec</span><span 
+class="pcrr7t-">_object &#x22C6; </span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-5-7-"><td  style="white-space:nowrap; text-align:left;" id="TBL-5-7-1"  
+class="td11"><span 
+class="pcrr7t-">IM</span><span 
+class="pcrr7t-">_OUTPUT</span><span 
+class="pcrr7t-">_IMASK      </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-5-7-2"  
+class="td11">Output int array to file            </td><td  style="white-space:nowrap; text-align:left;" id="TBL-5-7-3"  
+class="td11"><span 
+class="pcrr7t-">im</span><span 
+class="pcrr7t-">_mask</span><span 
+class="pcrr7t-">_object &#x22C6;   </span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-5-8-"><td  style="white-space:nowrap; text-align:left;" id="TBL-5-8-1"  
+class="td11"><span 
+class="pcrr7t-">IM</span><span 
+class="pcrr7t-">_INPUT</span><span 
+class="pcrr7t-">_DOUBLE      </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-5-8-2"  
+class="td11">Input double                           </td><td  style="white-space:nowrap; text-align:left;" id="TBL-5-8-3"  
+class="td11"><span 
+class="pcrr7t-">double &#x22C6;           </span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-5-9-"><td  style="white-space:nowrap; text-align:left;" id="TBL-5-9-1"  
+class="td11"><span 
+class="pcrr7t-">IM</span><span 
+class="pcrr7t-">_INPUT</span><span 
+class="pcrr7t-">_DOUBLEVEC   </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-5-9-2"  
+class="td11">Input vector of double            </td><td  style="white-space:nowrap; text-align:left;" id="TBL-5-9-3"  
+class="td11"><span 
+class="pcrr7t-">im</span><span 
+class="pcrr7t-">_realvec</span><span 
+class="pcrr7t-">_object &#x22C6;</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-5-10-"><td  style="white-space:nowrap; text-align:left;" id="TBL-5-10-1"  
+class="td11"><span 
+class="pcrr7t-">IM</span><span 
+class="pcrr7t-">_INPUT</span><span 
+class="pcrr7t-">_DMASK       </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-5-10-2"  
+class="td11">Input double array                  </td><td  style="white-space:nowrap; text-align:left;" id="TBL-5-10-3"  
+class="td11"><span 
+class="pcrr7t-">im</span><span 
+class="pcrr7t-">_mask</span><span 
+class="pcrr7t-">_object &#x22C6;   </span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-5-11-"><td  style="white-space:nowrap; text-align:left;" id="TBL-5-11-1"  
+class="td11"><span 
+class="pcrr7t-">IM</span><span 
+class="pcrr7t-">_OUTPUT</span><span 
+class="pcrr7t-">_DOUBLE     </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-5-11-2"  
+class="td11">Output double                         </td><td  style="white-space:nowrap; text-align:left;" id="TBL-5-11-3"  
+class="td11"><span 
+class="pcrr7t-">double &#x22C6;           </span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-5-12-"><td  style="white-space:nowrap; text-align:left;" id="TBL-5-12-1"  
+class="td11"><span 
+class="pcrr7t-">IM</span><span 
+class="pcrr7t-">_OUTPUT</span><span 
+class="pcrr7t-">_DOUBLEVEC  </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-5-12-2"  
+class="td11">Output vector of double         </td><td  style="white-space:nowrap; text-align:left;" id="TBL-5-12-3"  
+class="td11"><span 
+class="pcrr7t-">im</span><span 
+class="pcrr7t-">_realvec</span><span 
+class="pcrr7t-">_object &#x22C6;</span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-5-13-"><td  style="white-space:nowrap; text-align:left;" id="TBL-5-13-1"  
+class="td11"><span 
+class="pcrr7t-">IM</span><span 
+class="pcrr7t-">_OUTPUT</span><span 
+class="pcrr7t-">_DMASK      </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-5-13-2"  
+class="td11">Output double array to file     </td><td  style="white-space:nowrap; text-align:left;" id="TBL-5-13-3"  
+class="td11"><span 
+class="pcrr7t-">im</span><span 
+class="pcrr7t-">_mask</span><span 
+class="pcrr7t-">_object &#x22C6;   </span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-5-14-"><td  style="white-space:nowrap; text-align:left;" id="TBL-5-14-1"  
+class="td11"><span 
+class="pcrr7t-">IM</span><span 
+class="pcrr7t-">_OUTPUT</span><span 
+class="pcrr7t-">_DMASK</span><span 
+class="pcrr7t-">_STATS</span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-5-14-2"  
+class="td11">Output double array to screen</td><td  style="white-space:nowrap; text-align:left;" id="TBL-5-14-3"  
+class="td11">                   </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-5-15-"><td  style="white-space:nowrap; text-align:left;" id="TBL-5-15-1"  
+class="td11"><span 
+class="pcrr7t-">IM</span><span 
+class="pcrr7t-">_OUTPUT</span><span 
+class="pcrr7t-">_COMPLEX    </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-5-15-2"  
+class="td11">Output complex                      </td><td  style="white-space:nowrap; text-align:left;" id="TBL-5-15-3"  
+class="td11"><span 
+class="pcrr7t-">double &#x22C6;           </span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-5-16-"><td  style="white-space:nowrap; text-align:left;" id="TBL-5-16-1"  
+class="td11"><span 
+class="pcrr7t-">IM</span><span 
+class="pcrr7t-">_INPUT</span><span 
+class="pcrr7t-">_STRING      </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-5-16-2"  
+class="td11">Input string                             </td><td  style="white-space:nowrap; text-align:left;" id="TBL-5-16-3"  
+class="td11"><span 
+class="pcrr7t-">char &#x22C6;             </span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-5-17-"><td  style="white-space:nowrap; text-align:left;" id="TBL-5-17-1"  
+class="td11"><span 
+class="pcrr7t-">IM</span><span 
+class="pcrr7t-">_OUTPUT</span><span 
+class="pcrr7t-">_STRING     </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-5-17-2"  
+class="td11">Output string                          </td><td  style="white-space:nowrap; text-align:left;" id="TBL-5-17-3"  
+class="td11"><span 
+class="pcrr7t-">char &#x22C6;             </span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-5-18-"><td  style="white-space:nowrap; text-align:left;" id="TBL-5-18-1"  
+class="td11"><span 
+class="pcrr7t-">IM</span><span 
+class="pcrr7t-">_INPUT</span><span 
+class="pcrr7t-">_IMAGE       </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-5-18-2"  
+class="td11">Input image                            </td><td  style="white-space:nowrap; text-align:left;" id="TBL-5-18-3"  
+class="td11"><span 
+class="pcrr7t-">IMAGE &#x22C6;            </span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-5-19-"><td  style="white-space:nowrap; text-align:left;" id="TBL-5-19-1"  
+class="td11"><span 
+class="pcrr7t-">IM</span><span 
+class="pcrr7t-">_INPUT</span><span 
+class="pcrr7t-">_IMAGEVEC    </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-5-19-2"  
+class="td11">Vector of input images           </td><td  style="white-space:nowrap; text-align:left;" id="TBL-5-19-3"  
+class="td11"><span 
+class="pcrr7t-">IMAGE &#x22C6;&#x22C6;           </span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-5-20-"><td  style="white-space:nowrap; text-align:left;" id="TBL-5-20-1"  
+class="td11"><span 
+class="pcrr7t-">IM</span><span 
+class="pcrr7t-">_OUTPUT</span><span 
+class="pcrr7t-">_IMAGE      </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-5-20-2"  
+class="td11">Output image                          </td><td  style="white-space:nowrap; text-align:left;" id="TBL-5-20-3"  
+class="td11"><span 
+class="pcrr7t-">IMAGE &#x22C6;            </span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-5-21-"><td  style="white-space:nowrap; text-align:left;" id="TBL-5-21-1"  
+class="td11"><span 
+class="pcrr7t-">IM</span><span 
+class="pcrr7t-">_RW</span><span 
+class="pcrr7t-">_IMAGE          </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-5-21-2"  
+class="td11">Read-write image                   </td><td  style="white-space:nowrap; text-align:left;" id="TBL-5-21-3"  
+class="td11"><span 
+class="pcrr7t-">IMAGE &#x22C6;            </span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-5-22-"><td  style="white-space:nowrap; text-align:left;" id="TBL-5-22-1"  
+class="td11"><span 
+class="pcrr7t-">IM</span><span 
+class="pcrr7t-">_INPUT</span><span 
+class="pcrr7t-">_DISPLAY     </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-5-22-2"  
+class="td11">Input display                           </td><td  style="white-space:nowrap; text-align:left;" id="TBL-5-22-3"  
+class="td11"><span 
+class="pcrr7t-">im</span><span 
+class="pcrr7t-">_col</span><span 
+class="pcrr7t-">_display &#x22C6;   </span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-5-23-"><td  style="white-space:nowrap; text-align:left;" id="TBL-5-23-1"  
+class="td11"><span 
+class="pcrr7t-">IM</span><span 
+class="pcrr7t-">_OUTPUT</span><span 
+class="pcrr7t-">_DISPLAY    </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-5-23-2"  
+class="td11">Output display                        </td><td  style="white-space:nowrap; text-align:left;" id="TBL-5-23-3"  
+class="td11"><span 
+class="pcrr7t-">im</span><span 
+class="pcrr7t-">_col</span><span 
+class="pcrr7t-">_display &#x22C6;   </span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-5-24-"><td  style="white-space:nowrap; text-align:left;" id="TBL-5-24-1"  
+class="td11"><span 
+class="pcrr7t-">IM</span><span 
+class="pcrr7t-">_INPUT</span><span 
+class="pcrr7t-">_GVALUE      </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-5-24-2"  
+class="td11">Input GValue                          </td><td  style="white-space:nowrap; text-align:left;" id="TBL-5-24-3"  
+class="td11"><span 
+class="pcrr7t-">GValue &#x22C6;           </span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-5-25-"><td  style="white-space:nowrap; text-align:left;" id="TBL-5-25-1"  
+class="td11"><span 
+class="pcrr7t-">IM</span><span 
+class="pcrr7t-">_OUTPUT</span><span 
+class="pcrr7t-">_GVALUE     </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-5-25-2"  
+class="td11">Output GValue                       </td><td  style="white-space:nowrap; text-align:left;" id="TBL-5-25-3"  
+class="td11"><span 
+class="pcrr7t-">GValue &#x22C6;           </span></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-5-26-"><td  style="white-space:nowrap; text-align:left;" id="TBL-5-26-1"  
+class="td11"><span 
+class="pcrr7t-">IM</span><span 
+class="pcrr7t-">_INPUT</span><span 
+class="pcrr7t-">_INTERPOLATE </span></td><td  style="white-space:nowrap; text-align:left;" id="TBL-5-26-2"  
+class="td11">Input VipsInterpolate             </td><td  style="white-space:nowrap; text-align:left;" id="TBL-5-26-3"  
+class="td11"><span 
+class="pcrr7t-">VipsInterpolate &#x22C6;  </span></td>
+</tr><tr 
+class="hline"><td><hr></td><td><hr></td><td><hr></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-5-27-"><td  style="white-space:nowrap; text-align:left;" id="TBL-5-27-1"  
+class="td11">                     </td></tr></table></div></div>
+<br /><div class="caption" 
+><span class="id">Table&#x00A0;2.1: </span><span  
+class="content">Argument type macros</span></div><!--tex4ht:label?: x15-600011 -->
+                                           
+                                                                                       
+
+                                                                                       
+  </div><hr class="endfloat" />
+<!--l. 156--><p class="indent" >  The argument to the type macro is the name of the
+argument. These names are used by user-interface programs
+to provide feedback, and sometimes as variable names. The
+order in which you list the arguments is the order in which
+user-interfaces will present them to the user. You should use
+the following conventions when selecting names and an
+order for your arguments:
+    <ul class="itemize1">
+    <li class="itemize">Names   should   be   entirely   in   lower-case   and
+    contain no special characters, apart from the digits
+    0-9 and the underscore character &#8216;_&#8217;.
+    </li>
+    <li class="itemize">Names   should   indicate   the   function   of   the
+    argument.   For   example,   <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_add()</span></span></span> has   the
+    following argument names:
+                                                     <div class="verbatim" id="verbatim-83">
+          example%&#x00A0;vips&#x00A0;-help&#x00A0;im_add
+    &#x00A0;<br />vips:&#x00A0;args:&#x00A0;in1&#x00A0;in2&#x00A0;out
+    &#x00A0;<br />where:
+    &#x00A0;<br />&#x00A0;&#x00A0;in1&#x00A0;is&#x00A0;of&#x00A0;type&#x00A0;"image"
+    &#x00A0;<br />&#x00A0;&#x00A0;in2&#x00A0;is&#x00A0;of&#x00A0;type&#x00A0;"image"
+    &#x00A0;<br />&#x00A0;&#x00A0;out&#x00A0;is&#x00A0;of&#x00A0;type&#x00A0;"image"
+    &#x00A0;<br />add&#x00A0;two&#x00A0;images,&#x00A0;from&#x00A0;package
+    &#x00A0;<br />&#x00A0;&#x00A0;"arithmetic"
+    &#x00A0;<br />flags:
+    &#x00A0;<br />&#x00A0;&#x00A0;(PIO&#x00A0;function)
+    &#x00A0;<br />&#x00A0;&#x00A0;(no&#x00A0;coordinate&#x00A0;transformation)
+    &#x00A0;<br />&#x00A0;&#x00A0;(point-to-point&#x00A0;operation) 
+</div>
+   <!--l. 185--><p class="nopar" >
+   </li>
+   <li class="itemize">You should order arguments with large input objects
+        first, then output objects, then any extra arguments or
+        options. For example, <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_extract()</span></span></span> has the
+        following sequence of arguments:
+                                                                                       
+
+                                                                                       
+    <div class="verbatim" id="verbatim-84">
+    example%&#x00A0;vips&#x00A0;-help&#x00A0;im_extract
+    &#x00A0;<br />vips:&#x00A0;args:&#x00A0;input&#x00A0;output&#x00A0;left&#x00A0;top
+    &#x00A0;<br />&#x00A0;&#x00A0;width&#x00A0;height&#x00A0;channel
+    &#x00A0;<br />where:
+    &#x00A0;<br />&#x00A0;&#x00A0;input&#x00A0;is&#x00A0;of&#x00A0;type&#x00A0;"image"
+    &#x00A0;<br />&#x00A0;&#x00A0;output&#x00A0;is&#x00A0;of&#x00A0;type&#x00A0;"image"
+    &#x00A0;<br />&#x00A0;&#x00A0;left&#x00A0;is&#x00A0;of&#x00A0;type&#x00A0;"integer"
+    &#x00A0;<br />&#x00A0;&#x00A0;top&#x00A0;is&#x00A0;of&#x00A0;type&#x00A0;"integer"
+    &#x00A0;<br />&#x00A0;&#x00A0;width&#x00A0;is&#x00A0;of&#x00A0;type&#x00A0;"integer"
+    &#x00A0;<br />&#x00A0;&#x00A0;height&#x00A0;is&#x00A0;of&#x00A0;type&#x00A0;"integer"
+    &#x00A0;<br />&#x00A0;&#x00A0;channel&#x00A0;is&#x00A0;of&#x00A0;type&#x00A0;"integer"
+    &#x00A0;<br />extract&#x00A0;area/band,&#x00A0;from&#x00A0;package
+    &#x00A0;<br />&#x00A0;&#x00A0;"conversion"
+    &#x00A0;<br />flags:
+    &#x00A0;<br />&#x00A0;&#x00A0;(PIO&#x00A0;function)
+    &#x00A0;<br />&#x00A0;&#x00A0;(no&#x00A0;coordinate&#x00A0;transformation)
+    &#x00A0;<br />&#x00A0;&#x00A0;(point-to-point&#x00A0;operation)
+</div>
+    <!--l. 210--><p class="nopar" >
+    </li></ul>
+<!--l. 214--><p class="indent" >  This function sits over <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">double_integer()</span></span></span>, providing
+VIPS with an interface which it can call:
+                                                 <div class="verbatim" id="verbatim-85">
+  /&#x22C6;&#x00A0;Call&#x00A0;our&#x00A0;function&#x00A0;via&#x00A0;a&#x00A0;VIPS
+ &#x00A0;<br />&#x00A0;&#x22C6;&#x00A0;im_object&#x00A0;vector.
+ &#x00A0;<br />&#x00A0;&#x22C6;/
+ &#x00A0;<br />static&#x00A0;int
+ &#x00A0;<br />double_vec(&#x00A0;im_object&#x00A0;&#x22C6;argv&#x00A0;)
+ &#x00A0;<br />{
+ &#x00A0;<br />&#x00A0;&#x00A0;int&#x00A0;&#x22C6;in&#x00A0;=&#x00A0;(int&#x00A0;&#x22C6;)&#x00A0;argv[0];
+ &#x00A0;<br />&#x00A0;&#x00A0;int&#x00A0;&#x22C6;out&#x00A0;=&#x00A0;(int&#x00A0;&#x22C6;)&#x00A0;argv[1];
+ &#x00A0;<br />
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x22C6;out&#x00A0;=&#x00A0;double_integer(&#x00A0;&#x22C6;in&#x00A0;);
+ &#x00A0;<br />
+ &#x00A0;<br />&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Always&#x00A0;succeed.
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x22C6;/
+ &#x00A0;<br />&#x00A0;&#x00A0;return(&#x00A0;0&#x00A0;);
+ &#x00A0;<br />} 
+</div>
+<!--l. 233--><p class="nopar" >
+<!--l. 235--><p class="indent" >  Finally, these two pieces of information (the argument
+description and the VIPS-style function wrapper) can be
+gathered together into a function description.
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-86">
+/&#x22C6;&#x00A0;Description&#x00A0;of&#x00A0;double_integer.
+&#x00A0;<br />&#x00A0;&#x22C6;/
+&#x00A0;<br />static&#x00A0;im_function&#x00A0;double_desc&#x00A0;=&#x00A0;{
+&#x00A0;<br />&#x00A0;&#x00A0;"double_integer",
+&#x00A0;<br />&#x00A0;&#x00A0;"double&#x00A0;an&#x00A0;integer",
+&#x00A0;<br />&#x00A0;&#x00A0;0,
+&#x00A0;<br />&#x00A0;&#x00A0;double_vec,
+&#x00A0;<br />&#x00A0;&#x00A0;IM_NUMBER(&#x00A0;arg_types&#x00A0;),
+&#x00A0;<br />&#x00A0;&#x00A0;arg_types
+&#x00A0;<br />};
+</div>
+<!--l. 250--><p class="nopar" >
+<!--l. 253--><p class="indent" >  <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">IM_NUMBER()</span></span></span> is a macro which returns the number of
+elements in a static array. The <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">flags</span></span></span> field contains hints
+which user-interfaces can use for various optimisations. At
+present, the possible values are:
+    <dl class="description"><dt class="description">
+<span 
+class="pcrb7t-">IM</span><span 
+class="pcrb7t-">_FN</span><span 
+class="pcrb7t-">_PIO</span> </dt><dd 
+class="description">This function uses the VIPS PIO system
+    (see <span 
+class="cmsy-10">§</span><a 
+href="vipsmanualse15.html#x22-920003.3">3.3<!--tex4ht:ref: sec:pio --></a>).
+    </dd><dt class="description">
+<span 
+class="pcrb7t-">IM</span><span 
+class="pcrb7t-">_FN</span><span 
+class="pcrb7t-">_TRANSFORM</span> </dt><dd 
+class="description">This   the   function   transforms
+    coordinates.
+    </dd><dt class="description">
+<span 
+class="pcrb7t-">IM</span><span 
+class="pcrb7t-">_FN</span><span 
+class="pcrb7t-">_PTOP</span> </dt><dd 
+class="description">This is a point-to-point operation, that
+    is, it can be replaced with a look-up table.
+    </dd><dt class="description">
+<span 
+class="pcrb7t-">IM</span><span 
+class="pcrb7t-">_FN</span><span 
+class="pcrb7t-">_NOCACHE</span> </dt><dd 
+class="description">This operation has side effects and
+    should not be cached. Useful for video grabbers,
+    for example.
+    </dd></dl>
+<!--l. 275--><p class="indent" >  This function description now needs to be added to the
+VIPS function database. VIPS groups sets of related
+functions together in packages. There is only a single
+function in this example, so we can just write:
+                                                 <div class="verbatim" id="verbatim-87">
+  /&#x22C6;&#x00A0;Group&#x00A0;up&#x00A0;all&#x00A0;the&#x00A0;functions&#x00A0;in&#x00A0;this
+ &#x00A0;<br />&#x00A0;&#x22C6;&#x00A0;file.
+ &#x00A0;<br />&#x00A0;&#x22C6;/
+ &#x00A0;<br />static&#x00A0;im_function
+ &#x00A0;<br />&#x00A0;&#x00A0;&#x22C6;function_list[]&#x00A0;=&#x00A0;{
+ &#x00A0;<br />&#x00A0;&#x00A0;&amp;double_desc
+ &#x00A0;<br />};
+ &#x00A0;<br />
+ &#x00A0;<br />/&#x22C6;&#x00A0;Define&#x00A0;the&#x00A0;package_table&#x00A0;symbol.
+ &#x00A0;<br />&#x00A0;&#x22C6;&#x00A0;This&#x00A0;is&#x00A0;what&#x00A0;VIPS&#x00A0;looks&#x00A0;for&#x00A0;when
+ &#x00A0;<br />&#x00A0;&#x22C6;&#x00A0;loading&#x00A0;the&#x00A0;plugin.
+ &#x00A0;<br />&#x00A0;&#x22C6;/
+ &#x00A0;<br />im_package&#x00A0;package_table&#x00A0;=&#x00A0;{
+ &#x00A0;<br />&#x00A0;&#x00A0;"example",
+ &#x00A0;<br />&#x00A0;&#x00A0;IM_NUMBER(&#x00A0;function_list&#x00A0;),
+ &#x00A0;<br />&#x00A0;&#x00A0;function_list
+ &#x00A0;<br />}; 
+</div>
+<!--l. 297--><p class="nopar" >
+<!--l. 299--><p class="indent" >  The package has to be named <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">package_table</span></span></span>, and
+has to be exported from the file (that is, not a static). VIPS
+looks for a symbol of this name when it opens your object
+file.
+<!--l. 303--><p class="indent" >    This file needs to be made into a dynamically loadable
+object. On my machine, I can do this with:
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-88">
+example%&#x00A0;gcc&#x00A0;-fPIC&#x00A0;-DPIC&#x00A0;-c
+&#x00A0;<br />&#x00A0;&#x00A0;&#8216;pkg-config&#x00A0;vips-7.12&#x00A0;--cflags&#8216;
+&#x00A0;<br />&#x00A0;&#x00A0;plug.c&#x00A0;-o&#x00A0;plug.o
+&#x00A0;<br />example%&#x00A0;gcc&#x00A0;-shared&#x00A0;plug.o
+&#x00A0;<br />&#x00A0;&#x00A0;-o&#x00A0;double.plg
+</div>
+<!--l. 312--><p class="nopar" >
+<!--l. 314--><p class="indent" >  You can now use <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">double.plg</span></span></span> with any of the
+VIPS applications which support function dispatch. For
+example:
+                                                 <div class="verbatim" id="verbatim-89">
+  example%&#x00A0;vips&#x00A0;-plugin&#x00A0;double.plg&#x00A0;\
+ &#x00A0;<br />&#x00A0;&#x00A0;double_integer&#x00A0;12
+ &#x00A0;<br />24
+ &#x00A0;<br />example% 
+</div>
+<!--l. 322--><p class="nopar" >
+<!--l. 324--><p class="indent" >  When VIPS starts up, it looks for a directory in the
+library directory called <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">vips-</span></span></span>, with the vips major and
+minor versions numbers as extensions, and loads all files in
+there with the suffix <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">.plg</span></span></span>. So for example, on my machine,
+the plugin directory is <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">/usr/lib/vips-7.16</span></span></span> and any
+plugins in that directory are automatically loaded into any
+VIPS programs on startup.
+    <h4 class="subsectionHead"><span class="titlemark">2.3.2    </span> <a 
+ id="x15-610002.3.2"></a>A more complicated example</h4>
+<!--l. 332--><p class="noindent" >This section lists the source for <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_extract()</span></span></span>&#8217;s function
+description. Almost all functions in the VIPS library have
+descriptors &#8212; if you are not sure how to write a description,
+it&#8217;s usually easiest to copy one from a similar function in the
+library.
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-90">
+/&#x22C6;&#x00A0;Args&#x00A0;to&#x00A0;im_extract.
+&#x00A0;<br />&#x00A0;&#x22C6;/
+&#x00A0;<br />static&#x00A0;im_arg_desc
+&#x00A0;<br />&#x00A0;&#x00A0;extract_args[]&#x00A0;=&#x00A0;{
+&#x00A0;<br />&#x00A0;&#x00A0;IM_INPUT_IMAGE(&#x00A0;"input"&#x00A0;),
+&#x00A0;<br />&#x00A0;&#x00A0;IM_OUTPUT_IMAGE(&#x00A0;"output"&#x00A0;),
+&#x00A0;<br />&#x00A0;&#x00A0;IM_INPUT_INT(&#x00A0;"left"&#x00A0;),
+&#x00A0;<br />&#x00A0;&#x00A0;IM_INPUT_INT(&#x00A0;"top"&#x00A0;),
+&#x00A0;<br />&#x00A0;&#x00A0;IM_INPUT_INT(&#x00A0;"width"&#x00A0;),
+&#x00A0;<br />&#x00A0;&#x00A0;IM_INPUT_INT(&#x00A0;"height"&#x00A0;),
+&#x00A0;<br />&#x00A0;&#x00A0;IM_INPUT_INT(&#x00A0;"channel"&#x00A0;)
+&#x00A0;<br />};
+&#x00A0;<br />
+&#x00A0;<br />/&#x22C6;&#x00A0;Call&#x00A0;im_extract&#x00A0;via&#x00A0;arg&#x00A0;vector.
+&#x00A0;<br />&#x00A0;&#x22C6;/
+&#x00A0;<br />static&#x00A0;int
+&#x00A0;<br />extract_vec(&#x00A0;im_object&#x00A0;&#x22C6;argv&#x00A0;)
+&#x00A0;<br />{
+&#x00A0;<br />&#x00A0;&#x00A0;IMAGE_BOX&#x00A0;box;
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;box.xstart&#x00A0;=&#x00A0;&#x22C6;((int&#x00A0;&#x22C6;)&#x00A0;argv[2]);
+&#x00A0;<br />&#x00A0;&#x00A0;box.ystart&#x00A0;=&#x00A0;&#x22C6;((int&#x00A0;&#x22C6;)&#x00A0;argv[3]);
+&#x00A0;<br />&#x00A0;&#x00A0;box.xsize&#x00A0;=&#x00A0;&#x22C6;((int&#x00A0;&#x22C6;)&#x00A0;argv[4]);
+&#x00A0;<br />&#x00A0;&#x00A0;box.ysize&#x00A0;=&#x00A0;&#x22C6;((int&#x00A0;&#x22C6;)&#x00A0;argv[5]);
+&#x00A0;<br />&#x00A0;&#x00A0;box.chsel&#x00A0;=&#x00A0;&#x22C6;((int&#x00A0;&#x22C6;)&#x00A0;argv[6]);
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;return(&#x00A0;im_extract(
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;argv[0],&#x00A0;argv[1],&#x00A0;&amp;box&#x00A0;)&#x00A0;);
+&#x00A0;<br />}
+&#x00A0;<br />
+&#x00A0;<br />/&#x22C6;&#x00A0;Description&#x00A0;of&#x00A0;im_extract.
+&#x00A0;<br />&#x00A0;&#x22C6;/
+&#x00A0;<br />static&#x00A0;im_function
+&#x00A0;<br />&#x00A0;&#x00A0;extract_desc&#x00A0;=&#x00A0;{
+&#x00A0;<br />&#x00A0;&#x00A0;"im_extract",
+&#x00A0;<br />&#x00A0;&#x00A0;"extract&#x00A0;area/band",
+&#x00A0;<br />&#x00A0;&#x00A0;IM_FN_PIO&#x00A0;|&#x00A0;IM_FN_TRANSFORM,
+&#x00A0;<br />&#x00A0;&#x00A0;extract_vec,
+&#x00A0;<br />&#x00A0;&#x00A0;NUMBER(&#x00A0;extract_args&#x00A0;),
+&#x00A0;<br />&#x00A0;&#x00A0;extract_args
+&#x00A0;<br />};
+</div>
+<!--l. 379--><p class="nopar" >
+<!--l. 381--><p class="noindent" >                                              <h4 class="subsectionHead"><span class="titlemark">2.3.3    </span> <a 
+ id="x15-620002.3.3"></a>Adding new types</h4>
+  <!--l. 383--><p class="noindent" >The VIPS type mechanism is extensible. User plug-ins can
+  add new types and user-interfaces can (to a certain extent)
+  provide interfaces to these user-defined types.
+  <!--l. 387--><p class="indent" >    Here is the definition of <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_arg_desc</span></span></span>:
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-91">
+/&#x22C6;&#x00A0;Describe&#x00A0;a&#x00A0;VIPS&#x00A0;command&#x00A0;argument.
+&#x00A0;<br />&#x00A0;&#x22C6;/
+&#x00A0;<br />typedef&#x00A0;struct&#x00A0;{
+&#x00A0;<br />&#x00A0;&#x00A0;char&#x00A0;&#x22C6;name;
+&#x00A0;<br />&#x00A0;&#x00A0;im_type_desc&#x00A0;&#x22C6;desc;
+&#x00A0;<br />&#x00A0;&#x00A0;im_print_obj_fn&#x00A0;print;
+&#x00A0;<br />}&#x00A0;im_arg_desc;
+</div>
+<!--l. 397--><p class="nopar" >
+<!--l. 399--><p class="indent" >  The <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">name</span></span></span> field is the argument name above. The <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">desc</span></span></span>
+field points to a structure defining the argument type, and
+the <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">print</span></span></span> field is an (optionally <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">NULL</span></span></span>) pointer to a
+function which VIPS will call for output arguments after
+your function successfully completes and before the
+object is destroyed. It can be used to print results to
+the terminal, or to copy results into a user-interface
+layer.
+                                                 <div class="verbatim" id="verbatim-92">
+  /&#x22C6;&#x00A0;Success&#x00A0;on&#x00A0;an&#x00A0;argument.&#x00A0;This&#x00A0;is
+ &#x00A0;<br />&#x00A0;&#x22C6;&#x00A0;called&#x00A0;if&#x00A0;the&#x00A0;image&#x00A0;processing
+ &#x00A0;<br />&#x00A0;&#x22C6;&#x00A0;function&#x00A0;succeeds&#x00A0;and&#x00A0;should&#x00A0;be
+ &#x00A0;<br />&#x00A0;&#x22C6;&#x00A0;used&#x00A0;to&#x00A0;(for&#x00A0;example)&#x00A0;print
+ &#x00A0;<br />&#x00A0;&#x22C6;&#x00A0;output.
+ &#x00A0;<br />&#x00A0;&#x22C6;/
+ &#x00A0;<br />typedef&#x00A0;int&#x00A0;(&#x22C6;im_print_obj_fn)
+ &#x00A0;<br />&#x00A0;&#x00A0;(&#x00A0;im_object&#x00A0;obj&#x00A0;); 
+</div>
+<!--l. 415--><p class="nopar" >
+<!--l. 417--><p class="indent" >  <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_type_desc</span></span></span> is defined as:
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-93">
+/&#x22C6;&#x00A0;Describe&#x00A0;a&#x00A0;VIPS&#x00A0;type.
+&#x00A0;<br />&#x00A0;&#x22C6;/
+&#x00A0;<br />typedef&#x00A0;struct&#x00A0;{
+&#x00A0;<br />&#x00A0;&#x00A0;im_arg_type&#x00A0;type;
+&#x00A0;<br />&#x00A0;&#x00A0;int&#x00A0;size;
+&#x00A0;<br />&#x00A0;&#x00A0;im_type_flags&#x00A0;flags;
+&#x00A0;<br />&#x00A0;&#x00A0;im_init_obj_fn&#x00A0;init;
+&#x00A0;<br />&#x00A0;&#x00A0;im_dest_obj_fn&#x00A0;dest;
+&#x00A0;<br />}&#x00A0;im_type_desc;
+</div>
+<!--l. 429--><p class="nopar" >
+<!--l. 431--><p class="indent" >  Where <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_arg_type</span></span></span> is defined as
+                                                 <div class="verbatim" id="verbatim-94">
+  /&#x22C6;&#x00A0;Type&#x00A0;names.&#x00A0;You&#x00A0;may&#x00A0;define&#x00A0;your
+ &#x00A0;<br />&#x00A0;&#x22C6;&#x00A0;own,&#x00A0;but&#x00A0;if&#x00A0;you&#x00A0;use&#x00A0;one&#x00A0;of&#x00A0;these,
+ &#x00A0;<br />&#x00A0;&#x22C6;&#x00A0;then&#x00A0;you&#x00A0;should&#x00A0;use&#x00A0;the&#x00A0;built-in
+ &#x00A0;<br />&#x00A0;&#x22C6;&#x00A0;VIPS&#x00A0;type&#x00A0;converters.
+ &#x00A0;<br />&#x00A0;&#x22C6;/
+ &#x00A0;<br />#define&#x00A0;IM_TYPE_IMAGEVEC&#x00A0;"imagevec"
+ &#x00A0;<br />#define&#x00A0;IM_TYPE_DOUBLEVEC&#x00A0;"doublevec"
+ &#x00A0;<br />#define&#x00A0;IM_TYPE_INTVEC&#x00A0;"intvec"
+ &#x00A0;<br />#define&#x00A0;IM_TYPE_DOUBLE&#x00A0;"double"
+ &#x00A0;<br />#define&#x00A0;IM_TYPE_INT&#x00A0;"integer"
+ &#x00A0;<br />#define&#x00A0;IM_TYPE_COMPLEX&#x00A0;"complex"
+ &#x00A0;<br />#define&#x00A0;IM_TYPE_STRING&#x00A0;"string"
+ &#x00A0;<br />#define&#x00A0;IM_TYPE_IMASK&#x00A0;"intmask"
+ &#x00A0;<br />#define&#x00A0;IM_TYPE_DMASK&#x00A0;"doublemask"
+ &#x00A0;<br />#define&#x00A0;IM_TYPE_IMAGE&#x00A0;"image"
+ &#x00A0;<br />#define&#x00A0;IM_TYPE_DISPLAY&#x00A0;"display"
+ &#x00A0;<br />#define&#x00A0;IM_TYPE_GVALUE&#x00A0;"gvalue"
+ &#x00A0;<br />typedef&#x00A0;char&#x00A0;&#x22C6;im_arg_type; 
+</div>
+<!--l. 452--><p class="nopar" >
+<!--l. 454--><p class="indent" >  In other words, it&#8217;s just a string. When you add a new
+type, you just need to choose a new unique string to name it.
+Be aware that the string is printed to the user by various
+parts of VIPS, and so needs to be &#8220;human-readable&#8221;. The
+flags are:
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-95">
+/&#x22C6;&#x00A0;These&#x00A0;bits&#x00A0;are&#x00A0;ored&#x00A0;together&#x00A0;to
+&#x00A0;<br />&#x00A0;&#x22C6;&#x00A0;make&#x00A0;the&#x00A0;flags&#x00A0;in&#x00A0;a&#x00A0;type
+&#x00A0;<br />&#x00A0;&#x22C6;&#x00A0;descriptor.
+&#x00A0;<br />&#x00A0;&#x22C6;
+&#x00A0;<br />&#x00A0;&#x22C6;&#x00A0;IM_TYPE_OUTPUT:&#x00A0;set&#x00A0;to&#x00A0;indicate
+&#x00A0;<br />&#x00A0;&#x22C6;&#x00A0;output,&#x00A0;otherwise&#x00A0;input.
+&#x00A0;<br />&#x00A0;&#x22C6;
+&#x00A0;<br />&#x00A0;&#x22C6;&#x00A0;IM_TYPE_ARG:&#x00A0;Two&#x00A0;ways&#x00A0;of&#x00A0;making
+&#x00A0;<br />&#x00A0;&#x22C6;&#x00A0;an&#x00A0;im_object&#x00A0;---&#x00A0;with&#x00A0;and&#x00A0;without
+&#x00A0;<br />&#x00A0;&#x22C6;&#x00A0;a&#x00A0;command-line&#x00A0;string&#x00A0;to&#x00A0;help&#x00A0;you
+&#x00A0;<br />&#x00A0;&#x22C6;&#x00A0;along.&#x00A0;Arguments&#x00A0;with&#x00A0;a&#x00A0;string
+&#x00A0;<br />&#x00A0;&#x22C6;&#x00A0;are&#x00A0;thing&#x00A0;like&#x00A0;IMAGE&#x00A0;descriptors,
+&#x00A0;<br />&#x00A0;&#x22C6;&#x00A0;which&#x00A0;require&#x00A0;a&#x00A0;filename&#x00A0;to
+&#x00A0;<br />&#x00A0;&#x22C6;&#x00A0;initialise.&#x00A0;Arguments&#x00A0;without&#x00A0;are
+&#x00A0;<br />&#x00A0;&#x22C6;&#x00A0;things&#x00A0;like&#x00A0;output&#x00A0;numbers,&#x00A0;where
+&#x00A0;<br />&#x00A0;&#x22C6;&#x00A0;making&#x00A0;the&#x00A0;object&#x00A0;simply&#x00A0;involves
+&#x00A0;<br />&#x00A0;&#x22C6;&#x00A0;allocating&#x00A0;storage.
+&#x00A0;<br />&#x00A0;&#x22C6;/
+&#x00A0;<br />
+&#x00A0;<br />typedef&#x00A0;enum&#x00A0;{
+&#x00A0;<br />&#x00A0;&#x00A0;IM_TYPE_OUTPUT&#x00A0;=&#x00A0;0x1,
+&#x00A0;<br />&#x00A0;&#x00A0;IM_TYPE_ARG&#x00A0;=&#x00A0;0x2
+&#x00A0;<br />}&#x00A0;im_type_flags;
+</div>
+<!--l. 483--><p class="nopar" >
+<!--l. 485--><p class="indent" >  And the <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">init</span></span></span> and <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">destroy</span></span></span> functions are:
+                                                 <div class="verbatim" id="verbatim-96">
+  /&#x22C6;&#x00A0;Initialise&#x00A0;and&#x00A0;destroy&#x00A0;objects.
+ &#x00A0;<br />&#x00A0;&#x22C6;&#x00A0;The&#x00A0;"str"&#x00A0;argument&#x00A0;to&#x00A0;the&#x00A0;init
+ &#x00A0;<br />&#x00A0;&#x22C6;&#x00A0;function&#x00A0;will&#x00A0;not&#x00A0;be&#x00A0;supplied
+ &#x00A0;<br />&#x00A0;&#x22C6;&#x00A0;if&#x00A0;this&#x00A0;is&#x00A0;not&#x00A0;an&#x00A0;ARG&#x00A0;type.
+ &#x00A0;<br />&#x00A0;&#x22C6;/
+ &#x00A0;<br />typedef&#x00A0;int&#x00A0;(&#x22C6;im_init_obj_fn)
+ &#x00A0;<br />&#x00A0;&#x00A0;(&#x00A0;im_object&#x00A0;&#x22C6;obj,&#x00A0;char&#x00A0;&#x22C6;str&#x00A0;);
+ &#x00A0;<br />typedef&#x00A0;int&#x00A0;(&#x22C6;im_dest_obj_fn)
+ &#x00A0;<br />&#x00A0;&#x00A0;(&#x00A0;im_object&#x00A0;obj&#x00A0;); 
+</div>
+<!--l. 497--><p class="nopar" >
+<!--l. 499--><p class="indent" >  As an example, here is the definition for a new type of
+unsigned integers. First, we need to define the <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">init</span></span></span> and
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">print</span></span></span> functions. These transform objects of the type to
+and from string representation.
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-97">
+/&#x22C6;&#x00A0;Init&#x00A0;function&#x00A0;for&#x00A0;unsigned&#x00A0;int
+&#x00A0;<br />&#x00A0;&#x22C6;&#x00A0;input.
+&#x00A0;<br />&#x00A0;&#x22C6;/
+&#x00A0;<br />static&#x00A0;int
+&#x00A0;<br />uint_init(&#x00A0;im_object&#x00A0;&#x22C6;obj,&#x00A0;char&#x00A0;&#x22C6;str&#x00A0;)
+&#x00A0;<br />{
+&#x00A0;<br />&#x00A0;&#x00A0;unsigned&#x00A0;int&#x00A0;&#x22C6;i&#x00A0;=&#x00A0;(int&#x00A0;&#x22C6;)&#x00A0;&#x22C6;obj;
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;if(&#x00A0;sscanf(&#x00A0;str,&#x00A0;"%d",&#x00A0;i&#x00A0;)&#x00A0;!=&#x00A0;1&#x00A0;||
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x22C6;i&#x00A0;&#x003C;&#x00A0;0&#x00A0;)&#x00A0;{
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;im_error(&#x00A0;"uint_init",
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;"bad&#x00A0;format"&#x00A0;);
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;return(&#x00A0;-1&#x00A0;);
+&#x00A0;<br />&#x00A0;&#x00A0;}
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;return(&#x00A0;0&#x00A0;);
+&#x00A0;<br />}
+&#x00A0;<br />
+&#x00A0;<br />/&#x22C6;&#x00A0;Print&#x00A0;function&#x00A0;for&#x00A0;unsigned&#x00A0;int
+&#x00A0;<br />&#x00A0;&#x22C6;&#x00A0;output.
+&#x00A0;<br />&#x00A0;&#x22C6;/
+&#x00A0;<br />static&#x00A0;int
+&#x00A0;<br />uint_print(&#x00A0;im_object&#x00A0;obj&#x00A0;)
+&#x00A0;<br />{
+&#x00A0;<br />&#x00A0;&#x00A0;unsigned&#x00A0;int&#x00A0;&#x22C6;i&#x00A0;=
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;(unsigned&#x00A0;int&#x00A0;&#x22C6;)&#x00A0;obj;
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;printf(&#x00A0;"%d\n",&#x00A0;(int)&#x00A0;&#x22C6;i&#x00A0;);
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;return(&#x00A0;0&#x00A0;);
+&#x00A0;<br />}
+</div>
+<!--l. 536--><p class="nopar" >
+<!--l. 538--><p class="indent" >  Now we can define the type itself. We make two of
+these &#8212; one for unsigned int used as input, and one for
+output.
+                                                 <div class="verbatim" id="verbatim-98">
+  /&#x22C6;&#x00A0;Name&#x00A0;our&#x00A0;type.
+ &#x00A0;<br />&#x00A0;&#x22C6;/
+ &#x00A0;<br />#define&#x00A0;TYPE_UINT&#x00A0;"uint"
+ &#x00A0;<br />
+ &#x00A0;<br />/&#x22C6;&#x00A0;Input&#x00A0;unsigned&#x00A0;int&#x00A0;type.
+ &#x00A0;<br />&#x00A0;&#x22C6;/
+ &#x00A0;<br />static&#x00A0;im_type_desc&#x00A0;input_uint&#x00A0;=&#x00A0;{
+ &#x00A0;<br />&#x00A0;&#x00A0;TYPE_UINT,&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Its&#x00A0;an&#x00A0;int&#x00A0;&#x22C6;/
+ &#x00A0;<br />&#x00A0;&#x00A0;sizeof(&#x00A0;unsigned&#x00A0;int&#x00A0;),/&#x22C6;&#x00A0;Memory&#x00A0;&#x22C6;/
+ &#x00A0;<br />&#x00A0;&#x00A0;IM_TYPE_ARG,&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Needs&#x00A0;arg&#x00A0;&#x22C6;/
+ &#x00A0;<br />&#x00A0;&#x00A0;uint_init,&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Init&#x00A0;&#x22C6;/
+ &#x00A0;<br />&#x00A0;&#x00A0;NULL&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Destroy&#x00A0;&#x22C6;/
+ &#x00A0;<br />};
+ &#x00A0;<br />
+ &#x00A0;<br />/&#x22C6;&#x00A0;Output&#x00A0;unsigned&#x00A0;int&#x00A0;type.
+ &#x00A0;<br />&#x00A0;&#x22C6;/
+ &#x00A0;<br />static&#x00A0;im_type_desc&#x00A0;output_uint&#x00A0;=&#x00A0;{
+ &#x00A0;<br />&#x00A0;&#x00A0;TYPE_UINT,&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;/&#x22C6;&#x00A0;It's&#x00A0;an&#x00A0;int&#x00A0;&#x22C6;/
+ &#x00A0;<br />&#x00A0;&#x00A0;sizeof(&#x00A0;unsigned&#x00A0;int&#x00A0;),/&#x22C6;&#x00A0;Memory&#x00A0;&#x22C6;/
+ &#x00A0;<br />&#x00A0;&#x00A0;IM_TYPE_OUTPUT,&#x00A0;&#x00A0;&#x00A0;/&#x22C6;&#x00A0;It's&#x00A0;output&#x00A0;&#x22C6;/
+ &#x00A0;<br />&#x00A0;&#x00A0;NULL,&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Init&#x00A0;&#x22C6;/
+ &#x00A0;<br />&#x00A0;&#x00A0;NULL&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Destroy&#x00A0;&#x22C6;/
+ &#x00A0;<br />}; 
+</div>
+<!--l. 565--><p class="nopar" >
+<!--l. 567--><p class="indent" >  Finally, we can define two macros to make structures of
+type <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_arg_desc</span></span></span> for us.
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-99">
+#define&#x00A0;INPUT_UINT(&#x00A0;S&#x00A0;)&#x00A0;\
+&#x00A0;<br />&#x00A0;&#x00A0;{&#x00A0;S,&#x00A0;&amp;input_uint,&#x00A0;NULL&#x00A0;}
+&#x00A0;<br />#define&#x00A0;OUTPUT_UINT(&#x00A0;S&#x00A0;)&#x00A0;\
+&#x00A0;<br />&#x00A0;&#x00A0;{&#x00A0;S,&#x00A0;&amp;output_uint,&#x00A0;uint_print&#x00A0;}
+</div>
+<!--l. 575--><p class="nopar" >
+<!--l. 577--><p class="indent" >  For more examples, see the definitions for the built-in
+VIPS types.
+<!--l. 579--><p class="noindent" >
+  <h4 class="subsectionHead"><span class="titlemark">2.3.4    </span> <a 
+ id="x15-630002.3.4"></a>Using function dispatch in your application</h4>
+<!--l. 581--><p class="noindent" >VIPS provides a set of functions for adding new image
+processing functions to the VIPS function database, finding
+functions by name, and calling functions. See the manual
+pages for full details.
+<!--l. 585--><p class="noindent" >
+  <h5 class="subsubsectionHead"><a 
+ id="x15-640002.3.4"></a>Adding and removing functions</h5>
+                                                 <div class="verbatim" id="verbatim-100">
+  im_package&#x00A0;&#x22C6;im_load_plugin(
+ &#x00A0;<br />&#x00A0;&#x00A0;const&#x00A0;char&#x00A0;&#x22C6;name&#x00A0;); 
+</div>
+<!--l. 590--><p class="nopar" >
+<!--l. 592--><p class="indent" >  This function opens the named file, searches it for a
+symbol named <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">package_table</span></span></span>, and adds any functions
+it finds to the VIPS function database. When you search
+for a function, any plug-ins are searched first, so you
+can override standard VIPS function with your own
+code.
+<!--l. 597--><p class="indent" >    The function returns a pointer to the package it added, or
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">NULL</span></span></span> on error.
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-101">
+int&#x00A0;im_close_plugins(&#x00A0;void&#x00A0;)
+</div>
+<!--l. 602--><p class="nopar" >
+<!--l. 604--><p class="indent" >  This function closes all plug-ins, removing then from the
+VIPS function database. It returns non-zero on error.
+<!--l. 607--><p class="noindent" >
+  <h5 class="subsubsectionHead"><a 
+ id="x15-650002.3.4"></a>Searching the function database</h5>
+                                                 <div class="verbatim" id="verbatim-102">
+  void&#x00A0;&#x22C6;im_map_packages(
+ &#x00A0;<br />&#x00A0;&#x00A0;im_list_map_fn&#x00A0;fn,&#x00A0;void&#x00A0;&#x22C6;a&#x00A0;) 
+</div>
+<!--l. 612--><p class="nopar" >
+<!--l. 614--><p class="indent" >  This function applies the argument function <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">fn</span></span></span> to
+every package in the database, starting with the most
+recently added package. As with <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_list_map()</span></span></span>, the
+argument function should return <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">NULL</span></span></span> to continue
+searching, or non-<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">NULL</span></span></span> to terminate the search early.
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_map_packages()</span></span></span> returns <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">NULL</span></span></span> if <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">fn</span></span></span> returned
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">NULL</span></span></span> for all arguments. The extra argument <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">a</span></span></span> is carried
+around by VIPS for your use.
+<!--l. 622--><p class="indent" >    For example, this fragment of code prints the names of all
+loaded packages to <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">fd</span></span></span>:
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-103">
+static&#x00A0;void&#x00A0;&#x22C6;
+&#x00A0;<br />print_package_name(&#x00A0;im_package&#x00A0;&#x22C6;pack,
+&#x00A0;<br />&#x00A0;&#x00A0;FILE&#x00A0;&#x22C6;fp&#x00A0;)
+&#x00A0;<br />{
+&#x00A0;<br />&#x00A0;&#x00A0;(void)&#x00A0;fprintf(&#x00A0;fp,
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;"package:&#x00A0;\"%s\"\n",
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;pack-&#x003E;name&#x00A0;);
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;/&#x22C6;&#x00A0;Continue&#x00A0;search.
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x22C6;/
+&#x00A0;<br />&#x00A0;&#x00A0;return(&#x00A0;NULL&#x00A0;);
+&#x00A0;<br />}
+&#x00A0;<br />
+&#x00A0;<br />static&#x00A0;void
+&#x00A0;<br />print_packages(&#x00A0;FILE&#x00A0;&#x22C6;fp&#x00A0;)
+&#x00A0;<br />{
+&#x00A0;<br />&#x00A0;&#x00A0;(void)&#x00A0;im_map_packages(
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;(im_list_map_fn)
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;print_package_name,&#x00A0;fp&#x00A0;);
+&#x00A0;<br />}
+</div>
+<!--l. 646--><p class="nopar" >
+<!--l. 648--><p class="indent" >  VIPS defines three convenience functions based on
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_map_packages()</span></span></span> which simplify searching for
+specific functions:
+                                                 <div class="verbatim" id="verbatim-104">
+  im_function&#x00A0;&#x22C6;
+ &#x00A0;<br />&#x00A0;&#x00A0;im_find_function(&#x00A0;char&#x00A0;&#x22C6;name&#x00A0;)
+ &#x00A0;<br />im_package&#x00A0;&#x22C6;
+ &#x00A0;<br />&#x00A0;&#x00A0;im_find_package(&#x00A0;char&#x00A0;&#x22C6;name&#x00A0;)
+ &#x00A0;<br />im_package&#x00A0;&#x22C6;
+ &#x00A0;<br />&#x00A0;&#x00A0;im_package_of_function(&#x00A0;char&#x00A0;&#x22C6;name&#x00A0;) 
+</div>
+<!--l. 658--><p class="nopar" >
+<!--l. 660--><p class="noindent" >
+  <h5 class="subsubsectionHead"><a 
+ id="x15-660002.3.4"></a>Building argument structures and running commands</h5>
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-105">
+int&#x00A0;im_free_vargv(&#x00A0;im_function&#x00A0;&#x22C6;fn,
+&#x00A0;<br />&#x00A0;&#x00A0;im_object&#x00A0;&#x22C6;vargv&#x00A0;)
+&#x00A0;<br />int&#x00A0;im_allocate_vargv(
+&#x00A0;<br />&#x00A0;&#x00A0;im_function&#x00A0;&#x22C6;fn,
+&#x00A0;<br />&#x00A0;&#x00A0;im_object&#x00A0;&#x22C6;vargv&#x00A0;)
+</div>
+<!--l. 668--><p class="nopar" >
+<!--l. 670--><p class="indent" >  These two functions allocate space for and free VIPS
+argument lists. The allocate function simply calls
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_malloc()</span></span></span> to allocate any store that the types require
+(and also initializes it to zero). The free function just calls
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">im_free()</span></span></span> for any storage that was allocated.
+<!--l. 675--><p class="indent" >  Note that neither of these functions calls the <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">init</span></span></span>,
+<span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">dest</span></span></span> or <span class="obeylines-h"><span class="verb"><span 
+class="pcrr7t-">print</span></span></span> functions for the types &#8212; that&#8217;s up to
+you.
+                                                 <div class="verbatim" id="verbatim-106">
+  int&#x00A0;im_run_command(&#x00A0;char&#x00A0;&#x22C6;name,
+ &#x00A0;<br />&#x00A0;&#x00A0;int&#x00A0;argc,&#x00A0;char&#x00A0;&#x22C6;&#x22C6;argv&#x00A0;) 
+</div>
+<!--l. 681--><p class="nopar" >
+<!--l. 683--><p class="indent" >  This function does everything. In effect,
+                                                                                       
+
+                                                                                       
+  <div class="verbatim" id="verbatim-107">
+im_run_command(&#x00A0;"im_invert",&#x00A0;2,
+&#x00A0;<br />&#x00A0;&#x00A0;{&#x00A0;"fred.v",&#x00A0;"fred2.v",&#x00A0;NULL&#x00A0;}&#x00A0;)
+</div>
+<!--l. 688--><p class="nopar" >
+<!--l. 690--><p class="indent" >  is exactly equivalent to
+                                                 <div class="verbatim" id="verbatim-108">
+  system(&#x00A0;"vips&#x00A0;im_invert&#x00A0;fred.v&#x00A0;"
+ &#x00A0;<br />&#x00A0;&#x00A0;"fred2.v"&#x00A0;) 
+</div>
+<!--l. 695--><p class="nopar" >
+<!--l. 697--><p class="indent" >  but no process is forked.
+                                                                                       
+
+                                                                                       
+  <!--l. 1--><div class="crosslinks"><p class="noindent">[<a 
+href="vipsmanualse10.html" >next</a>] [<a 
+href="vipsmanualse8.html" >prev</a>] [<a 
+href="vipsmanualse8.html#tailvipsmanualse8.html" >prev-tail</a>] [<a 
+href="vipsmanualse9.html" >front</a>] [<a 
+href="vipsmanualch2.html#vipsmanualse9.html" >up</a>] </p></div>
+<!--l. 1--><p class="indent" >  <a 
+ id="tailvipsmanualse9.html"></a>    
+</body></html> 
