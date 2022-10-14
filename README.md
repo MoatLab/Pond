@@ -12,7 +12,7 @@
   title = "{Pond: CXL-Based Memory Pooling Systems for Cloud Platforms}",
   booktitle = {Proceedings of the 28th ACM International Conference on Architectural Support for Programming Languages and Operating Systems (ASPLOS)},
   address = {Vancouver, BC Canada},
-  Month = {March},
+  month = {March},
   year = {2023}
 }
 
