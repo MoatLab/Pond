@@ -6,7 +6,7 @@
 @InProceedings{pond.asplos23,
   author = {Huaicheng Li and Daniel S. Berger and Stanko Novakovic and Lisa Hsu and Dan Ernst and Pantea Zardoshti and Monish Shah and Samir Rajadnya and Scott Lee and Ishwar Agarwal and Mark Hill and Marcus Fontoura and Ricardo Bianchini},
   title = "{Pond: CXL-Based Memory Pooling Systems for Cloud Platforms}",
-  Booktitle = {Proceedings of the 28th ACM International Conference on Architectural Support for Programming Languages and Operating Systems (ASPLOS)},
+  booktitle = {Proceedings of the 28th ACM International Conference on Architectural Support for Programming Languages and Operating Systems (ASPLOS)},
   address = {Vancouver, BC Canada},
   Month = {March},
   year = {2023}
