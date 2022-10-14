@@ -1,6 +1,10 @@
 # README for CXL-emulation and Experiments HowTo #
 
-### Cite our Pond paper (ASPLOS '23)
+### Cite our Pond paper (ASPLOS '23): 
+
+>> Pond: CXL-Based Memory Pooling Systems for Cloud Platforms
+
+**The preprint of the paper can be found [here](https://arxiv.org/abs/2203.00241).**
 
 ```
 @InProceedings{pond.asplos23,
@@ -13,9 +17,6 @@
 }
 
 ```
-
-
-**The preprint of the paper can be found [here](https://arxiv.org/abs/2203.00241).**
 
 
 ### CXL Emulation on regular 2-socket (2S) server systems ###
