@@ -1,12 +1,31 @@
-# README for CXL-emulation and Experiments HowTo  #
+# README for CXL-emulation and Experiments HowTo #
+
+### Cite our Pond paper (ASPLOS '23)
+
+```
+@InProceedings{pond.asplos23,
+  author = {Huaicheng Li and Daniel S. Berger and Stanko Novakovic and Lisa Hsu and Dan Ernst and Pantea Zardoshti and Monish Shah and Samir Rajadnya and Scott Lee and Ishwar Agarwal and Mark Hill and Marcus Fontoura and Ricardo Bianchini},
+  title = "{Pond: CXL-Based Memory Pooling Systems for Cloud Platforms}",
+  Booktitle = {Proceedings of the 28th ACM International Conference on Architectural Support for Programming Languages and Operating Systems (ASPLOS)},
+  address = {Vancouver, BC Canada},
+  Month = {March},
+  year = {2023}
+}
+
+```
+
+
+**The preprint of the paper can be found [here](https://arxiv.org/abs/2203.00241).**
+
 
 ### CXL Emulation on regular 2-socket (2S) server systems ###
 
-We mainly emulate the following two characteristics of CXL memory
+We mainly emulate the following two characteristics of Compute Express Link
+(CXL) attached DRAM:
 
 - Latency: ~150ns
 - No local CPU which can directly accesses it, i.e., CXL-memory treated as a
-  "computerless" node
+  "computeless/cpuless" node
 
 The CXL latency is similar to the latency of one NUMA hop on modern 2S systems,
 thus, we simulate the CXL memory using the memory on the remote NUMA node and
@@ -18,7 +37,7 @@ In this repo, the CXL-simulation is mainly done via a few scripts, check
 ``cpu2017``, ``gapbs``, etc.).
 
 These scripts dynamically adjust the system configuration to simulate a certain
-percentage of CXL memory in the system, and run workloads againt such
+percentage of CXL memory in the system, and run workloads against such
 scenarios.
 
 
@@ -36,7 +55,7 @@ done via monitoring tools such as ``pidstat`` (the ``RSS`` field reported in
 the memory usage).
 
 
-### A Simple HowTo using CPUSPEC ###
+### A Simple HowTo using SPEC CPU 2017 ###
 
 Under folder ``cpu2017``, ``run-cpu2017.sh`` is the main entry to run a series
 of experiments under various split configurations. The script reads the
@@ -47,6 +66,6 @@ over a series of predefined split-ratios and run the experiments one by one.
 The scripts writes the logs and outputs to ``rst`` folder.
 
 One could co-run profiling utilities such as ``emon`` or ``Intel Vtune``
-together with the workload to get architecture-level metrics to help analyze
-the workload performance. Make sure Vtune is installed first before running the
-script.
+together with the workload to collect architecture-level metrics for
+performance analysis. Make sure Intel Vtune is installed first before running
+the script.
