@@ -1,11 +1,11 @@
 #!/bin/bash
 # Huaicheng Li <lhcwhu@gmail.com>
-# Run VM with CXL Memory emulation
+# Simulate a VM with CXL memory as a CPUless virtual NUMA node
 
 # image directory
 IMGDIR=$HOME/images
 # virtual machine disk image
-OSIMGF=$IMGDIR/caspian.qcow2
+OSIMGF=$IMGDIR/pondcxl.qcow2
 
 if [[ ! -e "$OSIMGF" ]]; then
 	echo ""
@@ -16,28 +16,10 @@ if [[ ! -e "$OSIMGF" ]]; then
 	exit
 fi
 
-# -numa node,cpus=0-3,nodeid=0 \
-# -numa node,cpus=4-7,nodeid=1 \
-# -m 16G \
-# mem-merge=on|off
-
-#
-    #-object memory-backend-ram,size=4096M,policy=bind,host-nodes=0,id=ram-node0,prealloc=on \
-    #-numa node,nodeid=0,cpus=0-1,memdev=ram-node0 \
-    #-object memory-backend-ram,size=8192M,policy=bind,host-nodes=1,id=ram-node1,prealloc=on \
-    #-numa node,nodeid=1,cpus=2-7,memdev=ram-node1 \
-
-
-    #-device virtio-scsi-pci,id=scsi1 \
-    #-device scsi-hd,drive=hd1 \
-    #-drive file=/users/huaichel/images/caspian2.qcow2,if=none,aio=native,cache=none,format=qcow2,id=hd1
-
-
 # $1: vnode ID, 0 or 1
 # $2: host/backing node ID to allocate VM memory from
 # $3: mem size in MB
 # $4: vcpus for this vnode, e.g. "0-7" (optional -> computeless-vnode)
-
 function configure_vnode()
 {
     vnodeid=$1
@@ -100,7 +82,7 @@ function configure_vnic()
 }
 
 QEMU_CMD_PREFIX="sudo x86_64-softmmu/qemu-system-x86_64 \
-    -name "CaspianVM" \
+    -name "PondVM" \
     -machine type=pc,accel=kvm,mem-merge=off \
     -enable-kvm \
     -cpu host \
@@ -109,19 +91,15 @@ QEMU_CMD_PREFIX="sudo x86_64-softmmu/qemu-system-x86_64 \
 
 QEMU_CMD_SUFFIX="$(configure_vdisk) \
     $(configure_vnic) \
-    -nographic \
-    -qmp unix:./qmp-sock,server,nowait"
+    -nographic"
 
-# run the main experiments across different VM vNUMA configurations
-for L in "${L100}" "${L75}" "${L50}" "${L25}" "${L0}"; do
+# Configure a VM with 25% of CXL memory
+# Feel free to try out other options: L100, L50, L0, etc.
+for L in "${L75}"; do
     VM_RUN_CMD=${QEMU_CMD_PREFIX}" "$L" "${QEMU_CMD_SUFFIX}
 
-    ${VM_RUN_CMD} > log 2>&1 &
-
-    sleep 10
-    # pin vCPUs to pCPUs explicitly
-    echo "===> Pinning vCPUs to pCPUs ..."
-    ./pin.sh
+    # Start the CXL VM
+    nohup ${VM_RUN_CMD} > log 2>&1 &
 
     echo "===> Sleep 60s to wait for the VM to be up ..."
     sleep 60
@@ -129,23 +107,14 @@ for L in "${L100}" "${L75}" "${L50}" "${L25}" "${L0}"; do
     while [[ $vmstatus != "ok" ]]; do
         #echo "===> Trying to connect to the VM ..."
         sleep 10
+        # You need to configure passwordless ssh access to the VM beforehand
+        # FIXME: change "huaicheng" to your own guest user account
         vmstatus=$(ssh -p8080 -o BatchMode=yes -o ConnectTimeout=5 huaicheng@localhost echo ok 2>&1)
     done
 
-    sleep 5
-    #ssh -p8080 huaicheng@localhost "sudo numactl --hardware && echo && echo; sudo shutdown -h now"
-    ssh -p8080 huaicheng@localhost "cd cpuspec2017 && source shrc && runcpu 657.xz_s && mv result result.$(date +%h%d%H%M) && sleep 10 && echo && echo; sudo shutdown -h now"
-    #ssh -p8080 huaicheng@localhost "sleep 10 && ./run-mutilate.sh $(date +%m%d) && sleep 10 && echo && echo; sudo shutdown -h now"
-
-
-    echo "===> Waiting for VM to shutdown"
-    sleep 60
-    # if VM is still up, let's kill it forcefully
-    for pid in $(ps -ef | grep qemu-system-x86_64 | grep -v grep | awk '{print $2}'); do
-        sudo kill -9 $pid
-    done
-
-    sleep 30
+    echo "===> Pond CXL VM is up! Please login into the guest OS for next steps ..."
+    echo ""
+    echo ""
 
 done
 
