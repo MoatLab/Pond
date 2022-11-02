@@ -24,7 +24,7 @@
 
 ```
 @InProceedings{pond.asplos23,
-  author = {Huaicheng Li and Daniel S. Berger and Stanko Novakovic and Lisa Hsu and Dan Ernst and Pantea Zardoshti and Monish Shah and Samir Rajadnya and Scott Lee and Ishwar Agarwal and Mark Hill and Marcus Fontoura and Ricardo Bianchini},
+  author = {Huaicheng Li and Daniel S. Berger and Stanko Novakovic and Lisa Hsu and Dan Ernst and Pantea Zardoshti and Monish Shah and Samir Rajadnya and Scott Lee and Ishwar Agarwal and Mark D. Hill and Marcus Fontoura and Ricardo Bianchini},
   title = "{Pond: CXL-Based Memory Pooling Systems for Cloud Platforms}",
   booktitle = {Proceedings of the 28th ACM International Conference on Architectural Support for Programming Languages and Operating Systems (ASPLOS)},
   address = {Vancouver, BC Canada},
@@ -61,7 +61,7 @@ scenarios.
 ### Configuring Local/CXL-DRAM Splits ###
 
 One major setup we are benchmarking is to adjust the perentage of CXL-memory
-being used to run a certain workload and observe the perfomrance impacts
+being used to run a certain workload and observe the performance impacts
 (compared to pure local DRAM "ideal" cases). For example, the common ratios the
 scripts include "100/0" (the 100% local DRAM case, no CXL), "95/5", "90/10"
 (90% local DRAM + 10% CXL), "85/15", "80/20", "75/25", "50/50", "25/75", etc. 
