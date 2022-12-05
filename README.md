@@ -34,6 +34,11 @@
 
 ```
 
+### What is this repo about?
+
+This repo open-sources our approach for CXL simulation and evaluations (mainly
+some scripts). It is not a full-fledged open-source version of Pond design.
+
 
 ### CXL Emulation on regular 2-socket (2S) server systems ###
 
