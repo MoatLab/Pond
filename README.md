@@ -20,7 +20,7 @@
 
 >> Pond: CXL-Based Memory Pooling Systems for Cloud Platforms
 
-**The preprint of the paper can be found [here](https://arxiv.org/abs/2203.00241).**
+**The preprint of the paper can be found [here](https://huaicheng.github.io/p/asplos23-pond.pdf).**
 
 ```
 @InProceedings{pond.asplos23,
