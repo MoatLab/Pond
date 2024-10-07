@@ -65,16 +65,24 @@ scenarios.
 
 ### Configuring Local/CXL-DRAM Splits ###
 
-One major setup we are benchmarking is to adjust the perentage of CXL-memory
+One major setup we are benchmarking is to adjust the percentage of CXL-memory
 being used to run a certain workload and observe the performance impacts
 (compared to pure local DRAM "ideal" cases). For example, the common ratios the
 scripts include "100/0" (the 100% local DRAM case, no CXL), "95/5", "90/10"
 (90% local DRAM + 10% CXL), "85/15", "80/20", "75/25", "50/50", "25/75", etc. 
 
-To provision correct amount of local/CXL memory for the above split ratios, we
+To provision the correct amount of local/CXL memory for the above split ratios, we
 need to profile the peak memory usage of the target workload. This is usually
 done via monitoring tools such as ``pidstat`` (the ``RSS`` field reported in
 the memory usage).
+
+
+#### Tips to limit the DRAM size
+
+To limit the size of local DRAM, we use (**memeater**) to consume a desirable amount of memory. 
+However, we suggest that while using tiering solutions, do not use it, as memory pages are not
+locked and could be migrated to other tiers.
+
 
 
 ### A Simple HowTo using SPEC CPU 2017 ###
