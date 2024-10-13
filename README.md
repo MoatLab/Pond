@@ -79,9 +79,11 @@ the memory usage).
 
 #### Tips to limit the DRAM size
 
-To limit the size of local DRAM, we use (**memeater**) to consume a desirable amount of memory. 
-However, we suggest that while using tiering solutions, do not use it, as memory pages are not
-locked and could be migrated to other tiers.
+To limit the size of local DRAM, we use [memeater](https://github.com/MoatLab/Pond/blob/master/memeater.c) 
+to consume a desirable amount of local memory. This works under Linux First-Touch policy.
+However, if you're experimenting with memory tiering systems, do not use it. Even 
+though memory pages in "memeater" are ``lock()``ed, they can still be migrated by the OS 
+(from one node to another).
 
 
 
